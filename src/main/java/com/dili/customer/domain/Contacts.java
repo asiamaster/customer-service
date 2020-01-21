@@ -38,6 +38,13 @@ public class Contacts extends BaseDomain {
     private Long customerId;
 
     /**
+     * 所属市场
+     */
+    @Column(name = "`firm_id`",updatable = false)
+    @NotNull(message = "所属市场不能为空")
+    private Long firmId;
+
+    /**
      * 姓名
      */
     @Column(name = "`name`")
@@ -87,6 +94,13 @@ public class Contacts extends BaseDomain {
     @Column(name = "`notes`")
     @Size(max = 250,message = "联系人备注请保持在250个字符以内")
     private String notes;
+
+    /**
+     * 是否默认联系人
+     */
+    @Column(name = "`is_default`")
+    @NotNull(message = "是否为默认联系人不能为空")
+    private Integer isDefault;
 
     /**
      * 创建时间

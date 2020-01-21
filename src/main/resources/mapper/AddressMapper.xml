@@ -16,7 +16,7 @@
     <result column="modifier_id" jdbcType="BIGINT" property="modifierId" />
     <result column="lat" jdbcType="VARCHAR" property="lat" />
     <result column="lng" jdbcType="VARCHAR" property="lng" />
-    <result column="is_default" jdbcType="BIT" property="isDefault" />
+    <result column="is_default"  property="isDefault" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--

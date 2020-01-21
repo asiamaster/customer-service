@@ -87,12 +87,6 @@ public class Customer extends BaseDomain {
     private String cellphone;
 
     /**
-     * 联系电话
-     */
-    @Column(name = "`contacts_phone`")
-    private String contactsPhone;
-
-    /**
      * 组织类型,个人/企业
      */
     @Column(name = "`organization_type`")

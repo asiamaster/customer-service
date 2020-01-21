@@ -93,6 +93,6 @@ public class Address extends BaseDomain {
     private String lng;
 
     @Column(name = "`is_default`")
-    private Boolean isDefault;
+    private Integer isDefault;
 
 }

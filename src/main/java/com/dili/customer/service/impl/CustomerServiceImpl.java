@@ -7,11 +7,11 @@ import cn.hutool.core.util.StrUtil;
 import com.dili.customer.domain.Contacts;
 import com.dili.customer.mapper.CustomerMapper;
 import com.dili.customer.domain.Customer;
-import com.dili.customer.domain.FirmInfo;
+import com.dili.customer.domain.CustomerFirm;
 import com.dili.customer.domain.dto.CustomerBaseInfoDTO;
 import com.dili.customer.domain.dto.CustomerCertificateInfoDTO;
 import com.dili.customer.service.ContactsService;
-import com.dili.customer.service.FirmInfoService;
+import com.dili.customer.service.CustomerFirmService;
 import com.dili.customer.service.CustomerService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
@@ -33,7 +33,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     }
 
     @Autowired
-    private FirmInfoService customerFirmInfoService;
+    private CustomerFirmService customerFirmService;
     @Autowired
     private ContactsService contactsService;
 
@@ -51,7 +51,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     @Transactional(rollbackFor = Exception.class)
     public BaseOutput saveBaseInfo(CustomerBaseInfoDTO baseInfo) {
         //客户归属市场信息
-        FirmInfo firmInfo = null;
+        CustomerFirm firmInfo = null;
         /**
          * ID为空，则认为是新增客户，走新增客户逻辑，否则就按修改客户基本信息逻辑处理
          */
@@ -83,21 +83,21 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 }
             }else{
                 //查询客户在当前传入市场的信息
-                firmInfo = customerFirmInfoService.queryByFirmAndCustomerId(baseInfo.getFirmId(), customer.getId());
+                firmInfo = customerFirmService.queryByFirmAndCustomerId(baseInfo.getFirmId(), customer.getId());
                 if (null != firmInfo){
                     return BaseOutput.failure("当前客户已存在，请勿重复添加");
                 }
             }
-            firmInfo = new FirmInfo();
+            firmInfo = new CustomerFirm();
             firmInfo.setCustomerId(customer.getId());
             firmInfo.setFirmId(baseInfo.getFirmId());
         } else {
             //查询当前客户信息
             Customer customer = this.get(baseInfo.getId());
             //查询客户在当前传入市场的信息
-            firmInfo = customerFirmInfoService.queryByFirmAndCustomerId(baseInfo.getFirmId(), customer.getId());
+            firmInfo = customerFirmService.queryByFirmAndCustomerId(baseInfo.getFirmId(), customer.getId());
             if (null == firmInfo) {
-                firmInfo = new FirmInfo();
+                firmInfo = new CustomerFirm();
                 firmInfo.setCustomerId(customer.getId());
                 firmInfo.setFirmId(baseInfo.getFirmId());
             }
@@ -115,7 +115,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         firmInfo.setOwnerId(baseInfo.getOwnerId());
         firmInfo.setModifierId(baseInfo.getOperatorId());
         firmInfo.setModifyTime(LocalDateTime.now());
-        customerFirmInfoService.saveOrUpdate(firmInfo);
+        customerFirmService.saveOrUpdate(firmInfo);
         return BaseOutput.success();
     }
 

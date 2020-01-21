@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
  * 客户归属市场关系表
  * This file was generated on 2020-01-09 18:02:32.
  */
-@Table(name = "`firm_info`")
+@Table(name = "`customer_firm`")
 @Getter
 @Setter
-public class FirmInfo extends BaseDomain {
+public class CustomerFirm extends BaseDomain {
     /**
      * ID
      */
@@ -61,12 +61,6 @@ public class FirmInfo extends BaseDomain {
      */
     @Column(name = "`type`")
     private String type;
-
-    /**
-     * 联系电话
-     */
-    @Column(name = "`phone`")
-    private String phone;
 
     /**
      * 备注信息

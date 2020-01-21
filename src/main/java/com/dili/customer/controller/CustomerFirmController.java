@@ -1,8 +1,7 @@
 package com.dili.customer.controller;
 
-import com.dili.customer.service.FirmInfoService;
+import com.dili.customer.service.CustomerFirmService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
  * @author yuehongbo
  */
 @RestController
-@RequestMapping("/firmInfo")
-public class FirmInfoController {
+@RequestMapping("/customerFirm")
+public class CustomerFirmController {
 
     @Autowired
-    private FirmInfoService firmInfoService;
+    private CustomerFirmService firmInfoService;
 
 }
