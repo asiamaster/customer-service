@@ -1,4 +1,4 @@
-package com.dili.customer.controller;
+package com.dili.customer.api;
 
 import com.dili.customer.domain.Contacts;
 import com.dili.customer.service.ContactsService;
@@ -16,7 +16,7 @@ import java.util.List;
  * @author yuehongbo
  */
 @RestController
-@RequestMapping("/contacts")
+@RequestMapping("/api/contacts")
 public class ContactsController {
 
     @Autowired

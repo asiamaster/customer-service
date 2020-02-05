@@ -19,7 +19,7 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
-public class CustomerCertificateInfoDTO implements Serializable {
+public class CustomerCertificateInfoInput implements Serializable {
 
     private static final long serialVersionUID = 2149328387032198883L;
 

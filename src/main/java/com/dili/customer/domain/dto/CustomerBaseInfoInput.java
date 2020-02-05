@@ -24,7 +24,7 @@ import java.time.LocalDate;
  */
 @Getter
 @Setter
-public class CustomerBaseInfoDTO implements Serializable {
+public class CustomerBaseInfoInput implements Serializable {
 
     private static final long serialVersionUID = -8478907270958032767L;
 

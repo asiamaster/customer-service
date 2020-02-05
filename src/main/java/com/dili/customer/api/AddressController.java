@@ -1,4 +1,4 @@
-package com.dili.customer.controller;
+package com.dili.customer.api;
 
 import com.dili.customer.domain.Address;
 import com.dili.customer.service.AddressService;
@@ -14,7 +14,7 @@ import java.util.List;
  * This file was generated on 2020-01-02 16:19:35.
  */
 @RestController
-@RequestMapping("/address")
+@RequestMapping("/api/address")
 public class AddressController {
     @Autowired
     private AddressService addressService;

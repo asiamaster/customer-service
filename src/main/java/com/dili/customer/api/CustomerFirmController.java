@@ -1,4 +1,4 @@
-package com.dili.customer.controller;
+package com.dili.customer.api;
 
 import com.dili.customer.service.CustomerFirmService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author yuehongbo
  */
 @RestController
-@RequestMapping("/customerFirm")
+@RequestMapping("/api/customerFirm")
 public class CustomerFirmController {
 
     @Autowired

@@ -1,10 +1,12 @@
 package com.dili.customer.service;
 
 import com.dili.customer.domain.Customer;
-import com.dili.customer.domain.dto.CustomerBaseInfoDTO;
-import com.dili.customer.domain.dto.CustomerCertificateInfoDTO;
+import com.dili.customer.domain.dto.CustomerBaseInfoInput;
+import com.dili.customer.domain.dto.CustomerCertificateInfoInput;
+import com.dili.customer.domain.dto.CustomerQueryInput;
 import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.domain.PageOutput;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -26,12 +28,19 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @param baseInfo
      * @return
      */
-    BaseOutput saveBaseInfo(CustomerBaseInfoDTO baseInfo);
+    BaseOutput saveBaseInfo(CustomerBaseInfoInput baseInfo);
 
     /**
      * 保存客户证件相关新
      * @param certificateInfo
      * @return
      */
-    BaseOutput saveCertificateInfo(CustomerCertificateInfoDTO certificateInfo);
+    BaseOutput saveCertificateInfo(CustomerCertificateInfoInput certificateInfo);
+
+    /**
+     * 分页查询客户信息
+     * @param input
+     * @return
+     */
+    PageOutput listPageByExample(CustomerQueryInput input);
 }

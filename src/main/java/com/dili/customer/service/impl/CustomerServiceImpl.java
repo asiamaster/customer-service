@@ -1,24 +1,28 @@
 package com.dili.customer.service.impl;
-import java.time.LocalDateTime;
-import java.util.List;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.dili.customer.domain.Contacts;
-import com.dili.customer.mapper.CustomerMapper;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.CustomerFirm;
-import com.dili.customer.domain.dto.CustomerBaseInfoDTO;
-import com.dili.customer.domain.dto.CustomerCertificateInfoDTO;
+import com.dili.customer.domain.dto.CustomerBaseInfoInput;
+import com.dili.customer.domain.dto.CustomerCertificateInfoInput;
+import com.dili.customer.domain.dto.CustomerQueryInput;
+import com.dili.customer.mapper.CustomerMapper;
 import com.dili.customer.service.ContactsService;
 import com.dili.customer.service.CustomerFirmService;
 import com.dili.customer.service.CustomerService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.domain.PageOutput;
+import com.github.pagehelper.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -49,7 +53,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BaseOutput saveBaseInfo(CustomerBaseInfoDTO baseInfo) {
+    public BaseOutput saveBaseInfo(CustomerBaseInfoInput baseInfo) {
         //客户归属市场信息
         CustomerFirm firmInfo = null;
         /**
@@ -120,7 +124,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     }
 
     @Override
-    public BaseOutput saveCertificateInfo(CustomerCertificateInfoDTO certificateInfo) {
+    public BaseOutput saveCertificateInfo(CustomerCertificateInfoInput certificateInfo) {
         Customer customer = this.get(certificateInfo.getId());
         if (null == customer){
             return BaseOutput.failure("客户信息不存在");
@@ -128,6 +132,20 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         BeanUtils.copyProperties(certificateInfo,customer);
         update(customer);
         return BaseOutput.success();
+    }
+
+    @Override
+    public PageOutput listPageByExample(CustomerQueryInput input) {
+        List<Customer> list = listByExample(input);
+        //总记录
+        Long total = list instanceof Page ? ( (Page) list).getTotal() : list.size();
+        //总页数
+        int totalPage = list instanceof Page ? ( (Page) list).getPages():1;
+        //当前页数
+        int pageNum = list instanceof Page ? ( (Page) list).getPageNum():1;
+        PageOutput output = PageOutput.success();
+        output.setData(list).setPageNum(pageNum).setTotal(total.intValue()).setPageSize(input.getPage()).setPages(totalPage);
+        return output;
     }
 
 }

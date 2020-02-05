@@ -2,6 +2,7 @@ package com.dili.customer.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.ss.domain.BaseDomain;
+import com.dili.ss.domain.annotation.Like;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -59,6 +60,7 @@ public class Customer extends BaseDomain {
      * 客户名称
      */
     @Column(name = "`name`")
+    @Like
     private String name;
 
     /**
@@ -85,6 +87,12 @@ public class Customer extends BaseDomain {
      */
     @Column(name = "`cellphone`")
     private String cellphone;
+
+    /**
+     * 联系电话
+     */
+    @Column(name = "`contacts_phone`")
+    private String contactsPhone;
 
     /**
      * 组织类型,个人/企业
