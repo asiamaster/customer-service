@@ -32,4 +32,9 @@ public class CustomerQueryInput extends Customer {
     @Column(name = "create_time")
     @Operator(Operator.LITTLE_EQUAL_THAN)
     private LocalDateTime createTimeEnd;
+
+    /**
+     * 客户所属组织
+     */
+    private Long firmId;
 }

@@ -55,101 +55,39 @@
     from customer
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <update id="updateBy" parameterType="com.dili.customer.domain.Customer">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    update customer
-    <set>
-      <if test="code != null">
-        code = #{code,jdbcType=VARCHAR},
-      </if>
-      <if test="certificateNumber != null">
-        certificate_number = #{certificateNumber,jdbcType=VARCHAR},
-      </if>
-      <if test="certificateType != null">
-        certificate_type = #{certificateType,jdbcType=VARCHAR},
-      </if>
-      <if test="certificateRange != null">
-        certificate_range = #{certificateRange,jdbcType=VARCHAR},
-      </if>
-      <if test="certificateAddr != null">
-        certificate_addr = #{certificateAddr,jdbcType=VARCHAR},
+
+  <!--- 联合查询分页信息 -->
+  <select id="listForPage" parameterType="com.dili.customer.domain.dto.CustomerQueryInput" resultType="com.dili.customer.domain.Customer">
+    SELECT c.* from customer c,customer_firm cf where c.id = cf.customer_id
+      <if test="firmId != null">
+        and cf.firm_id = #{firmId}
       </if>
       <if test="name != null">
-        name = #{name,jdbcType=VARCHAR},
+        and c.name LIKE CONCAT('%',#{name},'%')
       </if>
-      <if test="birthdate != null">
-        birthdate = #{birthdate,jdbcType=DATE},
+       <if test="certificateNumber != null">
+        and c.certificate_number LIKE CONCAT('',#{certificateNumber},'%')
       </if>
-      <if test="gender != null">
-        gender = #{gender,jdbcType=BIT},
+      <if test="code != null">
+        and c.code = #{code}
       </if>
-      <if test="photo != null">
-        photo = #{photo,jdbcType=VARCHAR},
-      </if>
-      <if test="cellphone != null">
-        cellphone = #{cellphone,jdbcType=VARCHAR},
-      </if>
-      <if test="organizationType != null">
-        organization_type = #{organizationType,jdbcType=VARCHAR},
+      <if test="contactsPhone != null">
+        and c.contacts_phone = #{contactsPhone}
       </if>
       <if test="sourceSystem != null">
-        source_system = #{sourceSystem,jdbcType=VARCHAR},
-      </if>
-      <if test="profession != null">
-        profession = #{profession,jdbcType=VARCHAR},
-      </if>
-      <if test="operatingArea != null">
-        operating_area = #{operatingArea,jdbcType=VARCHAR},
-      </if>
-      <if test="operatingLng != null">
-        operating_lng = #{operatingLng,jdbcType=VARCHAR},
-      </if>
-      <if test="operatingLat != null">
-        operating_lat = #{operatingLat,jdbcType=VARCHAR},
-      </if>
-      <if test="otherTitle != null">
-        other_title = #{otherTitle,jdbcType=VARCHAR},
-      </if>
-      <if test="mainCategory != null">
-        main_category = #{mainCategory,jdbcType=VARCHAR},
-      </if>
-      <if test="registeredCapital != null">
-        registered_capital = #{registeredCapital,jdbcType=BIGINT},
-      </if>
-      <if test="employeeNumber != null">
-        employee_number = #{employeeNumber,jdbcType=VARCHAR},
-      </if>
-      <if test="corporationCertificateType != null">
-        corporation_certificate_type = #{corporationCertificateType,jdbcType=VARCHAR},
-      </if>
-      <if test="corporationCertificateNumber != null">
-        corporation_certificate_number = #{corporationCertificateNumber,jdbcType=VARCHAR},
-      </if>
-      <if test="corporationName != null">
-        corporation_name = #{corporationName,jdbcType=VARCHAR},
-      </if>
-      <if test="isCellphoneValid != null">
-        is_cellphone_valid = #{isCellphoneValid,jdbcType=INTEGER},
-      </if>
-      <if test="creatorId != null">
-        creator_id = #{creatorId,jdbcType=BIGINT},
-      </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="modifyTime != null">
-        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="isDelete != null">
-        is_delete = #{isDelete,jdbcType=INTEGER},
+        and c.source_system = #{sourceSystem}
       </if>
       <if test="state != null">
-        state = #{state,jdbcType=INTEGER},
+        and c.state = #{state}
       </if>
-    </set>
-    where id = #{id,jdbcType=BIGINT}
-  </update>
+      <if test="createTimeStart != null">
+        and c.create_time >= #{createTimeStart}
+      </if>
+      <if test="createTimeEnd != null">
+        and c.create_time <![CDATA[ <= ]]> #{createTimeEnd}
+      </if>
+    GROUP BY  c.id
+    order by ${sort} ${order}
+  </select>
 
 </mapper>

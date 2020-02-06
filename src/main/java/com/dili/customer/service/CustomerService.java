@@ -42,5 +42,5 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @param input
      * @return
      */
-    PageOutput listPageByExample(CustomerQueryInput input);
+    PageOutput listForPage(CustomerQueryInput input);
 }

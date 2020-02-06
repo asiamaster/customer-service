@@ -15,7 +15,10 @@ import com.dili.customer.service.CustomerService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
+import com.dili.ss.util.POJOUtils;
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -135,8 +138,14 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     }
 
     @Override
-    public PageOutput listPageByExample(CustomerQueryInput input) {
-        List<Customer> list = listByExample(input);
+    public PageOutput listForPage(CustomerQueryInput input) {
+        if (input.getRows() != null && input.getRows() >= 1) {
+            PageHelper.startPage(input.getPage(), input.getRows());
+        }
+        if (StringUtils.isNotBlank(input.getSort())) {
+            input.setSort(POJOUtils.humpToLineFast(input.getSort()));
+        }
+        List<Customer> list = getActualMapper().listForPage(input);
         //总记录
         Long total = list instanceof Page ? ( (Page) list).getTotal() : list.size();
         //总页数

@@ -9,10 +9,8 @@ import com.dili.customer.validator.AddView;
 import com.dili.customer.validator.EnterpriseView;
 import com.dili.customer.validator.UpdateView;
 import com.dili.ss.domain.BaseOutput;
-import com.dili.ss.domain.BasePage;
 import com.dili.ss.domain.PageOutput;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,23 +29,13 @@ public class CustomerController {
     private CustomerService customerService;
 
     /**
-     * 跳转到Customer页面
-     * @param modelMap
-     * @return String
-     */
-    @RequestMapping(value="/index.html", method = RequestMethod.GET)
-    public String index(ModelMap modelMap) {
-        return "customer/index";
-    }
-
-    /**
      * 分页查询客户数据集
      * @param customer
      * @return
      */
-    @RequestMapping
+    @RequestMapping(value="/listPage.action", method = {RequestMethod.POST})
     public PageOutput<List<Customer>> listPage(@RequestBody(required = false) CustomerQueryInput customer){
-        return customerService.listPageByExample(customer);
+        return customerService.listForPage(customer);
     }
 
     /**
@@ -55,9 +43,10 @@ public class CustomerController {
      * @param customer
      * @return
      */
-    @RequestMapping
+    @RequestMapping(value="/list.action", method = {RequestMethod.POST})
     public BaseOutput<List<Customer>> list(@RequestBody(required = false) CustomerQueryInput customer) {
-        return BaseOutput.success().setData(customerService.listByExample(customer));
+        PageOutput pageOutput = customerService.listForPage(customer);
+        return BaseOutput.success().setData(pageOutput.getData());
     }
 
     /**
