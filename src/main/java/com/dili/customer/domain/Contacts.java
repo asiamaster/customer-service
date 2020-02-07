@@ -40,9 +40,9 @@ public class Contacts extends BaseDomain {
     /**
      * 所属市场
      */
-    @Column(name = "`firm_id`",updatable = false)
+    @Column(name = "`market_id`",updatable = false)
     @NotNull(message = "所属市场不能为空")
-    private Long firmId;
+    private Long marketId;
 
     /**
      * 姓名

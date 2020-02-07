@@ -24,7 +24,7 @@ public class AddressController {
      * @param customerAddress 地址信息信息
      * @return BaseOutput
      */
-    @RequestMapping(value = "/saveAddress.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/saveAddress", method = {RequestMethod.GET, RequestMethod.POST})
     public BaseOutput saveAddress(@Validated @RequestBody Address customerAddress) {
         addressService.saveOrUpdate(customerAddress);
         return BaseOutput.success();
@@ -35,7 +35,7 @@ public class AddressController {
      * @param customerId 客户ID
      * @return
      */
-    @RequestMapping(value="/listAllAddress.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value="/listAllAddress", method = {RequestMethod.GET, RequestMethod.POST})
     public BaseOutput<List<Address>> listAllAddress(@RequestParam("customerId") Long customerId) {
         Address condition = new Address();
         condition.setCustomerId(customerId);

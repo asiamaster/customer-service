@@ -110,7 +110,7 @@ public class CustomerBaseInfoInput implements Serializable {
      * 客户所属市场
      */
     @NotNull(message = "所属市场不能为空", groups = {AddView.class,UpdateView.class})
-    private String firmId;
+    private Long marketId;
 
     /**
      * 别名
@@ -128,7 +128,7 @@ public class CustomerBaseInfoInput implements Serializable {
      * 联系电话
      */
     @NotBlank(message = "联系电话不能为空", groups = {AddView.class,UpdateView.class})
-    @Pattern(regexp = "^((0\\d{2,3}-\\d{7,8})|(1[3456789]\\d{9}))$", message = "请输入正确的联系方式", groups = {AddView.class,UpdateView.class})
+    @Pattern(regexp = "^(1[3456789]\\d{9})$", message = "请输入正确的联系方式", groups = {AddView.class,UpdateView.class})
     private String contactsPhone;
 
     /**
@@ -172,7 +172,7 @@ public class CustomerBaseInfoInput implements Serializable {
                 .add("profession", profession)
                 .add("operatorId", operatorId)
                 .add("ownerId", ownerId)
-                .add("firmId", firmId)
+                .add("marketId", marketId)
                 .add("alias", alias)
                 .add("notes", notes)
                 .add("state", state)

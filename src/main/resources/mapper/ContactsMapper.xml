@@ -7,7 +7,7 @@
     -->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="customer_id" jdbcType="BIGINT" property="customerId" />
-    <result column="firm_id" property="firmId" />
+    <result column="market_id" property="marketId" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="gender" jdbcType="BIT" property="gender" />
     <result column="phone" jdbcType="VARCHAR" property="phone" />

@@ -12,9 +12,9 @@ public interface CustomerFirmService extends BaseService<CustomerFirm, Long> {
 
     /**
      * 根据客户ID及所属市场，获取客户当前市场信息
-     * @param firmId 市场ID
+     * @param marketId 市场ID
      * @param customerId 客户ID
      * @return
      */
-    CustomerFirm queryByFirmAndCustomerId(String firmId, Long customerId);
+    CustomerFirm queryByFirmAndCustomerId(Long marketId, Long customerId);
 }

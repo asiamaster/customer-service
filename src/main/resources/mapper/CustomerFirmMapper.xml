@@ -6,7 +6,7 @@
       WARNING - @mbg.generated
     -->
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="firm_id" jdbcType="VARCHAR" property="firmId" />
+    <result column="market_id"  property="marketId" />
     <result column="department_id" jdbcType="BIGINT" property="departmentId" />
     <result column="customer_id" jdbcType="BIGINT" property="customerId" />
     <result column="owner_id" jdbcType="BIGINT" property="ownerId" />

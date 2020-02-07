@@ -27,7 +27,7 @@ public class ContactsController {
      * @param id
      * @return BaseOutput
      */
-    @RequestMapping(value = "/delete.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/delete", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public BaseOutput delete(Long id) {
         contactsService.delete(id);
@@ -39,7 +39,7 @@ public class ContactsController {
      * @param customerContacts 联系人信息
      * @return BaseOutput
      */
-    @RequestMapping(value = "/saveContacts.action", method = {RequestMethod.POST})
+    @RequestMapping(value = "/saveContacts", method = {RequestMethod.POST})
     public BaseOutput saveContacts(@Validated Contacts customerContacts) {
         return contactsService.saveContacts(customerContacts);
     }
@@ -49,7 +49,7 @@ public class ContactsController {
      * @param customerId 客户ID
      * @return
      */
-    @RequestMapping(value = "/listAllContacts.action", method = {RequestMethod.POST})
+    @RequestMapping(value = "/listAllContacts", method = {RequestMethod.POST})
     public BaseOutput<List<Contacts>> listAllContacts(@RequestParam("customerId") Long customerId) {
         Contacts condition = new Contacts();
         condition.setCustomerId(customerId);

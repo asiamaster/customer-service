@@ -33,7 +33,7 @@ public class CustomerController {
      * @param customer
      * @return
      */
-    @RequestMapping(value="/listPage.action", method = {RequestMethod.POST})
+    @RequestMapping(value="/listPage", method = {RequestMethod.POST})
     public PageOutput<List<Customer>> listPage(@RequestBody(required = false) CustomerQueryInput customer){
         return customerService.listForPage(customer);
     }
@@ -43,7 +43,7 @@ public class CustomerController {
      * @param customer
      * @return
      */
-    @RequestMapping(value="/list.action", method = {RequestMethod.POST})
+    @RequestMapping(value="/list", method = {RequestMethod.POST})
     public BaseOutput<List<Customer>> list(@RequestBody(required = false) CustomerQueryInput customer) {
         PageOutput pageOutput = customerService.listForPage(customer);
         return BaseOutput.success().setData(pageOutput.getData());
@@ -54,8 +54,7 @@ public class CustomerController {
      * @param customer
      * @return BaseOutput
      */
-    @RequestMapping(value="/saveBaseInfo.action", method = {RequestMethod.POST})
-    @ResponseBody
+    @RequestMapping(value="/saveBaseInfo", method = {RequestMethod.POST})
     public BaseOutput saveBaseInfo(@Validated(UpdateView.class) CustomerBaseInfoInput customer, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
@@ -68,8 +67,7 @@ public class CustomerController {
      * @param customer
      * @return BaseOutput
      */
-    @RequestMapping(value="/registerEnterprise.action", method = {RequestMethod.POST})
-    @ResponseBody
+    @RequestMapping(value="/registerEnterprise", method = {RequestMethod.POST})
     public BaseOutput registerEnterprise(@Validated({AddView.class, EnterpriseView.class}) CustomerBaseInfoInput customer, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
@@ -82,8 +80,7 @@ public class CustomerController {
      * @param customer
      * @return BaseOutput
      */
-    @RequestMapping(value="/registerIndividual.action", method = {RequestMethod.POST})
-    @ResponseBody
+    @RequestMapping(value="/registerIndividual", method = {RequestMethod.POST})
     public BaseOutput registerIndividual(@Validated({AddView.class}) CustomerBaseInfoInput customer, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
@@ -96,8 +93,7 @@ public class CustomerController {
      * @param certificateInfo
      * @return BaseOutput
      */
-    @RequestMapping(value="/saveCertificateInfo.action", method = {RequestMethod.POST})
-    @ResponseBody
+    @RequestMapping(value="/saveCertificateInfo", method = {RequestMethod.POST})
     public BaseOutput saveCertificateInfo(@Validated CustomerCertificateInfoInput certificateInfo, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
@@ -106,14 +102,13 @@ public class CustomerController {
     }
 
     /**
-     * 保存客户证件信息信息
-     * @param id 客户ID
-     * @param firmId 市场ID
-     * @return BaseOutput
+     * 根据证件号检测某个客户在某市场是否已存在
+     * @param certificateNumber 客户证件号
+     * @param marketId 市场ID
+     * @return
      */
-    @RequestMapping(value="/getAllInfoById.action", method = {RequestMethod.GET, RequestMethod.POST})
-    @ResponseBody
-    public Customer getAllInfoById(@RequestParam(value = "id") Long id,@RequestParam(value = "firmId") String firmId) {
-        return null;
+    @RequestMapping(value="/checkExistByNoAndMarket", method = {RequestMethod.GET, RequestMethod.POST})
+    public BaseOutput checkExistByNoAndMarket(@RequestParam(value = "certificateNumber") String certificateNumber,@RequestParam(value = "marketId") Long marketId) {
+        return customerService.checkExistByNoAndMarket(certificateNumber,marketId);
     }
 }

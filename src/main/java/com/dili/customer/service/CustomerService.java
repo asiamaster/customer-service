@@ -43,4 +43,12 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @return
      */
     PageOutput listForPage(CustomerQueryInput input);
+
+    /**
+     * 根据证件号检测某个客户在某市场是否已存在
+     * @param certificateNumber 证件号
+     * @param marketId 市场ID
+     * @return 如果客户在当前市场已存在，则返回错误信息，如果不存在，则返回客户信息(若客户信息存在)
+     */
+    BaseOutput checkExistByNoAndMarket(String certificateNumber,Long marketId);
 }

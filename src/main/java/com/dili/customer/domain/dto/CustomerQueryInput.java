@@ -1,12 +1,14 @@
 package com.dili.customer.domain.dto;
 
 import com.dili.customer.domain.Customer;
+import com.dili.ss.domain.annotation.Like;
 import com.dili.ss.domain.annotation.Operator;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Column;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <B>客户信息查询输入项</B>
@@ -33,8 +35,17 @@ public class CustomerQueryInput extends Customer {
     @Operator(Operator.LITTLE_EQUAL_THAN)
     private LocalDateTime createTimeEnd;
 
+    @Column(name = "certificate_number")
+    @Like(value = Like.RIGHT)
+    private String certificateNumberMatch;
+
     /**
      * 客户所属组织
      */
     private Long firmId;
+
+    /**
+     * 客户所属组织集
+     */
+    private List<Long> firmIdList;
 }

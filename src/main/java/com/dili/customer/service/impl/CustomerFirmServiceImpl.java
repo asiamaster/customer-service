@@ -21,9 +21,9 @@ public class CustomerFirmServiceImpl extends BaseServiceImpl<CustomerFirm, Long>
     }
 
     @Override
-    public CustomerFirm queryByFirmAndCustomerId(String firmId, Long customerId) {
+    public CustomerFirm queryByFirmAndCustomerId(Long marketId, Long customerId) {
         CustomerFirm info = new CustomerFirm();
-        info.setFirmId(firmId);
+        info.setMarketId(marketId);
         info.setCustomerId(customerId);
         List<CustomerFirm> firmInfos = list(info);
         return firmInfos.stream().findFirst().orElse(null);

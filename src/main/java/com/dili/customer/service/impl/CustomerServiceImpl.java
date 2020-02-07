@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -78,7 +79,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customer.setCreatorId(baseInfo.getOperatorId());
                 customer.setCreateTime(LocalDateTime.now());
                 customer.setModifyTime(customer.getCreateTime());
-                //TODO 差一个客户状态的枚举定义
                 super.insertSelective(customer);
                 if ("企业".equalsIgnoreCase(baseInfo.getOrganizationType())){
                     //客户联系人
@@ -90,23 +90,23 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 }
             }else{
                 //查询客户在当前传入市场的信息
-                firmInfo = customerFirmService.queryByFirmAndCustomerId(baseInfo.getFirmId(), customer.getId());
+                firmInfo = customerFirmService.queryByFirmAndCustomerId(baseInfo.getMarketId(), customer.getId());
                 if (null != firmInfo){
                     return BaseOutput.failure("当前客户已存在，请勿重复添加");
                 }
             }
             firmInfo = new CustomerFirm();
             firmInfo.setCustomerId(customer.getId());
-            firmInfo.setFirmId(baseInfo.getFirmId());
+            firmInfo.setMarketId(baseInfo.getMarketId());
         } else {
             //查询当前客户信息
             Customer customer = this.get(baseInfo.getId());
             //查询客户在当前传入市场的信息
-            firmInfo = customerFirmService.queryByFirmAndCustomerId(baseInfo.getFirmId(), customer.getId());
+            firmInfo = customerFirmService.queryByFirmAndCustomerId(baseInfo.getMarketId(), customer.getId());
             if (null == firmInfo) {
                 firmInfo = new CustomerFirm();
                 firmInfo.setCustomerId(customer.getId());
-                firmInfo.setFirmId(baseInfo.getFirmId());
+                firmInfo.setMarketId(baseInfo.getMarketId());
             }
             //保存客户基本信息
             customer.setBirthdate(baseInfo.getBirthdate());
@@ -155,6 +155,29 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         PageOutput output = PageOutput.success();
         output.setData(list).setPageNum(pageNum).setTotal(total.intValue()).setPageSize(input.getPage()).setPages(totalPage);
         return output;
+    }
+
+    @Override
+    public BaseOutput checkExistByNoAndMarket(String certificateNumber, Long marketId) {
+        if (StrUtil.isBlank(certificateNumber) || null == marketId){
+            return BaseOutput.failure("业务关键信息丢失");
+        }
+        Customer condition = new Customer();
+        condition.setCertificateNumber(certificateNumber);
+        condition.setIsDelete(0);
+        List<Customer> customerList = this.list(condition);
+        if (CollectionUtil.isEmpty(customerList)){
+            return BaseOutput.success("客户基本信息不存在");
+        }
+        if (customerList.size()>1){
+            return BaseOutput.failure("存在多个客户信息，请联系管理员处理");
+        }
+        Customer customer = customerList.get(0);
+        CustomerFirm customerFirm = customerFirmService.queryByFirmAndCustomerId(marketId, customer.getId());
+        if (Objects.nonNull(customerFirm)){
+            return BaseOutput.failure("该证件号对应的客户已存在");
+        }
+        return BaseOutput.success().setData(customer);
     }
 
 }

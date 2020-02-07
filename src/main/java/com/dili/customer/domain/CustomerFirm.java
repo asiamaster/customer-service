@@ -29,8 +29,8 @@ public class CustomerFirm extends BaseDomain {
     /**
      * 归属组织
      */
-    @Column(name = "`firm_id`")
-    private String firmId;
+    @Column(name = "`market_id`")
+    private Long marketId;
 
     /**
      * 归属部门##内部创建归属到创建员工的部门
