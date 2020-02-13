@@ -40,7 +40,7 @@ public class ContactsController {
      * @return BaseOutput
      */
     @RequestMapping(value = "/saveContacts", method = {RequestMethod.POST})
-    public BaseOutput saveContacts(@Validated Contacts customerContacts) {
+    public BaseOutput saveContacts(@Validated @RequestBody Contacts customerContacts) {
         return contactsService.saveContacts(customerContacts);
     }
 

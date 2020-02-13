@@ -144,6 +144,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         }
         if (StringUtils.isNotBlank(input.getSort())) {
             input.setSort(POJOUtils.humpToLineFast(input.getSort()));
+        }else{
+            input.setSort("id");
+            input.setOrder("desc");
         }
         List<Customer> list = getActualMapper().listForPage(input);
         //总记录

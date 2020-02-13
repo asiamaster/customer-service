@@ -42,10 +42,10 @@ public class CustomerQueryInput extends Customer {
     /**
      * 客户所属组织
      */
-    private Long firmId;
+    private Long marketId;
 
     /**
      * 客户所属组织集
      */
-    private List<Long> firmIdList;
+    private List<Long> marketIdList;
 }

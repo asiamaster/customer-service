@@ -68,7 +68,7 @@ public class CustomerController {
      * @return BaseOutput
      */
     @RequestMapping(value="/registerEnterprise", method = {RequestMethod.POST})
-    public BaseOutput registerEnterprise(@Validated({AddView.class, EnterpriseView.class}) CustomerBaseInfoInput customer, BindingResult bindingResult) {
+    public BaseOutput registerEnterprise(@Validated({AddView.class, EnterpriseView.class}) @RequestBody CustomerBaseInfoInput customer, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
@@ -81,7 +81,7 @@ public class CustomerController {
      * @return BaseOutput
      */
     @RequestMapping(value="/registerIndividual", method = {RequestMethod.POST})
-    public BaseOutput registerIndividual(@Validated({AddView.class}) CustomerBaseInfoInput customer, BindingResult bindingResult) {
+    public BaseOutput registerIndividual(@Validated({AddView.class}) @RequestBody CustomerBaseInfoInput customer, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
@@ -94,7 +94,7 @@ public class CustomerController {
      * @return BaseOutput
      */
     @RequestMapping(value="/saveCertificateInfo", method = {RequestMethod.POST})
-    public BaseOutput saveCertificateInfo(@Validated CustomerCertificateInfoInput certificateInfo, BindingResult bindingResult) {
+    public BaseOutput saveCertificateInfo(@Validated @RequestBody CustomerCertificateInfoInput certificateInfo, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }

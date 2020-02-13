@@ -58,48 +58,51 @@
 
   <!--- 联合查询分页信息 -->
   <select id="listForPage" parameterType="com.dili.customer.domain.dto.CustomerQueryInput" resultType="com.dili.customer.domain.Customer">
-     SELECT c.* from customer c
-      <where>
-        <if test="marketId != null">
-          and c.id in (SELECT cf.customer_id FROM customer_firm cf where cf.market_id = #{marketId} )
-        </if>
-        <if test="null != marketIdList and marketIdList.size()>0">
-          and c.id in (SELECT cf.customer_id FROM customer_firm cf where cf.market_id in
+      SELECT c.* from customer c
+        <where>
+          <if test="id != null">
+            and c.id = #{id}
+          </if>
+          <if test="marketId != null">
+            and c.id in (SELECT cf.customer_id FROM customer_firm cf where cf.market_id = #{marketId} )
+          </if>
+          <if test="null != marketIdList and marketIdList.size()>0">
+            and c.id in (SELECT cf.customer_id FROM customer_firm cf where cf.market_id in
             <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
               #{item}
             </foreach>
-          )
-        </if>
-        <if test="name != null">
-          and c.name LIKE CONCAT('%',#{name},'%')
-        </if>
-        <if test="certificateNumber != null">
-          and c.certificate_number = #{certificateNumber}
-        </if>
-        <if test="certificateNumberMatch != null">
-          and c.certificate_number LIKE CONCAT('',#{certificateNumberMatch},'%')
-        </if>
-        <if test="code != null">
-          and c.code = #{code}
-        </if>
-        <if test="contactsPhone != null">
-          and c.contacts_phone = #{contactsPhone}
-        </if>
-        <if test="sourceSystem != null">
-          and c.source_system = #{sourceSystem}
-        </if>
-        <if test="state != null">
-          and c.state = #{state}
-        </if>
-        <if test="createTimeStart != null">
-          and c.create_time >= #{createTimeStart}
-        </if>
-        <if test="createTimeEnd != null">
-          and c.create_time <![CDATA[ <= ]]> #{createTimeEnd}
-        </if>
-      </where>
-    GROUP BY  c.id
-    order by ${sort} ${order}
+            )
+          </if>
+          <if test="name != null">
+            and c.name LIKE CONCAT('%',#{name},'%')
+          </if>
+          <if test="certificateNumber != null">
+            and c.certificate_number = #{certificateNumber}
+          </if>
+          <if test="certificateNumberMatch != null">
+            and c.certificate_number LIKE CONCAT('',#{certificateNumberMatch},'%')
+          </if>
+          <if test="code != null">
+            and c.code = #{code}
+          </if>
+          <if test="contactsPhone != null">
+            and c.contacts_phone = #{contactsPhone}
+          </if>
+          <if test="sourceSystem != null">
+            and c.source_system = #{sourceSystem}
+          </if>
+          <if test="state != null">
+            and c.state = #{state}
+          </if>
+          <if test="createTimeStart != null">
+            and c.create_time >= #{createTimeStart}
+          </if>
+          <if test="createTimeEnd != null">
+            and c.create_time <![CDATA[ <= ]]> #{createTimeEnd}
+          </if>
+        </where>
+      GROUP BY c.id
+      order by ${sort} ${order}
   </select>
 
 </mapper>
