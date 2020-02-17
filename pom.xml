@@ -128,11 +128,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.springframework/springloaded -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -141,7 +136,7 @@
         </dependency>
         <dependency>
             <groupId>com.dili</groupId>
-            <artifactId>ss-core</artifactId>
+            <artifactId>ss-mvc</artifactId>
             <version>${sharp-sword.version}</version>
         </dependency>
         <!-- 内部包  -->
