@@ -83,6 +83,12 @@ public class Customer extends BaseDomain {
     private String photo;
 
     /**
+     * 客户等级
+     */
+    @Column(name = "`grade`")
+    private Integer grade;
+
+    /**
      * 手机号
      */
     @Column(name = "`cellphone`")

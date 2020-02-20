@@ -69,6 +69,14 @@ public class CustomerFirm extends BaseDomain {
     private String notes;
 
     /**
+     * 创建时间
+     */
+    @Column(name = "`create_time`",updatable = false)
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createTime;
+
+    /**
      * 修改人id
      */
     @Column(name = "`modifier_id`")

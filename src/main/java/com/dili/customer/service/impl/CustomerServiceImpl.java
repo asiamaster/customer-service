@@ -107,6 +107,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 firmInfo = new CustomerFirm();
                 firmInfo.setCustomerId(customer.getId());
                 firmInfo.setMarketId(baseInfo.getMarketId());
+                firmInfo.setCreateTime(LocalDateTime.now());
             }
             //保存客户基本信息
             customer.setBirthdate(baseInfo.getBirthdate());

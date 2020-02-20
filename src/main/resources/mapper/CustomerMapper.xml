@@ -85,6 +85,12 @@
           <if test="code != null">
             and c.code = #{code}
           </if>
+          <if test="organizationType != null">
+            and c.organization_type = #{organizationType}
+          </if>
+          <if test="grade != null">
+            and c.grade = #{grade}
+          </if>
           <if test="contactsPhone != null">
             and c.contacts_phone = #{contactsPhone}
           </if>
