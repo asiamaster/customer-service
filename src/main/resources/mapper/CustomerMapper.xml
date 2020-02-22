@@ -104,7 +104,7 @@
             and c.create_time >= #{createTimeStart}
           </if>
           <if test="createTimeEnd != null">
-            and c.create_time <![CDATA[ <= ]]> #{createTimeEnd}
+            and c.create_time <![CDATA[ < ]]> #{createTimeEnd}
           </if>
         </where>
       GROUP BY c.id

@@ -5,9 +5,9 @@ import cn.hutool.core.util.StrUtil;
 import com.dili.customer.domain.Contacts;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.CustomerFirm;
-import com.dili.customer.domain.dto.CustomerBaseInfoInput;
 import com.dili.customer.domain.dto.CustomerCertificateInfoInput;
 import com.dili.customer.domain.dto.CustomerQueryInput;
+import com.dili.customer.domain.dto.EnterpriseCustomerInput;
 import com.dili.customer.mapper.CustomerMapper;
 import com.dili.customer.service.ContactsService;
 import com.dili.customer.service.CustomerFirmService;
@@ -50,6 +50,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     public Customer getBaseInfoByCertificateNumber(String certificateNumber) {
         if (StrUtil.isNotBlank(certificateNumber)) {
             Customer customer = new Customer();
+            customer.setCertificateNumber(certificateNumber);
             return list(customer).stream().findFirst().orElse(null);
         }
         return null;
@@ -57,7 +58,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BaseOutput saveBaseInfo(CustomerBaseInfoInput baseInfo) {
+    public BaseOutput saveBaseInfo(EnterpriseCustomerInput baseInfo) {
         //客户归属市场信息
         CustomerFirm firmInfo = null;
         /**
@@ -67,20 +68,20 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             //根据证件号判断客户是否已存在
             Customer customer = getBaseInfoByCertificateNumber(baseInfo.getCertificateNumber());
             if (null == customer) {
-                //身份证号对应的客户不存在，单手机号对应的客户已存在，则认为手机号已被使用
-                Customer queryPhone = new Customer();
-                queryPhone.setCellphone(baseInfo.getCellphone());
-                List<Customer> phoneExist = list(queryPhone);
-                if (CollectionUtil.isNotEmpty(phoneExist)) {
-                    return BaseOutput.failure("此手机号已被注册");
-                }
+//                //身份证号对应的客户不存在，手机号对应的客户已存在，则认为手机号已被使用
+//                Customer queryPhone = new Customer();
+//                queryPhone.setCellphone(baseInfo.getCellphone());
+//                List<Customer> phoneExist = list(queryPhone);
+//                if (CollectionUtil.isNotEmpty(phoneExist)) {
+//                    return BaseOutput.failure("此手机号已被注册");
+//                }
                 customer = new Customer();
                 BeanUtils.copyProperties(baseInfo,customer);
                 customer.setCreatorId(baseInfo.getOperatorId());
                 customer.setCreateTime(LocalDateTime.now());
                 customer.setModifyTime(customer.getCreateTime());
                 super.insertSelective(customer);
-                if ("企业".equalsIgnoreCase(baseInfo.getOrganizationType())){
+                if ("enterprise".equalsIgnoreCase(baseInfo.getOrganizationType())){
                     //客户联系人
                     Contacts contacts = new Contacts();
                     contacts.setName(baseInfo.getContactsName());
@@ -110,15 +111,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 firmInfo.setCreateTime(LocalDateTime.now());
             }
             //保存客户基本信息
-            customer.setBirthdate(baseInfo.getBirthdate());
-            customer.setPhoto(baseInfo.getPhoto());
-            customer.setProfession(baseInfo.getProfession());
             customer.setModifyTime(LocalDateTime.now());
             super.update(customer);
         }
         firmInfo.setOwnerId(baseInfo.getOwnerId());
-        firmInfo.setAlias(baseInfo.getAlias());
-        firmInfo.setNotes(baseInfo.getNotes());
         firmInfo.setDepartmentId(baseInfo.getDepartmentId());
         firmInfo.setOwnerId(baseInfo.getOwnerId());
         firmInfo.setModifierId(baseInfo.getOperatorId());
@@ -163,7 +159,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Override
     public BaseOutput checkExistByNoAndMarket(String certificateNumber, Long marketId) {
-        if (StrUtil.isBlank(certificateNumber) || null == marketId){
+        if (StrUtil.isBlank(certificateNumber) || Objects.isNull(marketId)){
             return BaseOutput.failure("业务关键信息丢失");
         }
         Customer condition = new Customer();

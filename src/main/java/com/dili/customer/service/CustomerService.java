@@ -1,9 +1,9 @@
 package com.dili.customer.service;
 
 import com.dili.customer.domain.Customer;
-import com.dili.customer.domain.dto.CustomerBaseInfoInput;
 import com.dili.customer.domain.dto.CustomerCertificateInfoInput;
 import com.dili.customer.domain.dto.CustomerQueryInput;
+import com.dili.customer.domain.dto.EnterpriseCustomerInput;
 import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
@@ -28,7 +28,7 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @param baseInfo
      * @return
      */
-    BaseOutput saveBaseInfo(CustomerBaseInfoInput baseInfo);
+    BaseOutput saveBaseInfo(EnterpriseCustomerInput baseInfo);
 
     /**
      * 保存客户证件相关新
@@ -48,7 +48,7 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * 根据证件号检测某个客户在某市场是否已存在
      * @param certificateNumber 证件号
      * @param marketId 市场ID
-     * @return 如果客户在当前市场已存在，则返回错误信息，如果不存在，则返回客户信息(若客户信息存在)
+     * @return 如果客户在当前市场已存在，则返回错误(false)信息，如果不存在，则返回客户信息(若客户信息存在)
      */
     BaseOutput checkExistByNoAndMarket(String certificateNumber,Long marketId);
 }
