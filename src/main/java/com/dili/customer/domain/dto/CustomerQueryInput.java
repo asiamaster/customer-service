@@ -48,4 +48,6 @@ public class CustomerQueryInput extends Customer {
      * 客户所属组织集
      */
     private List<Long> marketIdList;
+
+    private String contactsName;
 }

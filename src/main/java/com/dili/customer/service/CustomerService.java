@@ -50,5 +50,5 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @param marketId 市场ID
      * @return 如果客户在当前市场已存在，则返回错误(false)信息，如果不存在，则返回客户信息(若客户信息存在)
      */
-    BaseOutput checkExistByNoAndMarket(String certificateNumber,Long marketId);
+    BaseOutput<Customer> checkExistByNoAndMarket(String certificateNumber,Long marketId);
 }

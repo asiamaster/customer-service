@@ -2,7 +2,6 @@ package com.dili.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import com.dili.customer.domain.Contacts;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.CustomerFirm;
 import com.dili.customer.domain.dto.CustomerCertificateInfoInput;
@@ -31,13 +30,14 @@ import java.util.Objects;
 /**
  * 由MyBatis Generator工具自动生成
  * This file was generated on 2019-12-30 11:18:34.
+ *
  * @author yuehongbo
  */
 @Service
 public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> implements CustomerService {
 
     private CustomerMapper getActualMapper() {
-        return (CustomerMapper)getDao();
+        return (CustomerMapper) getDao();
     }
 
     @Autowired
@@ -64,7 +64,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         /**
          * ID为空，则认为是新增客户，走新增客户逻辑，否则就按修改客户基本信息逻辑处理
          */
-        if (null == baseInfo.getId()){
+        if (null == baseInfo.getId()) {
             //根据证件号判断客户是否已存在
             Customer customer = getBaseInfoByCertificateNumber(baseInfo.getCertificateNumber());
             if (null == customer) {
@@ -76,23 +76,15 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 //                    return BaseOutput.failure("此手机号已被注册");
 //                }
                 customer = new Customer();
-                BeanUtils.copyProperties(baseInfo,customer);
+                BeanUtils.copyProperties(baseInfo, customer);
                 customer.setCreatorId(baseInfo.getOperatorId());
                 customer.setCreateTime(LocalDateTime.now());
                 customer.setModifyTime(customer.getCreateTime());
                 super.insertSelective(customer);
-                if ("enterprise".equalsIgnoreCase(baseInfo.getOrganizationType())){
-                    //客户联系人
-                    Contacts contacts = new Contacts();
-                    contacts.setName(baseInfo.getContactsName());
-                    contacts.setPhone(baseInfo.getContactsPhone());
-                    contacts.setCustomerId(customer.getId());
-                    contactsService.saveContacts(contacts);
-                }
-            }else{
+            } else {
                 //查询客户在当前传入市场的信息
                 firmInfo = customerFirmService.queryByFirmAndCustomerId(baseInfo.getMarketId(), customer.getId());
-                if (null != firmInfo){
+                if (null != firmInfo) {
                     return BaseOutput.failure("当前客户已存在，请勿重复添加");
                 }
             }
@@ -126,10 +118,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     @Override
     public BaseOutput saveCertificateInfo(CustomerCertificateInfoInput certificateInfo) {
         Customer customer = this.get(certificateInfo.getId());
-        if (null == customer){
+        if (null == customer) {
             return BaseOutput.failure("客户信息不存在");
         }
-        BeanUtils.copyProperties(certificateInfo,customer);
+        BeanUtils.copyProperties(certificateInfo, customer);
         update(customer);
         return BaseOutput.success();
     }
@@ -141,40 +133,40 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         }
         if (StringUtils.isNotBlank(input.getSort())) {
             input.setSort(POJOUtils.humpToLineFast(input.getSort()));
-        }else{
+        } else {
             input.setSort("id");
             input.setOrder("desc");
         }
         List<Customer> list = getActualMapper().listForPage(input);
         //总记录
-        Long total = list instanceof Page ? ( (Page) list).getTotal() : list.size();
+        Long total = list instanceof Page ? ((Page) list).getTotal() : list.size();
         //总页数
-        int totalPage = list instanceof Page ? ( (Page) list).getPages():1;
+        int totalPage = list instanceof Page ? ((Page) list).getPages() : 1;
         //当前页数
-        int pageNum = list instanceof Page ? ( (Page) list).getPageNum():1;
+        int pageNum = list instanceof Page ? ((Page) list).getPageNum() : 1;
         PageOutput output = PageOutput.success();
         output.setData(list).setPageNum(pageNum).setTotal(total.intValue()).setPageSize(input.getPage()).setPages(totalPage);
         return output;
     }
 
     @Override
-    public BaseOutput checkExistByNoAndMarket(String certificateNumber, Long marketId) {
-        if (StrUtil.isBlank(certificateNumber) || Objects.isNull(marketId)){
+    public BaseOutput<Customer> checkExistByNoAndMarket(String certificateNumber, Long marketId) {
+        if (StrUtil.isBlank(certificateNumber) || Objects.isNull(marketId)) {
             return BaseOutput.failure("业务关键信息丢失");
         }
         Customer condition = new Customer();
         condition.setCertificateNumber(certificateNumber);
         condition.setIsDelete(0);
         List<Customer> customerList = this.list(condition);
-        if (CollectionUtil.isEmpty(customerList)){
+        if (CollectionUtil.isEmpty(customerList)) {
             return BaseOutput.success("客户基本信息不存在");
         }
-        if (customerList.size()>1){
+        if (customerList.size() > 1) {
             return BaseOutput.failure("存在多个客户信息，请联系管理员处理");
         }
         Customer customer = customerList.get(0);
         CustomerFirm customerFirm = customerFirmService.queryByFirmAndCustomerId(marketId, customer.getId());
-        if (Objects.nonNull(customerFirm)){
+        if (Objects.nonNull(customerFirm)) {
             return BaseOutput.failure("该证件号对应的客户已存在");
         }
         return BaseOutput.success().setData(customer);

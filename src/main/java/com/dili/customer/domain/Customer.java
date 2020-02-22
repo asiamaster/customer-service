@@ -101,6 +101,13 @@ public class Customer extends BaseDomain {
     private String contactsPhone;
 
     /**
+     * 联系人
+     */
+    @Column(name = "`contacts_name`")
+    private String contactsName;
+
+
+    /**
      * 组织类型,个人/企业
      */
     @Column(name = "`organization_type`")
@@ -109,7 +116,7 @@ public class Customer extends BaseDomain {
     /**
      * 来源系统##外部系统来源标识
      */
-    @Column(name = "`source_system`")
+    @Column(name = "`source_system`", updatable = false)
     private String sourceSystem;
 
     /**
