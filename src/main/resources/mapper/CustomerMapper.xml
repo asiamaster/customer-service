@@ -64,10 +64,10 @@
             and c.id = #{id}
           </if>
           <if test="marketId != null">
-            and c.id in (SELECT cf.customer_id FROM customer_firm cf where cf.market_id = #{marketId} )
+            and c.id in (SELECT cf.customer_id FROM customer_market cf where cf.market_id = #{marketId} )
           </if>
           <if test="null != marketIdList and marketIdList.size()>0">
-            and c.id in (SELECT cf.customer_id FROM customer_firm cf where cf.market_id in
+            and c.id in (SELECT cf.customer_id FROM customer_market cf where cf.market_id in
             <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
               #{item}
             </foreach>
