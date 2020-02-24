@@ -50,9 +50,10 @@ public class ContactsController {
      * @return
      */
     @RequestMapping(value = "/listAllContacts", method = {RequestMethod.POST})
-    public BaseOutput<List<Contacts>> listAllContacts(@RequestParam("customerId") Long customerId) {
+    public BaseOutput<List<Contacts>> listAllContacts(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId) {
         Contacts condition = new Contacts();
         condition.setCustomerId(customerId);
+        condition.setMarketId(marketId);
         return BaseOutput.success().setData(contactsService.list(condition));
     }
 }
