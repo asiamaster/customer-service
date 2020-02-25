@@ -108,4 +108,9 @@ public class IndividualCustomerInput implements Serializable {
      */
     private Long departmentId;
 
+    /**
+     * 是否删除
+     */
+    private Integer isDelete;
+
 }

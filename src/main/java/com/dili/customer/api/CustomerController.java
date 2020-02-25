@@ -88,7 +88,7 @@ public class CustomerController {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
         EnterpriseCustomerInput input = new EnterpriseCustomerInput();
-        BeanUtils.copyProperties(input,customer);
+        BeanUtils.copyProperties(customer,input);
         return customerService.saveBaseInfo(input);
     }
 
