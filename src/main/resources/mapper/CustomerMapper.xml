@@ -106,6 +106,9 @@
           <if test="createTimeEnd != null">
             and c.create_time <![CDATA[ <= ]]> #{createTimeEnd}
           </if>
+          <if test="isDelete != null">
+            and c.is_delete = #{isDelete}
+          </if>
         </where>
       GROUP BY c.id
       order by ${sort} ${order}
