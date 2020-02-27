@@ -1,7 +1,6 @@
 package com.dili.customer.domain.dto;
 
 import com.dili.customer.validator.AddView;
-import com.dili.customer.validator.EnterpriseAddView;
 import com.dili.customer.validator.UpdateView;
 import lombok.Getter;
 import lombok.Setter;
@@ -69,8 +68,15 @@ public class IndividualCustomerInput implements Serializable {
     /**
      * 来源系统##外部系统来源标识
      */
-    @NotBlank(message = "客户来源不能为空", groups = {AddView.class})
+    @NotBlank(message = "客户来源系统不能为空", groups = {AddView.class})
     private String sourceSystem;
+
+    /**
+     * 来源渠道##摊位租赁、系统注册等
+     */
+    @NotBlank(message = "客户来源渠道不能为空", groups = {AddView.class})
+    private String sourceChannel;
+
 
     /**
      * 创建人
@@ -112,5 +118,30 @@ public class IndividualCustomerInput implements Serializable {
      * 是否删除
      */
     private Integer isDelete;
+
+    /**
+     * 性别
+     */
+    private Integer gender;
+
+    /**
+     * 照片
+     */
+    private String photo;
+
+    /**
+     * 出生日期
+     */
+    private LocalDate birthdate;
+
+    /**
+     * 证件地址
+     */
+    private String certificateAddr;
+
+    /**
+     * 证件日期##企业时为营业执照日期,如:2011-09-01 至 长期
+     */
+    private String certificateRange;
 
 }

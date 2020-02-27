@@ -120,6 +120,12 @@ public class Customer extends BaseDomain {
     private String sourceSystem;
 
     /**
+     * 来源渠道##租赁业务、系统创建等
+     */
+    @Column(name = "`source_channel`", updatable = false)
+    private String sourceChannel;
+
+    /**
      * 客户行业##水果批发/蔬菜批发/超市
      */
     @Column(name = "`profession`")
@@ -214,7 +220,7 @@ public class Customer extends BaseDomain {
     private LocalDateTime modifyTime;
 
     /**
-     * 是否可用
+     * 是否删除
      */
     @Column(name = "`is_delete`")
     private Integer isDelete;
