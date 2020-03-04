@@ -8,6 +8,8 @@ import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 
+import java.util.List;
+
 /**
  * 由MyBatis Generator工具自动生成
  * This file was generated on 2019-12-30 11:18:34.
@@ -36,7 +38,7 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @param input
      * @return
      */
-    PageOutput listForPage(CustomerQueryInput input);
+    PageOutput<List<Customer>> listForPage(CustomerQueryInput input);
 
     /**
      * 根据证件号检测某个客户在某市场是否已存在

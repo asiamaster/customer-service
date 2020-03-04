@@ -128,7 +128,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
 
     @Override
-    public PageOutput listForPage(CustomerQueryInput input) {
+    public PageOutput<List<Customer>> listForPage(CustomerQueryInput input) {
         if (input.getRows() != null && input.getRows() >= 1) {
             PageHelper.startPage(input.getPage(), input.getRows());
         }
