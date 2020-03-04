@@ -54,4 +54,15 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
         }
         return BaseOutput.success();
     }
+
+    @Override
+    public Integer deleteByCustomerId(Long customerId, Long marketId) {
+        if (Objects.isNull(customerId)) {
+            return 0;
+        }
+        Contacts condition = new Contacts();
+        condition.setCustomerId(customerId);
+        condition.setMarketId(marketId);
+        return deleteByExample(condition);
+    }
 }

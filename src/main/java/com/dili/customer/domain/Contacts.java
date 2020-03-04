@@ -67,6 +67,12 @@ public class Contacts extends BaseDomain {
     private String phone;
 
     /**
+     * 民族
+     */
+    @Column(name = "`nation`")
+    private Integer nation;
+
+    /**
      * 地址
      */
     @Column(name = "`address`")

@@ -2,12 +2,15 @@ package com.dili.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import com.dili.customer.domain.Contacts;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.CustomerMarket;
-import com.dili.customer.domain.dto.CustomerCertificateInfoInput;
+import com.dili.customer.domain.dto.CustomerCertificateInput;
 import com.dili.customer.domain.dto.CustomerQueryInput;
+import com.dili.customer.domain.dto.CustomerUpdateInput;
 import com.dili.customer.domain.dto.EnterpriseCustomerInput;
 import com.dili.customer.mapper.CustomerMapper;
+import com.dili.customer.service.ContactsService;
 import com.dili.customer.service.CustomerMarketService;
 import com.dili.customer.service.CustomerService;
 import com.dili.ss.base.BaseServiceImpl;
@@ -41,6 +44,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Autowired
     private CustomerMarketService customerMarketService;
+    @Autowired
+    private ContactsService contactsService;
 
 
     @Override
@@ -58,10 +63,12 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     public BaseOutput saveBaseInfo(EnterpriseCustomerInput baseInfo) {
         //客户归属市场信息
         CustomerMarket marketInfo = null;
+        //客户ID
+        Long customerId = baseInfo.getId();
         /**
          * ID为空，则认为是新增客户，走新增客户逻辑，否则就按修改客户基本信息逻辑处理
          */
-        if (null == baseInfo.getId()) {
+        if (Objects.isNull(customerId)) {
             //根据证件号判断客户是否已存在
             Customer customer = getBaseInfoByCertificateNumber(baseInfo.getCertificateNumber());
             if (null == customer) {
@@ -78,7 +85,11 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customer.setCreateTime(LocalDateTime.now());
                 customer.setModifyTime(customer.getCreateTime());
                 super.insertSelective(customer);
+                customerId = customer.getId();
             } else {
+                if (!customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())){
+                    return BaseOutput.failure("已存在客户与当次请求的客户类型不一致");
+                }
                 //查询客户在当前传入市场的信息
                 marketInfo = customerMarketService.queryByMarketAndCustomerId(baseInfo.getMarketId(), customer.getId());
                 if (null != marketInfo) {
@@ -91,6 +102,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         } else {
             //查询当前客户信息
             Customer customer = this.get(baseInfo.getId());
+            if (!customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())){
+                return BaseOutput.failure("已存在客户与当次请求的客户类型不一致");
+            }
             //查询客户在当前传入市场的信息
             marketInfo = customerMarketService.queryByMarketAndCustomerId(baseInfo.getMarketId(), customer.getId());
             if (null == marketInfo) {
@@ -109,19 +123,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         marketInfo.setModifierId(baseInfo.getOperatorId());
         marketInfo.setModifyTime(LocalDateTime.now());
         customerMarketService.saveOrUpdate(marketInfo);
-        return BaseOutput.success();
+        return BaseOutput.success().setData(customerId);
     }
 
-    @Override
-    public BaseOutput saveCertificateInfo(CustomerCertificateInfoInput certificateInfo) {
-        Customer customer = this.get(certificateInfo.getId());
-        if (null == customer) {
-            return BaseOutput.failure("客户信息不存在");
-        }
-        BeanUtils.copyProperties(certificateInfo, customer);
-        update(customer);
-        return BaseOutput.success();
-    }
 
     @Override
     public PageOutput listForPage(CustomerQueryInput input) {
@@ -167,6 +171,53 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             return BaseOutput.failure("该证件号对应的客户已存在");
         }
         return BaseOutput.success().setData(customer);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public BaseOutput update(CustomerUpdateInput updateInput) {
+        Customer customer = this.get(updateInput.getId());
+        if (Objects.isNull(customer)) {
+            return BaseOutput.failure("客户信息已不存在");
+        }
+        customer.setName(updateInput.getName());
+        customer.setState(updateInput.getState());
+        customer.setProfession(updateInput.getProfession());
+        customer.setContactsPhone(updateInput.getContactsPhone());
+        if (Objects.nonNull(updateInput.getCustomerCertificate())){
+            CustomerCertificateInput customerCertificate = updateInput.getCustomerCertificate();
+            customer.setCertificateRange(customerCertificate.getCertificateRange());
+            customer.setCertificateAddr(customerCertificate.getCertificateAddr());
+            //以下数据为企业客户才有的数据
+            customer.setCorporationCertificateType(customerCertificate.getCorporationCertificateType());
+            customer.setCorporationCertificateNumber(customerCertificate.getCorporationCertificateNumber());
+            customer.setCorporationName(customerCertificate.getCorporationName());
+        }
+        super.update(customer);
+        //更改市场归属信息
+        CustomerMarket customerMarket = customerMarketService.queryByMarketAndCustomerId(updateInput.getMarketId(), updateInput.getId());
+        if (Objects.isNull(customerMarket)){
+            customerMarket = new CustomerMarket();
+        }
+        customerMarket.setMarketId(updateInput.getMarketId());
+        customerMarket.setOwnerId(updateInput.getOwnerId());
+        customerMarket.setCustomerId(updateInput.getId());
+        customerMarket.setDepartmentId(updateInput.getDepartmentId());
+        customerMarket.setModifierId(updateInput.getOperatorId());
+        customerMarketService.saveOrUpdate(customerMarket);
+        //更新联系人信息
+        contactsService.deleteByCustomerId(customer.getId(),updateInput.getMarketId());
+        if (CollectionUtil.isNotEmpty(updateInput.getContactsList())){
+            List<Contacts> contactsList = updateInput.getContactsList();
+            contactsList.forEach(t -> {
+                t.setCustomerId(customer.getId());
+                t.setMarketId(updateInput.getMarketId());
+                t.setCreatorId(updateInput.getOperatorId());
+                t.setModifierId(updateInput.getOperatorId());
+            });
+            contactsService.batchInsert(contactsList);
+        }
+        return BaseOutput.success();
     }
 
 }

@@ -1,10 +1,7 @@
 package com.dili.customer.api;
 
 import com.dili.customer.domain.Customer;
-import com.dili.customer.domain.dto.CustomerCertificateInfoInput;
-import com.dili.customer.domain.dto.CustomerQueryInput;
-import com.dili.customer.domain.dto.EnterpriseCustomerInput;
-import com.dili.customer.domain.dto.IndividualCustomerInput;
+import com.dili.customer.domain.dto.*;
 import com.dili.customer.service.CustomerService;
 import com.dili.customer.validator.AddView;
 import com.dili.customer.validator.EnterpriseView;
@@ -82,16 +79,16 @@ public class CustomerController {
     }
 
     /**
-     * 保存客户基本信息
-     * @param customer
+     * 客户信息更新
+     * @param updateInput 更新数据
      * @return BaseOutput
      */
-    @RequestMapping(value="/saveBaseInfo", method = {RequestMethod.POST})
-    public BaseOutput saveBaseInfo(@Validated(UpdateView.class) EnterpriseCustomerInput customer, BindingResult bindingResult) {
+    @RequestMapping(value="/update", method = {RequestMethod.POST})
+    public BaseOutput update(@Validated CustomerUpdateInput updateInput, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
-        return customerService.saveBaseInfo(customer);
+        return customerService.update(updateInput);
     }
 
     /**
@@ -122,18 +119,6 @@ public class CustomerController {
         return customerService.saveBaseInfo(input);
     }
 
-    /**
-     * 保存客户证件信息信息
-     * @param certificateInfo
-     * @return BaseOutput
-     */
-    @RequestMapping(value="/saveCertificateInfo", method = {RequestMethod.POST})
-    public BaseOutput saveCertificateInfo(@Validated @RequestBody CustomerCertificateInfoInput certificateInfo, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()){
-            return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
-        }
-        return customerService.saveCertificateInfo(certificateInfo);
-    }
 
     /**
      * 根据证件号检测某个客户在某市场是否已存在

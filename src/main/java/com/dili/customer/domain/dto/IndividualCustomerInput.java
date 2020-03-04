@@ -110,6 +110,12 @@ public class IndividualCustomerInput implements Serializable {
     private Integer state;
 
     /**
+     * 客户编码
+     */
+    @NotBlank(message = "客户编码不能为空", groups = {AddView.class})
+    private String code;
+
+    /**
      * 归属部门
      */
     private Long departmentId;
