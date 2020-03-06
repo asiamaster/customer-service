@@ -108,7 +108,7 @@ public class CustomerController {
      * @return BaseOutput
      */
     @RequestMapping(value="/update", method = {RequestMethod.POST})
-    public BaseOutput update(@Validated CustomerUpdateInput updateInput, BindingResult bindingResult) {
+    public BaseOutput update(@Validated @RequestBody CustomerUpdateInput updateInput, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
