@@ -188,6 +188,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             CustomerCertificateInput customerCertificate = updateInput.getCustomerCertificate();
             customer.setCertificateRange(customerCertificate.getCertificateRange());
             customer.setCertificateAddr(customerCertificate.getCertificateAddr());
+            customer.setCertificateLongTerm(customerCertificate.getCertificateLongTerm());
             //以下数据为企业客户才有的数据
             customer.setCorporationCertificateType(customerCertificate.getCorporationCertificateType());
             customer.setCorporationCertificateNumber(customerCertificate.getCorporationCertificateNumber());

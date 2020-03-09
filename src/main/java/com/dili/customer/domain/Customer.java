@@ -51,6 +51,12 @@ public class Customer extends BaseDomain {
     private String certificateRange;
 
     /**
+     * 证件是否长期有效 1-是；0-否
+     */
+    @Column(name = "`certificate_long_term`")
+    private Integer certificateLongTerm;
+
+    /**
      * 证件地址
      */
     @Column(name = "`certificate_addr`")

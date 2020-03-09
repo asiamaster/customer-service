@@ -36,6 +36,11 @@ public class CustomerCertificateInput implements Serializable {
     private String certificateRange;
 
     /**
+     * 证件是否长期有效 1-是；0-否
+     */
+    private Integer certificateLongTerm;
+
+    /**
      * 证件地址
      */
     @Size(max = 100,message = "证件有效期请保持在40个字符以内")
