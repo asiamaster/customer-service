@@ -5,6 +5,7 @@ import com.dili.ss.domain.annotation.Like;
 import com.dili.ss.domain.annotation.Operator;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class CustomerQueryInput extends Customer {
 
     /**
@@ -49,5 +51,8 @@ public class CustomerQueryInput extends Customer {
      */
     private List<Long> marketIdList;
 
-    private String contactsName;
+    /**
+     * 关键字查询，根据证件号匹配或名称模糊查询
+     */
+    private String keyword;
 }

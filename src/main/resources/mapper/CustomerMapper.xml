@@ -109,6 +109,9 @@
           <if test="isDelete != null">
             and c.is_delete = #{isDelete}
           </if>
+          <if test="keyword != null">
+            and ( c.certificate_number =  #{keyword} or c.name like concat('%', #{keyword}, '%') )
+          </if>
         </where>
       GROUP BY c.id
       order by ${sort} ${order}
