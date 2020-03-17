@@ -121,7 +121,7 @@ public class CustomerController {
      * @return BaseOutput
      */
     @RequestMapping(value="/registerEnterprise", method = {RequestMethod.POST})
-    public BaseOutput registerEnterprise(@Validated({AddView.class, EnterpriseView.class}) @RequestBody EnterpriseCustomerInput customer, BindingResult bindingResult) {
+    public BaseOutput<Customer> registerEnterprise(@Validated({AddView.class, EnterpriseView.class}) @RequestBody EnterpriseCustomerInput customer, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
@@ -134,7 +134,7 @@ public class CustomerController {
      * @return BaseOutput
      */
     @RequestMapping(value="/registerIndividual", method = {RequestMethod.POST})
-    public BaseOutput registerIndividual(@Validated({AddView.class}) @RequestBody IndividualCustomerInput customer, BindingResult bindingResult) {
+    public BaseOutput<Customer> registerIndividual(@Validated({AddView.class}) @RequestBody IndividualCustomerInput customer, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }

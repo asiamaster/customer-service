@@ -60,17 +60,17 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BaseOutput saveBaseInfo(EnterpriseCustomerInput baseInfo) {
+    public BaseOutput<Customer> saveBaseInfo(EnterpriseCustomerInput baseInfo) {
         //客户归属市场信息
         CustomerMarket marketInfo = null;
-        //客户ID
-        Long customerId = baseInfo.getId();
+        //客户基本信息对象
+        Customer customer = null;
         /**
          * ID为空，则认为是新增客户，走新增客户逻辑，否则就按修改客户基本信息逻辑处理
          */
-        if (Objects.isNull(customerId)) {
+        if (Objects.isNull(baseInfo.getId())) {
             //根据证件号判断客户是否已存在
-            Customer customer = getBaseInfoByCertificateNumber(baseInfo.getCertificateNumber());
+            customer = getBaseInfoByCertificateNumber(baseInfo.getCertificateNumber());
             if (null == customer) {
 //                //身份证号对应的客户不存在，手机号对应的客户已存在，则认为手机号已被使用
 //                Customer queryPhone = new Customer();
@@ -85,7 +85,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customer.setCreateTime(LocalDateTime.now());
                 customer.setModifyTime(customer.getCreateTime());
                 super.insertSelective(customer);
-                customerId = customer.getId();
             } else {
                 if (!customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())){
                     return BaseOutput.failure("已存在客户与当次请求的客户类型不一致");
@@ -101,7 +100,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             marketInfo.setMarketId(baseInfo.getMarketId());
         } else {
             //查询当前客户信息
-            Customer customer = this.get(baseInfo.getId());
+            customer = this.get(baseInfo.getId());
             if (!customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())){
                 return BaseOutput.failure("已存在客户与当次请求的客户类型不一致");
             }
@@ -123,7 +122,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         marketInfo.setModifierId(baseInfo.getOperatorId());
         marketInfo.setModifyTime(LocalDateTime.now());
         customerMarketService.saveOrUpdate(marketInfo);
-        return BaseOutput.success().setData(customerId);
+        return BaseOutput.success().setData(customer);
     }
 
 

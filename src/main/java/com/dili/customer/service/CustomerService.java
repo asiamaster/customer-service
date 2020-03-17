@@ -30,7 +30,7 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @param baseInfo
      * @return
      */
-    BaseOutput saveBaseInfo(EnterpriseCustomerInput baseInfo);
+    BaseOutput<Customer> saveBaseInfo(EnterpriseCustomerInput baseInfo);
 
 
     /**
