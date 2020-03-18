@@ -84,11 +84,12 @@ public class CustomerController {
      * @return
      */
     @RequestMapping(value = "/updateState", method = {RequestMethod.POST})
-    public BaseOutput updateState(@RequestParam("customerId") Long customerId, @RequestParam("state") Integer state) {
-        Customer condition = new Customer();
-        condition.setId(customerId);
-        condition.setState(state);
-        return BaseOutput.success().setData(customerService.updateSelective(condition));
+    public BaseOutput<Customer> updateState(@RequestParam("customerId") Long customerId, @RequestParam("state") Integer state) {
+        Customer data = customerService.get(customerId);
+        data.setId(customerId);
+        data.setState(state);
+        customerService.updateSelective(data);
+        return BaseOutput.success().setData(data);
     }
 
     /**
@@ -108,7 +109,7 @@ public class CustomerController {
      * @return BaseOutput
      */
     @RequestMapping(value="/update", method = {RequestMethod.POST})
-    public BaseOutput update(@Validated @RequestBody CustomerUpdateInput updateInput, BindingResult bindingResult) {
+    public BaseOutput<Customer> update(@Validated @RequestBody CustomerUpdateInput updateInput, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }

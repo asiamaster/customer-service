@@ -174,7 +174,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BaseOutput update(CustomerUpdateInput updateInput) {
+    public BaseOutput<Customer> update(CustomerUpdateInput updateInput) {
         Customer customer = this.get(updateInput.getId());
         if (Objects.isNull(customer)) {
             return BaseOutput.failure("客户信息已不存在");
@@ -217,7 +217,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             });
             contactsService.batchInsert(contactsList);
         }
-        return BaseOutput.success();
+        return BaseOutput.success().setData(customer);
     }
 
 }

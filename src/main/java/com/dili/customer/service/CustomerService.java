@@ -53,5 +53,5 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @param updateInput 需要更新的数据
      * @return
      */
-    BaseOutput update(CustomerUpdateInput updateInput);
+    BaseOutput<Customer> update(CustomerUpdateInput updateInput);
 }
