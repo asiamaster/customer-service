@@ -97,6 +97,9 @@
           <if test="sourceSystem != null">
             and c.source_system = #{sourceSystem}
           </if>
+          <if test="sourceChannel != null">
+            and c.source_channel = #{sourceChannel}
+          </if>
           <if test="state != null">
             and c.state = #{state}
           </if>
