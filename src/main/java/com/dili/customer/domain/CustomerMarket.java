@@ -69,6 +69,12 @@ public class CustomerMarket extends BaseDomain {
     private String notes;
 
     /**
+     * 在本市场的初始创建人
+     */
+    @Column(name = "`creator_id`",updatable = false)
+    private Long creatorId;
+
+    /**
      * 创建时间
      */
     @Column(name = "`create_time`",updatable = false)

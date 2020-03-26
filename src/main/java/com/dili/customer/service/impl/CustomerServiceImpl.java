@@ -98,6 +98,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             marketInfo = new CustomerMarket();
             marketInfo.setCustomerId(customer.getId());
             marketInfo.setMarketId(baseInfo.getMarketId());
+            marketInfo.setCreateTime(LocalDateTime.now());
+            marketInfo.setCreatorId(baseInfo.getOperatorId());
         } else {
             //查询当前客户信息
             customer = this.get(baseInfo.getId());
@@ -111,6 +113,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 marketInfo.setCustomerId(customer.getId());
                 marketInfo.setMarketId(baseInfo.getMarketId());
                 marketInfo.setCreateTime(LocalDateTime.now());
+                marketInfo.setCreatorId(baseInfo.getOperatorId());
             }
             //保存客户基本信息
             customer.setModifyTime(LocalDateTime.now());

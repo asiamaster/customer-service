@@ -150,4 +150,9 @@ public class IndividualCustomerInput implements Serializable {
      */
     private String certificateRange;
 
+    /**
+     * 证件是否长期有效 1-是；0-否
+     */
+    private Integer certificateLongTerm;
+
 }

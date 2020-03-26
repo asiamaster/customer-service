@@ -42,6 +42,16 @@ public class CustomerQueryInput extends Customer {
     private String certificateNumberMatch;
 
     /**
+     * 客户所在市场中的创建时间-开始
+     */
+    private LocalDateTime marketCreateTimeStart;
+
+    /**
+     * 客户所在市场中的创建时间-介绍
+     */
+    private LocalDateTime marketCreateTimeEnd;
+
+    /**
      * 客户所属组织
      */
     private Long marketId;
@@ -55,4 +65,15 @@ public class CustomerQueryInput extends Customer {
      * 关键字查询，根据证件号匹配或名称模糊查询
      */
     private String keyword;
+
+    /**
+     * 所在市场的创建人
+     */
+    private Long marketCreatorId;
+
+    /**
+     * 当客户在多市场时，是否分组只返回一条客户主数据
+     * 如果设置为true，则根据客户id分组
+     */
+    private Boolean isGroup;
 }

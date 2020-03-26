@@ -237,4 +237,26 @@ public class Customer extends BaseDomain {
     @Column(name = "`state`")
     private Integer state;
 
+    /**
+     * 客户所在市场的创建人
+     * 数据来源于客户市场表的创建人
+     */
+    @Transient
+    private Long marketCreatorId;
+
+    /**
+     * 客户所在市场的创建时间
+     * 数据来源于客户市场表的创建时间
+     */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Transient
+    private LocalDateTime marketCreateTime;
+
+    /**
+     * 客户当前所属的市场
+     * 数据来源于客户市场表的市场ID
+     */
+    @Transient
+    private Long marketId;
 }
