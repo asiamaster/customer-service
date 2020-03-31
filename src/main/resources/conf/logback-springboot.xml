@@ -14,11 +14,11 @@
                 <pattern>${PATTERN}</pattern>
             </encoder>
         </appender>
-        <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>${LOG_HOME}/${LOG_NAME_PREFIX}.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <!--日志文件输出的文件名-->
-                <FileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}/${LOG_NAME_PREFIX}_%i.log.zip</FileNamePattern>
+                <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}/${LOG_NAME_PREFIX}_%i.log.zip</fileNamePattern>
                 <!--日志文件保留天数(FileNamePattern中的%d 格式有关，如果yyyy-MM-dd 则是天数)-->
                 <maxHistory>30</maxHistory>
                 <!--日志文件最大的大小-->
@@ -40,7 +40,7 @@
             <file>${LOG_HOME}/${LOG_NAME_PREFIX}.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <!--日志文件输出的文件名-->
-                <FileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}/${LOG_NAME_PREFIX}_%i.log.zip</FileNamePattern>
+                <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}/${LOG_NAME_PREFIX}_%i.log.zip</fileNamePattern>
                 <!--日志文件保留天数(FileNamePattern中的%d 格式有关，如果yyyy-MM-dd 则是天数)-->
                 <maxHistory>30</maxHistory>
                 <!--日志文件最大的大小-->
@@ -63,7 +63,7 @@
             <file>${LOG_HOME}/${LOG_NAME_PREFIX}.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <!--日志文件输出的文件名-->
-                <FileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}/${LOG_NAME_PREFIX}_%i.log.zip</FileNamePattern>
+                <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}/${LOG_NAME_PREFIX}_%i.log.zip</fileNamePattern>
                 <!--日志文件保留天数(FileNamePattern中的%d 格式有关，如果yyyy-MM-dd 则是天数)-->
                 <maxHistory>30</maxHistory>
                 <!--日志文件最大的大小-->
@@ -86,7 +86,7 @@
             <file>${LOG_HOME}/${LOG_NAME_PREFIX}.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <!--日志文件输出的文件名-->
-                <FileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}/${LOG_NAME_PREFIX}_%i.log.zip</FileNamePattern>
+                <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}/${LOG_NAME_PREFIX}_%i.log.zip</fileNamePattern>
                 <!--日志文件保留天数(FileNamePattern中的%d 格式有关，如果yyyy-MM-dd 则是天数)-->
                 <maxHistory>30</maxHistory>
                 <!--日志文件最大的大小-->
