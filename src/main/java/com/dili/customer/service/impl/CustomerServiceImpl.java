@@ -87,7 +87,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 super.insertSelective(customer);
             } else {
                 if (!customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())){
-                    return BaseOutput.failure("已存在客户与当次请求的客户类型不一致");
+                    return BaseOutput.failure("已存在相同证件号的客户");
                 }
                 //查询客户在当前传入市场的信息
                 marketInfo = customerMarketService.queryByMarketAndCustomerId(baseInfo.getMarketId(), customer.getId());
@@ -104,7 +104,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             //查询当前客户信息
             customer = this.get(baseInfo.getId());
             if (!customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())){
-                return BaseOutput.failure("已存在客户与当次请求的客户类型不一致");
+                return BaseOutput.failure("已存在相同证件号的客户");
             }
             //查询客户在当前传入市场的信息
             marketInfo = customerMarketService.queryByMarketAndCustomerId(baseInfo.getMarketId(), customer.getId());
