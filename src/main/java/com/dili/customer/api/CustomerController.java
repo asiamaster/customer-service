@@ -1,5 +1,6 @@
 package com.dili.customer.api;
 
+import cn.hutool.core.util.StrUtil;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.dto.CustomerQueryInput;
 import com.dili.customer.domain.dto.CustomerUpdateInput;
@@ -8,6 +9,7 @@ import com.dili.customer.domain.dto.IndividualCustomerInput;
 import com.dili.customer.service.CustomerService;
 import com.dili.customer.validator.AddView;
 import com.dili.customer.validator.EnterpriseView;
+import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import org.springframework.beans.BeanUtils;
@@ -64,7 +66,7 @@ public class CustomerController {
     @RequestMapping(value="/get", method = {RequestMethod.POST})
     public BaseOutput<Customer> get(@RequestParam("id") Long id, @RequestParam("marketId") Long marketId){
         if (Objects.isNull(id) || Objects.isNull(marketId)) {
-            return BaseOutput.failure("必要参数丢失");
+            return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
         }
         CustomerQueryInput condition = new CustomerQueryInput();
         condition.setId(id);
@@ -72,7 +74,29 @@ public class CustomerController {
         PageOutput<List<Customer>> pageOutput = customerService.listForPage(condition);
         Customer customer = pageOutput.getData().stream().findFirst().orElse(null);
         if (Objects.isNull(customer)){
-            return BaseOutput.failure("客户信息不存在");
+            return BaseOutput.failure("客户信息不存在").setCode(ResultCode.DATA_ERROR);
+        }
+        return BaseOutput.success().setData(customer);
+    }
+
+    /**
+     * 根据证件号及市场，查询客户的信息
+     * @param certificateNumber 客户证件号
+     * @param marketId 市场ID
+     * @return
+     */
+    @RequestMapping(value="/getByCertificateNumber", method = {RequestMethod.POST})
+    public BaseOutput<Customer> getByCertificateNumber(@RequestParam("certificateNumber") String certificateNumber, @RequestParam("marketId") Long marketId){
+        if (StrUtil.isBlank(certificateNumber) || Objects.isNull(marketId)) {
+            return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
+        }
+        CustomerQueryInput condition = new CustomerQueryInput();
+        condition.setCertificateNumber(certificateNumber);
+        condition.setMarketId(marketId);
+        PageOutput<List<Customer>> pageOutput = customerService.listForPage(condition);
+        Customer customer = pageOutput.getData().stream().findFirst().orElse(null);
+        if (Objects.isNull(customer)){
+            return BaseOutput.failure("客户信息不存在").setCode(ResultCode.DATA_ERROR);
         }
         return BaseOutput.success().setData(customer);
     }

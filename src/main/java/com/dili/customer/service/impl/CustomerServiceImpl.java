@@ -14,6 +14,7 @@ import com.dili.customer.service.ContactsService;
 import com.dili.customer.service.CustomerMarketService;
 import com.dili.customer.service.CustomerService;
 import com.dili.ss.base.BaseServiceImpl;
+import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import com.dili.ss.util.POJOUtils;
@@ -87,12 +88,12 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 super.insertSelective(customer);
             } else {
                 if (!customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())){
-                    return BaseOutput.failure("已存在相同证件号的客户");
+                    return BaseOutput.failure("已存在相同证件号的客户").setCode(ResultCode.DATA_ERROR);
                 }
                 //查询客户在当前传入市场的信息
                 marketInfo = customerMarketService.queryByMarketAndCustomerId(baseInfo.getMarketId(), customer.getId());
                 if (null != marketInfo) {
-                    return BaseOutput.failure("当前客户已存在，请勿重复添加");
+                    return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR);
                 }
             }
             marketInfo = new CustomerMarket();
@@ -104,7 +105,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             //查询当前客户信息
             customer = this.get(baseInfo.getId());
             if (!customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())){
-                return BaseOutput.failure("已存在相同证件号的客户");
+                return BaseOutput.failure("已存在相同证件号的客户").setCode(ResultCode.DATA_ERROR);
             }
             //查询客户在当前传入市场的信息
             marketInfo = customerMarketService.queryByMarketAndCustomerId(baseInfo.getMarketId(), customer.getId());
@@ -155,22 +156,22 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     @Override
     public BaseOutput<Customer> checkExistByNoAndMarket(String certificateNumber, Long marketId) {
         if (StrUtil.isBlank(certificateNumber) || Objects.isNull(marketId)) {
-            return BaseOutput.failure("业务关键信息丢失");
+            return BaseOutput.failure("业务关键信息丢失").setCode(ResultCode.PARAMS_ERROR);
         }
         Customer condition = new Customer();
         condition.setCertificateNumber(certificateNumber);
         condition.setIsDelete(0);
         List<Customer> customerList = this.list(condition);
         if (CollectionUtil.isEmpty(customerList)) {
-            return BaseOutput.success("客户基本信息不存在");
+            return BaseOutput.success("客户基本信息不存在").setCode(ResultCode.DATA_ERROR);
         }
         if (customerList.size() > 1) {
-            return BaseOutput.failure("存在多个客户信息，请联系管理员处理");
+            return BaseOutput.failure("存在多个客户信息，请联系管理员处理").setCode(ResultCode.DATA_ERROR);
         }
         Customer customer = customerList.get(0);
         CustomerMarket customerFirm = customerMarketService.queryByMarketAndCustomerId(marketId, customer.getId());
         if (Objects.nonNull(customerFirm)) {
-            return BaseOutput.failure("该证件号对应的客户已存在");
+            return BaseOutput.failure("该证件号对应的客户已存在").setCode(ResultCode.DATA_ERROR);
         }
         return BaseOutput.success().setData(customer);
     }
@@ -180,7 +181,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     public BaseOutput<Customer> update(CustomerUpdateInput updateInput) {
         Customer customer = this.get(updateInput.getId());
         if (Objects.isNull(customer)) {
-            return BaseOutput.failure("客户信息已不存在");
+            return BaseOutput.failure("客户信息已不存在").setCode(ResultCode.DATA_ERROR);
         }
         customer.setName(updateInput.getName());
         customer.setState(updateInput.getState());
