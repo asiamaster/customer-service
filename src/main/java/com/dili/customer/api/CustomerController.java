@@ -73,9 +73,6 @@ public class CustomerController {
         condition.setMarketId(marketId);
         PageOutput<List<Customer>> pageOutput = customerService.listForPage(condition);
         Customer customer = pageOutput.getData().stream().findFirst().orElse(null);
-        if (Objects.isNull(customer)){
-            return BaseOutput.failure("客户信息不存在").setCode(ResultCode.DATA_ERROR);
-        }
         return BaseOutput.success().setData(customer);
     }
 
@@ -95,9 +92,6 @@ public class CustomerController {
         condition.setMarketId(marketId);
         PageOutput<List<Customer>> pageOutput = customerService.listForPage(condition);
         Customer customer = pageOutput.getData().stream().findFirst().orElse(null);
-        if (Objects.isNull(customer)){
-            return BaseOutput.failure("客户信息不存在").setCode(ResultCode.DATA_ERROR);
-        }
         return BaseOutput.success().setData(customer);
     }
 
