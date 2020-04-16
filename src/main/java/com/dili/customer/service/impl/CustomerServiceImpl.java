@@ -163,7 +163,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         condition.setIsDelete(0);
         List<Customer> customerList = this.list(condition);
         if (CollectionUtil.isEmpty(customerList)) {
-            return BaseOutput.success("客户基本信息不存在").setCode(ResultCode.DATA_ERROR);
+            return BaseOutput.success("客户基本信息不存在");
         }
         if (customerList.size() > 1) {
             return BaseOutput.failure("存在多个客户信息，请联系管理员处理").setCode(ResultCode.DATA_ERROR);
