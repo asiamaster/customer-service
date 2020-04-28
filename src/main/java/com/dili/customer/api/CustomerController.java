@@ -50,6 +50,9 @@ public class CustomerController {
      */
     @RequestMapping(value="/listNormalPage", method = {RequestMethod.POST})
     public PageOutput<List<Customer>> listNormalPage(@RequestBody(required = false) CustomerQueryInput customer){
+        if (Objects.isNull(customer)) {
+            customer = new CustomerQueryInput();
+        }
         if (Objects.isNull(customer.getState())) {
             customer.setState(1);
         }

@@ -1,6 +1,8 @@
 package com.dili.customer.domain;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.dili.customer.utils.CustomerInfoUtil;
 import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.domain.annotation.Like;
 import lombok.Getter;
@@ -259,4 +261,18 @@ public class Customer extends BaseDomain {
      */
     @Transient
     private Long marketId;
+
+    /**
+     * 客户证件号打码加*显示
+     */
+    @Transient
+    private String certificateNumberMask;
+
+    public String getCertificateNumberMask() {
+        if (StrUtil.isNotBlank(certificateNumber)) {
+            return CustomerInfoUtil.certificateNumberHide(certificateNumber);
+        }
+        return certificateNumberMask;
+    }
+
 }
