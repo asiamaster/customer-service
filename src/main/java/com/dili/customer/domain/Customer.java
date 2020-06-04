@@ -10,6 +10,9 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -38,12 +41,15 @@ public class Customer extends BaseDomain {
      * 证件号
      */
     @Column(name = "`certificate_number`", updatable = false)
+    @NotBlank(message = "客户证件号不能为空")
+    @Size(min = 1, max = 40, message = "证件号码请保持在40个字以内")
     private String certificateNumber;
 
     /**
      * 证件类型
      */
     @Column(name = "`certificate_type`")
+    @NotBlank(message = "客户证件类型不能为空")
     private String certificateType;
 
     /**
@@ -69,6 +75,8 @@ public class Customer extends BaseDomain {
      */
     @Column(name = "`name`")
     @Like
+    @NotBlank(message = "客户名称不能为空")
+    @Size(min = 1, max = 40, message = "客户名称请保持在40个字以内")
     private String name;
 
     /**
@@ -106,12 +114,15 @@ public class Customer extends BaseDomain {
      * 联系电话
      */
     @Column(name = "`contacts_phone`")
+    @NotBlank(message = "客户联系手机不能为空")
+    @Pattern(regexp = "^(1[3456789]\\d{9})$", message = "客户联系方式格式不正确")
     private String contactsPhone;
 
     /**
      * 联系人
      */
     @Column(name = "`contacts_name`")
+    @NotBlank(message = "客户联系人不能为空")
     private String contactsName;
 
 
@@ -125,12 +136,14 @@ public class Customer extends BaseDomain {
      * 来源系统##外部系统来源标识
      */
     @Column(name = "`source_system`", updatable = false)
+    @NotBlank(message = "客户来源系统不能为空")
     private String sourceSystem;
 
     /**
      * 来源渠道##租赁业务、系统创建等
      */
     @Column(name = "`source_channel`", updatable = false)
+    @NotBlank(message = "客户来源渠道不能为空")
     private String sourceChannel;
 
     /**

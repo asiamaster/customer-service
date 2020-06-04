@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -154,5 +155,11 @@ public class IndividualCustomerInput implements Serializable {
      * 证件是否长期有效 1-是；0-否
      */
     private Integer certificateLongTerm;
+
+    /**
+     * 客户证件信息
+     */
+    @Valid
+    private CustomerCertificateInput customerCertificate;
 
 }

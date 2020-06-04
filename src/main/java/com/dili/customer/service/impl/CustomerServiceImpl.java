@@ -101,6 +101,19 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             marketInfo.setMarketId(baseInfo.getMarketId());
             marketInfo.setCreateTime(LocalDateTime.now());
             marketInfo.setCreatorId(baseInfo.getOperatorId());
+            //保存客户联系人信息
+            Contacts contacts = new Contacts();
+            contacts.setCustomerId(customer.getId());
+            if (StrUtil.isNotBlank(customer.getContactsName())){
+                contacts.setName(customer.getContactsName());
+            }else{
+                contacts.setName(customer.getName());
+            }
+            contacts.setPhone(customer.getContactsPhone());
+            contacts.setMarketId(baseInfo.getMarketId());
+            contacts.setCreatorId(baseInfo.getOperatorId());
+            contacts.setModifierId(baseInfo.getOperatorId());
+            contactsService.saveContacts(contacts);
         } else {
             //查询当前客户信息
             customer = this.get(baseInfo.getId());

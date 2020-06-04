@@ -12,6 +12,7 @@ import com.dili.customer.validator.EnterpriseView;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -28,6 +29,7 @@ import java.util.Objects;
  */
 @RestController
 @RequestMapping("/api/customer")
+@Slf4j
 public class CustomerController {
     @Autowired
     private CustomerService customerService;

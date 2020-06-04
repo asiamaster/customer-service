@@ -4,8 +4,7 @@ import com.google.common.base.MoreObjects;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -24,15 +23,9 @@ public class CustomerCertificateInput implements Serializable {
     private static final long serialVersionUID = 2149328387032198883L;
 
     /**
-     * 客户ID
-     */
-    @NotNull(message = "客户ID不能为空")
-    private Long id;
-
-    /**
      * 证件有效期
      */
-    @Size(max = 40,message = "证件有效期请保持在40个字符以内")
+    @Size(max = 40, message = "证件有效期请保持在40个字符以内")
     private String certificateRange;
 
     /**
@@ -43,32 +36,32 @@ public class CustomerCertificateInput implements Serializable {
     /**
      * 证件地址
      */
-    @Size(max = 100,message = "证件有效期请保持在100个字符以内")
+    @Size(max = 100, message = "证件有效期请保持在100个字符以内")
     private String certificateAddr;
 
     /**
      * 法人证件类型
      */
-    @Size(max = 20,message = "法人证件类型请保持在20个字符以内")
+    @Size(max = 20, message = "法人证件类型请保持在20个字符以内")
     private String corporationCertificateType;
 
     /**
      * 法人证件号
      */
-    @Size(max = 40,message = "法人证件号码请保持在40个字符以内")
+    @Size(max = 40, message = "法人证件号码请保持在40个字符以内")
     private String corporationCertificateNumber;
 
     /**
      * 法人真实姓名
      */
-    @Size(max = 40,message = "法人姓名请保持在40个字符以内")
+    @NotBlank(message = "法人姓名不能为空")
+    @Size(max = 40, message = "法人姓名请保持在40个字符以内")
     private String corporationName;
 
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("id", id)
                 .add("certificateRange", certificateRange)
                 .add("certificateAddr", certificateAddr)
                 .add("corporationCertificateType", corporationCertificateType)

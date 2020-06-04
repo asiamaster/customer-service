@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -30,6 +31,7 @@ public class CustomerMarket extends BaseDomain {
      * 归属组织
      */
     @Column(name = "`market_id`")
+    @NotNull(message = "客户所属市场不能为空")
     private Long marketId;
 
     /**
@@ -48,6 +50,7 @@ public class CustomerMarket extends BaseDomain {
      * 所有者
      */
     @Column(name = "`owner_id`")
+    @NotNull(message = "客户所有者不能为空")
     private Long ownerId;
 
     /**
