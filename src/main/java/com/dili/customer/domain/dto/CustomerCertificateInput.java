@@ -4,7 +4,6 @@ import com.google.common.base.MoreObjects;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -54,7 +53,6 @@ public class CustomerCertificateInput implements Serializable {
     /**
      * 法人真实姓名
      */
-    @NotBlank(message = "法人姓名不能为空")
     @Size(max = 40, message = "法人姓名请保持在40个字符以内")
     private String corporationName;
 
