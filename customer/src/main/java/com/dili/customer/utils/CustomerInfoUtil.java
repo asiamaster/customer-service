@@ -1,9 +1,7 @@
 package com.dili.customer.utils;
 
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.StrUtil;
-import org.apache.commons.codec.digest.Md5Crypt;
 
 /**
  * <B>客户信息相关的辅助处理类</B>
