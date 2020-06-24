@@ -54,6 +54,48 @@ public class CustomerMarket extends BaseDomain {
     private Long ownerId;
 
     /**
+     * 客户等级
+     */
+    @Column(name = "`grade`")
+    private Integer grade;
+
+    /**
+     * 客户行业##水果批发/蔬菜批发/超市
+     */
+    @Column(name = "`profession`")
+    private String profession;
+
+    /**
+     * 经营地区##经营地区城市id
+     */
+    @Column(name = "`operating_area`")
+    private String operatingArea;
+
+    /**
+     * 经营地区经度
+     */
+    @Column(name = "`operating_lng`")
+    private String operatingLng;
+
+    /**
+     * 经营地区纬度
+     */
+    @Column(name = "`operating_lat`")
+    private String operatingLat;
+
+    /**
+     * 其它头衔
+     */
+    @Column(name = "`other_title`")
+    private String otherTitle;
+
+    /**
+     * 主营品类
+     */
+    @Column(name = "`main_category`")
+    private String mainCategory;
+
+    /**
      * 客户别名
      */
     @Column(name = "`alias`")

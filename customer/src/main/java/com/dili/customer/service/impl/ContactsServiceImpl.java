@@ -28,6 +28,7 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
         //构造查询条件，用于查询该客户是否已有该联系人
         Contacts condition = new Contacts();
         condition.setCustomerId(customerContacts.getCustomerId());
+        condition.setMarketId(customerContacts.getMarketId());
         condition.setPhone(customerContacts.getPhone());
         List<Contacts> contactsList = list(condition);
         if (null == customerContacts.getId()) {
@@ -45,7 +46,7 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
                 return BaseOutput.failure("数据已不存在，不能修改");
             }
             if (CollectionUtil.isNotEmpty(contactsList)) {
-                Boolean exist = contactsList.stream().allMatch(c-> !Objects.equals(c.getId(),customerContacts.getId()) && Objects.equals(c.getPhone(),customerContacts.getPhone()));
+                Boolean exist = contactsList.stream().allMatch(c -> !Objects.equals(c.getId(), customerContacts.getId()) && Objects.equals(c.getPhone(), customerContacts.getPhone()) && Objects.equals(c.getMarketId(), customerContacts.getMarketId()));
                 if (exist) {
                     return BaseOutput.failure("该手机号对应的联系人已存在");
                 }

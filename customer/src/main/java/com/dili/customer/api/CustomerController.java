@@ -2,13 +2,13 @@ package com.dili.customer.api;
 
 import cn.hutool.core.util.StrUtil;
 import com.dili.customer.domain.Customer;
-import com.dili.customer.domain.dto.CustomerQueryInput;
 import com.dili.customer.domain.dto.CustomerUpdateInput;
 import com.dili.customer.domain.dto.EnterpriseCustomerInput;
 import com.dili.customer.domain.dto.IndividualCustomerInput;
+import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
+import com.dili.customer.sdk.validator.AddView;
+import com.dili.customer.sdk.validator.EnterpriseView;
 import com.dili.customer.service.CustomerService;
-import com.dili.customer.validator.AddView;
-import com.dili.customer.validator.EnterpriseView;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;

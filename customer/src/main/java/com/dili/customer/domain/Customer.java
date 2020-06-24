@@ -7,6 +7,7 @@ import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.domain.annotation.Like;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -25,7 +26,9 @@ import java.time.LocalDateTime;
 @Table(name = "`customer`")
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class Customer extends BaseDomain {
+
     @Id
     @Column(name = "`id`",updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -99,12 +102,6 @@ public class Customer extends BaseDomain {
     private String photo;
 
     /**
-     * 客户等级
-     */
-    @Column(name = "`grade`")
-    private Integer grade;
-
-    /**
      * 手机号
      */
     @Column(name = "`cellphone`")
@@ -145,42 +142,6 @@ public class Customer extends BaseDomain {
     @Column(name = "`source_channel`", updatable = false)
     @NotBlank(message = "客户来源渠道不能为空")
     private String sourceChannel;
-
-    /**
-     * 客户行业##水果批发/蔬菜批发/超市
-     */
-    @Column(name = "`profession`")
-    private String profession;
-
-    /**
-     * 经营地区##经营地区城市id
-     */
-    @Column(name = "`operating_area`")
-    private String operatingArea;
-
-    /**
-     * 经营地区经度
-     */
-    @Column(name = "`operating_lng`")
-    private String operatingLng;
-
-    /**
-     * 经营地区纬度
-     */
-    @Column(name = "`operating_lat`")
-    private String operatingLat;
-
-    /**
-     * 其它头衔
-     */
-    @Column(name = "`other_title`")
-    private String otherTitle;
-
-    /**
-     * 主营品类
-     */
-    @Column(name = "`main_category`")
-    private String mainCategory;
 
     /**
      * 注册资金##企业客户属性
@@ -237,7 +198,7 @@ public class Customer extends BaseDomain {
      */
     @Column(name = "`modify_time`")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HHm:m:ss")
     private LocalDateTime modifyTime;
 
     /**
@@ -253,27 +214,11 @@ public class Customer extends BaseDomain {
     private Integer state;
 
     /**
-     * 客户所在市场的创建人
-     * 数据来源于客户市场表的创建人
+     * 客户市场服务信息
+     * 客户市场本身是一对多的关系，而此处使用单个对象，是按一个客户一个市场信息的单一关系返回
      */
     @Transient
-    private Long marketCreatorId;
-
-    /**
-     * 客户所在市场的创建时间
-     * 数据来源于客户市场表的创建时间
-     */
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Transient
-    private LocalDateTime marketCreateTime;
-
-    /**
-     * 客户当前所属的市场
-     * 数据来源于客户市场表的市场ID
-     */
-    @Transient
-    private Long marketId;
+    private CustomerMarket customerMarket;
 
     /**
      * 客户证件号打码加*显示

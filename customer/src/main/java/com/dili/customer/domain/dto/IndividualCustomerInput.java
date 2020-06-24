@@ -1,7 +1,7 @@
 package com.dili.customer.domain.dto;
 
-import com.dili.customer.validator.AddView;
-import com.dili.customer.validator.UpdateView;
+import com.dili.customer.sdk.validator.AddView;
+import com.dili.customer.sdk.validator.UpdateView;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -161,5 +161,10 @@ public class IndividualCustomerInput implements Serializable {
      */
     @Valid
     private CustomerCertificateInput customerCertificate;
+
+    /**
+     * 客户身份类型(买家、卖家等)
+     */
+    private String customerType;
 
 }

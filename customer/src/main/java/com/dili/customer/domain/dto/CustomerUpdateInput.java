@@ -1,6 +1,7 @@
 package com.dili.customer.domain.dto;
 
 import com.dili.customer.domain.Contacts;
+import com.dili.customer.domain.CustomerMarket;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -39,10 +40,6 @@ public class CustomerUpdateInput implements Serializable {
     @NotBlank(message = "客户姓名不能为空")
     private String name;
 
-    /**
-     * 客户行业##水果批发/蔬菜批发/超市
-     */
-    private String profession;
 
     /**
      * 客户状态 0注销，1生效，2禁用，
@@ -58,20 +55,10 @@ public class CustomerUpdateInput implements Serializable {
     private String contactsPhone;
 
     /**
-     * 客户归属人
+     * 客户市场信息
      */
-    @NotNull(message = "客户所属人不能为空")
-    private Long ownerId;
-
-    /**
-     * 所属市场ID
-     */
-    private Long marketId;
-
-    /**
-     * 归属部门
-     */
-    private Long departmentId;
+    @Valid
+    private CustomerMarket customerMarket;
 
     /**
      * 证件信息

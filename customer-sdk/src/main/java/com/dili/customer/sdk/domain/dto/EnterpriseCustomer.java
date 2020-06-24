@@ -1,27 +1,22 @@
-package com.dili.customer.domain.dto;
+package com.dili.customer.sdk.domain.dto;
+
 import com.dili.customer.sdk.validator.AddView;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
- * <B>Description</B>
+ * <B>企业客户基本信息</B>
  * <B>Copyright:本软件源代码版权归农丰时代所有,未经许可不得任意复制与传播.</B>
  * <B>农丰时代科技有限公司</B>
  *
  * @author yuehongbo
- * @date 2020/2/21 18:40
+ * @date 2020/2/3 17:40
  */
-@Getter
-@Setter
-@ToString(callSuper = true)
-public class EnterpriseCustomerInput extends IndividualCustomerInput implements Serializable {
+public class EnterpriseCustomer extends IndividualCustomer implements Serializable {
 
-    private static final long serialVersionUID = -2571148515605329127L;
+    private static final long serialVersionUID = 4869002082778403248L;
 
     /**
      * 联系人
@@ -37,4 +32,16 @@ public class EnterpriseCustomerInput extends IndividualCustomerInput implements 
     @Size(max = 40, message = "法人请保持在40个字以内", groups = {AddView.class})
     private String corporationName;
 
+    public String getContactsName() {
+        return contactsName;
+    }
+    public void setContactsName(String contactsName) {
+        this.contactsName = contactsName;
+    }
+    public String getCorporationName() {
+        return corporationName;
+    }
+    public void setCorporationName(String corporationName) {
+        this.corporationName = corporationName;
+    }
 }

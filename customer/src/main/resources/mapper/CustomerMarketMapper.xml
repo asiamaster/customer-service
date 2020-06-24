@@ -5,16 +5,23 @@
     <!--
       WARNING - @mbg.generated
     -->
-    <id column="id" jdbcType="BIGINT" property="id" />
+    <id column="id"  property="id" />
     <result column="market_id"  property="marketId" />
-    <result column="department_id" jdbcType="BIGINT" property="departmentId" />
-    <result column="customer_id" jdbcType="BIGINT" property="customerId" />
-    <result column="owner_id" jdbcType="BIGINT" property="ownerId" />
-    <result column="alias" jdbcType="VARCHAR" property="alias" />
-    <result column="type" jdbcType="VARCHAR" property="type" />
-    <result column="notes" jdbcType="VARCHAR" property="notes" />
-    <result column="modifier_id" jdbcType="BIGINT" property="modifierId" />
-    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="department_id"  property="departmentId" />
+    <result column="customer_id"  property="customerId" />
+    <result column="owner_id"  property="ownerId" />
+    <result column="grade" property="grade" />
+    <result column="profession"  property="profession" />
+    <result column="operating_area"  property="operatingArea" />
+    <result column="operating_lng"  property="operatingLng" />
+    <result column="operating_lat"  property="operatingLat" />
+    <result column="other_title"  property="otherTitle" />
+    <result column="main_category"  property="mainCategory" />
+    <result column="alias"  property="alias" />
+    <result column="type"  property="type" />
+    <result column="notes"  property="notes" />
+    <result column="modifier_id"  property="modifierId" />
+    <result column="modify_time"  property="modifyTime" />
   </resultMap>
 
 </mapper>

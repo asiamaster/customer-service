@@ -6,67 +6,72 @@
       WARNING - @mbg.generated
     -->
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="code" jdbcType="VARCHAR" property="code" />
-    <result column="certificate_number" jdbcType="VARCHAR" property="certificateNumber" />
-    <result column="certificate_type" jdbcType="VARCHAR" property="certificateType" />
-    <result column="certificate_range" jdbcType="VARCHAR" property="certificateRange" />
-    <result column="certificate_addr" jdbcType="VARCHAR" property="certificateAddr" />
-    <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="birthdate" jdbcType="DATE" property="birthdate" />
-    <result column="gender" jdbcType="BIT" property="gender" />
-    <result column="photo" jdbcType="VARCHAR" property="photo" />
-    <result column="cellphone" jdbcType="VARCHAR" property="cellphone" />
-    <result column="organization_type" jdbcType="VARCHAR" property="organizationType" />
-    <result column="source_system" jdbcType="VARCHAR" property="sourceSystem" />
-    <result column="profession" jdbcType="VARCHAR" property="profession" />
-    <result column="operating_area" jdbcType="VARCHAR" property="operatingArea" />
-    <result column="operating_lng" jdbcType="VARCHAR" property="operatingLng" />
-    <result column="operating_lat" jdbcType="VARCHAR" property="operatingLat" />
-    <result column="other_title" jdbcType="VARCHAR" property="otherTitle" />
-    <result column="main_category" jdbcType="VARCHAR" property="mainCategory" />
+    <result column="code"  property="code" />
+    <result column="certificate_number"  property="certificateNumber" />
+    <result column="certificate_type"  property="certificateType" />
+    <result column="certificate_range"  property="certificateRange" />
+    <result column="certificate_addr"  property="certificateAddr" />
+    <result column="name"  property="name" />
+    <result column="birthdate"  property="birthdate" />
+    <result column="gender"  property="gender" />
+    <result column="photo"  property="photo" />
+    <result column="cellphone"  property="cellphone" />
+    <result column="contacts_phone" property="contactsPhone" />
+    <result column="contacts_name" property="contactsName" />
+    <result column="organization_type"  property="organizationType" />
+    <result column="source_system"  property="sourceSystem" />
+    <result column="source_channel" property="sourceChannel" />
     <result column="registered_capital" jdbcType="BIGINT" property="registeredCapital" />
-    <result column="employee_number" jdbcType="VARCHAR" property="employeeNumber" />
-    <result column="corporation_certificate_type" jdbcType="VARCHAR" property="corporationCertificateType" />
-    <result column="corporation_certificate_number" jdbcType="VARCHAR" property="corporationCertificateNumber" />
-    <result column="corporation_name" jdbcType="VARCHAR" property="corporationName" />
-    <result column="is_cellphone_valid" jdbcType="INTEGER" property="isCellphoneValid" />
-    <result column="creator_id" jdbcType="BIGINT" property="creatorId" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
-    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
-    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="employee_number"  property="employeeNumber" />
+    <result column="corporation_certificate_type"  property="corporationCertificateType" />
+    <result column="corporation_certificate_number"  property="corporationCertificateNumber" />
+    <result column="corporation_name"  property="corporationName" />
+    <result column="is_cellphone_valid"  property="isCellphoneValid" />
+    <result column="creator_id"  property="creatorId" />
+    <result column="create_time"  property="createTime" />
+    <result column="modify_time"  property="modifyTime" />
+    <result column="is_delete"  property="isDelete" />
+    <result column="state"  property="state" />
   </resultMap>
+
+  <!-- list列表查询返回结果集 -->
+  <resultMap id="listResultMap"  type="com.dili.customer.domain.Customer" extends="BaseResultMap">
+    <result column="customerMarketId"  property="customerMarket.id" />
+    <result column="marketId" property="customerMarket.marketId" />
+    <result column="marketCreateTime" property="customerMarket.createTime" />
+    <result column="marketCreatorId" property="customerMarket.creatorId" />
+    <result column="grade" property="customerMarket.grade" />
+    <result column="type" property="customerMarket.type" />
+  </resultMap>
+
   <sql id="Base_Column_List">
     <!--
       WARNING - @mbg.generated
     -->
     id, code, certificate_number, certificate_type, certificate_range, certificate_addr, 
-    name, birthdate, gender, photo, cellphone, organization_type, source_system, profession, 
-    operating_area, operating_lng, operating_lat, other_title, main_category, registered_capital, 
+    name, birthdate, gender, photo, cellphone, organization_type, source_system, registered_capital,
     employee_number, corporation_certificate_type, corporation_certificate_number, corporation_name, 
     is_cellphone_valid, creator_id, create_time, modify_time, is_delete, state
   </sql>
-  <select id="selectBy" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    select 
-    <include refid="Base_Column_List" />
-    from customer
-    where id = #{id,jdbcType=BIGINT}
-  </select>
+
 
   <!--- 联合查询分页信息 -->
-  <select id="listForPage" parameterType="com.dili.customer.domain.dto.CustomerQueryInput" resultType="com.dili.customer.domain.Customer">
-    <!-- SELECT c.* from customer -->
+  <select id="listForPage" parameterType="com.dili.customer.sdk.domain.dto.CustomerQueryInput"  resultMap="listResultMap">
     SELECT
-        c.*,cm.market_id as marketId,cm.create_time as marketCreateTime,cm.creator_id AS marketCreatorId
+        c.*,
+        cm.id as customerMarketId, cm.market_id as marketId,cm.create_time as marketCreateTime,cm.creator_id AS marketCreatorId,cm.grade,cm.type
     FROM
       customer c,customer_market cm
       <where>
         c.id = cm.customer_id
         <if test="id != null">
           and c.id = #{id}
+        </if>
+        <if test="null != idList and idList.size()>0">
+          and c.id in
+          <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+          </foreach>
         </if>
         <if test="marketId != null">
           and cm.market_id = #{marketId}
@@ -94,7 +99,7 @@
           and c.organization_type = #{organizationType}
         </if>
         <if test="grade != null">
-          and c.grade = #{grade}
+          and cm.grade = #{grade}
         </if>
         <if test="contactsPhone != null">
           and c.contacts_phone = #{contactsPhone}
@@ -118,7 +123,7 @@
           and c.is_delete = #{isDelete}
         </if>
         <if test="keyword != null">
-          and ( c.certificate_number =  #{keyword} or c.name like concat('%', #{keyword}, '%') )
+          and ( c.certificate_number =  #{keyword} or c.name like concat('%', #{keyword}, '%') or c.code like concat('%', #{keyword}, '') )
         </if>
         <if test="marketCreatorId != null">
           and cm.creator_id = #{marketCreatorId}

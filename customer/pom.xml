@@ -122,6 +122,13 @@
             <version>${sharp-sword.version}</version>
         </dependency>
         <!-- 内部包  -->
+
+        <dependency>
+            <groupId>com.dili</groupId>
+            <artifactId>customer-sdk</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.dili</groupId>
             <artifactId>ss-processor</artifactId>
