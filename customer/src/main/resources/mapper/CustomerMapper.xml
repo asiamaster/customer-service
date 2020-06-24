@@ -37,11 +37,14 @@
   <!-- list列表查询返回结果集 -->
   <resultMap id="listResultMap"  type="com.dili.customer.domain.Customer" extends="BaseResultMap">
     <result column="customerMarketId"  property="customerMarket.id" />
-    <result column="marketId" property="customerMarket.marketId" />
+    <result column="market_id" property="customerMarket.marketId" />
     <result column="marketCreateTime" property="customerMarket.createTime" />
     <result column="marketCreatorId" property="customerMarket.creatorId" />
     <result column="grade" property="customerMarket.grade" />
     <result column="type" property="customerMarket.type" />
+    <result column="department_id" property="customerMarket.departmentId" />
+    <result column="profession" property="customerMarket.profession" />
+    <result column="main_category" property="customerMarket.mainCategory" />
   </resultMap>
 
   <sql id="Base_Column_List">
@@ -59,7 +62,8 @@
   <select id="listForPage" parameterType="com.dili.customer.sdk.domain.dto.CustomerQueryInput"  resultMap="listResultMap">
     SELECT
         c.*,
-        cm.id as customerMarketId, cm.market_id as marketId,cm.create_time as marketCreateTime,cm.creator_id AS marketCreatorId,cm.grade,cm.type
+        cm.id as customerMarketId, cm.market_id,cm.create_time as marketCreateTime,cm.creator_id AS marketCreatorId,
+        cm.grade,cm.type,cm.department_id,cm.profession,cm.main_category
     FROM
       customer c,customer_market cm
       <where>
