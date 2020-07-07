@@ -1,5 +1,6 @@
 package com.dili.customer.api;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.dto.CustomerUpdateInput;
@@ -40,7 +41,10 @@ public class CustomerController {
      * @return
      */
     @RequestMapping(value="/listPage", method = {RequestMethod.POST})
-    public PageOutput<List<Customer>> listPage(@RequestBody(required = false) CustomerQueryInput customer){
+    public PageOutput<List<Customer>> listPage(@RequestBody CustomerQueryInput customer){
+        if (Objects.isNull(customer.getMarketId()) && CollectionUtil.isEmpty(customer.getMarketIdList())) {
+            return PageOutput.failure("客户所属市场不能为空");
+        }
         return customerService.listForPage(customer);
     }
 
@@ -51,9 +55,9 @@ public class CustomerController {
      * @return
      */
     @RequestMapping(value="/listNormalPage", method = {RequestMethod.POST})
-    public PageOutput<List<Customer>> listNormalPage(@RequestBody(required = false) CustomerQueryInput customer){
-        if (Objects.isNull(customer)) {
-            customer = new CustomerQueryInput();
+    public PageOutput<List<Customer>> listNormalPage(@RequestBody CustomerQueryInput customer){
+        if (Objects.isNull(customer.getMarketId()) && CollectionUtil.isEmpty(customer.getMarketIdList())) {
+            return PageOutput.failure("客户所属市场不能为空");
         }
         if (Objects.isNull(customer.getState())) {
             customer.setState(1);
@@ -122,6 +126,9 @@ public class CustomerController {
      */
     @RequestMapping(value="/list", method = {RequestMethod.POST})
     public BaseOutput<List<Customer>> list(@RequestBody(required = false) CustomerQueryInput customer) {
+        if (Objects.isNull(customer.getMarketId()) && CollectionUtil.isEmpty(customer.getMarketIdList())) {
+            return BaseOutput.failure("客户所属市场不能为空");
+        }
         PageOutput pageOutput = customerService.listForPage(customer);
         return BaseOutput.success().setData(pageOutput.getData());
     }

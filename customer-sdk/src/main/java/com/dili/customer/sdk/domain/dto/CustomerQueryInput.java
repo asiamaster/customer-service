@@ -1,10 +1,7 @@
 package com.dili.customer.sdk.domain.dto;
 
 import com.dili.customer.sdk.domain.Customer;
-import com.dili.customer.sdk.validator.AddView;
-import com.dili.customer.sdk.validator.UpdateView;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
