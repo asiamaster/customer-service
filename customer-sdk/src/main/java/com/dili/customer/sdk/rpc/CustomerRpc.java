@@ -96,11 +96,11 @@ public interface CustomerRpc {
 
     /**
      * 根据证件号及市场，查询客户的信息
-     * @param getByCertificateNumber 客户证件号
+     * @param certificateNumber 客户证件号
      * @param marketId 市场ID
      * @return
      */
     @RequestMapping(value="/api/customer/getByCertificateNumber", method = {RequestMethod.POST})
-    BaseOutput<Customer> getByCertificateNumber(@RequestParam("getByCertificateNumber") String getByCertificateNumber, @RequestParam("marketId") Long marketId);
+    BaseOutput<Customer> getByCertificateNumber(@RequestParam("certificateNumber") String certificateNumber, @RequestParam("marketId") Long marketId);
 
 }
