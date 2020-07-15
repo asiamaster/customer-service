@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 由MyBatis Generator工具自动生成
+ * 客户所属市场
  * This file was generated on 2019-12-31 10:19:41.
  * @author yuehongbo
  */

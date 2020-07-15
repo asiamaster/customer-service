@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 由MyBatis Generator工具自动生成
+ * 客户联系人信息
  * This file was generated on 2020-01-02 16:18:39.
  * @author yuehongbo
  */

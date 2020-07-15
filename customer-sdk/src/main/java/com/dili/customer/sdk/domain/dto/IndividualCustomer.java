@@ -149,6 +149,22 @@ public class IndividualCustomer implements Serializable {
      */
     private String customerType;
 
+    /**
+     * 现住址城市ID
+     */
+    private Long currentCityId;
+
+    /**
+     * 现住址城市名称
+     */
+    private String currentCityName;
+
+    /**
+     * 现住址详细地址
+     */
+    private String currentAddress;
+
+
 
     public Long getId() {
         return id;

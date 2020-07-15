@@ -5,6 +5,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.customer.utils.CustomerInfoUtil;
 import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.domain.annotation.Like;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -180,6 +181,24 @@ public class Customer extends BaseDomain {
     private Integer isCellphoneValid;
 
     /**
+     * 现住址城市ID
+     */
+    @Column(name = "current_city_id")
+    private Long currentCityId;
+
+    /**
+     * 现住址城市名称
+     */
+    @Column(name = "current_city_name")
+    private String currentCityName;
+
+    /**
+     * 现住址详细地址
+     */
+    @Column(name = "current_address")
+    private String currentAddress;
+
+    /**
      * 创建人
      */
     @Column(name = "`creator_id`",updatable = false)
@@ -190,6 +209,7 @@ public class Customer extends BaseDomain {
      */
     @Column(name = "`create_time`",updatable = false)
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
@@ -198,6 +218,7 @@ public class Customer extends BaseDomain {
      */
     @Column(name = "`modify_time`")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HHm:m:ss")
     private LocalDateTime modifyTime;
 

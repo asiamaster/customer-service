@@ -138,6 +138,21 @@ public class Customer extends BaseDomain {
     private Integer isCellphoneValid;
 
     /**
+     * 现住址城市ID
+     */
+    private Long currentCityId;
+
+    /**
+     * 现住址城市名称
+     */
+    private String currentCityName;
+
+    /**
+     * 现住址详细地址
+     */
+    private String currentAddress;
+
+    /**
      * 创建人
      */
     private Long creatorId;
@@ -318,6 +333,24 @@ public class Customer extends BaseDomain {
     }
     public void setIsCellphoneValid(Integer isCellphoneValid) {
         this.isCellphoneValid = isCellphoneValid;
+    }
+    public Long getCurrentCityId() {
+        return currentCityId;
+    }
+    public void setCurrentCityId(Long currentCityId) {
+        this.currentCityId = currentCityId;
+    }
+    public String getCurrentCityName() {
+        return currentCityName;
+    }
+    public void setCurrentCityName(String currentCityName) {
+        this.currentCityName = currentCityName;
+    }
+    public String getCurrentAddress() {
+        return currentAddress;
+    }
+    public void setCurrentAddress(String currentAddress) {
+        this.currentAddress = currentAddress;
     }
     public Long getCreatorId() {
         return creatorId;

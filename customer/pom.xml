@@ -127,7 +127,6 @@
             <artifactId>customer-sdk</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.dili</groupId>
             <artifactId>ss-processor</artifactId>

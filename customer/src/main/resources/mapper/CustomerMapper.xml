@@ -27,6 +27,9 @@
     <result column="corporation_certificate_number"  property="corporationCertificateNumber" />
     <result column="corporation_name"  property="corporationName" />
     <result column="is_cellphone_valid"  property="isCellphoneValid" />
+    <result column="current_city_id" property="currentCityId" />
+    <result column="current_city_name" property="currentCityName" />
+    <result column="current_address" property="currentAddress" />
     <result column="creator_id"  property="creatorId" />
     <result column="create_time"  property="createTime" />
     <result column="modify_time"  property="modifyTime" />
@@ -44,7 +47,8 @@
     <result column="type" property="customerMarket.type" />
     <result column="department_id" property="customerMarket.departmentId" />
     <result column="profession" property="customerMarket.profession" />
-    <result column="main_category" property="customerMarket.mainCategory" />
+    <result column="category" property="customerMarket.category" />
+    <result column="sales_market" property="customerMarket.salesMarket" />
   </resultMap>
 
   <sql id="Base_Column_List">
@@ -63,7 +67,7 @@
     SELECT
         c.*,
         cm.id as customerMarketId, cm.market_id,cm.create_time as marketCreateTime,cm.creator_id AS marketCreatorId,
-        cm.grade,cm.type,cm.department_id,cm.profession,cm.main_category
+        cm.grade,cm.type,cm.department_id,cm.profession,cm.category,cm.sales_market
     FROM
       customer c,customer_market cm
       <where>

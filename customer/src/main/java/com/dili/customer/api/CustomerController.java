@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 由MyBatis Generator工具自动生成
+ * 客户基础信息
  * This file was generated on 2019-12-27 14:43:13.
  * @author yuehongbo
  */

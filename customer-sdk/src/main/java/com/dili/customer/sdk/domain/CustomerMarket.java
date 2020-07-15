@@ -75,9 +75,14 @@ public class CustomerMarket extends BaseDomain {
     private String otherTitle;
 
     /**
-     * 主营品类
+     * 经营品类
      */
-    private String mainCategory;
+    private String category;
+
+    /**
+     * 销售市场
+     */
+    private String salesMarket;
 
     /**
      * 客户别名
@@ -119,7 +124,6 @@ public class CustomerMarket extends BaseDomain {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyTime;
-
 
     @Override
     public Long getId() {
@@ -189,11 +193,17 @@ public class CustomerMarket extends BaseDomain {
     public void setOtherTitle(String otherTitle) {
         this.otherTitle = otherTitle;
     }
-    public String getMainCategory() {
-        return mainCategory;
+    public String getCategory() {
+        return category;
     }
-    public void setMainCategory(String mainCategory) {
-        this.mainCategory = mainCategory;
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    public String getSalesMarket() {
+        return salesMarket;
+    }
+    public void setSalesMarket(String salesMarket) {
+        this.salesMarket = salesMarket;
     }
     public String getAlias() {
         return alias;
