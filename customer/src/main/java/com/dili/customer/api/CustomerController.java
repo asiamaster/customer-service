@@ -156,7 +156,7 @@ public class CustomerController {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
-        return customerService.saveBaseInfo(customer);
+        return customerService.register(customer);
     }
 
     /**
@@ -171,7 +171,7 @@ public class CustomerController {
         }
         EnterpriseCustomerInput input = new EnterpriseCustomerInput();
         BeanUtils.copyProperties(customer,input);
-        return customerService.saveBaseInfo(input);
+        return customerService.register(input);
     }
 
 

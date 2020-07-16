@@ -5,75 +5,16 @@
     <!--
       WARNING - @mbg.generated
     -->
-    <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="customer_id" jdbcType="BIGINT" property="customerId" />
-    <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="address" jdbcType="VARCHAR" property="address" />
-    <result column="city_id" jdbcType="VARCHAR" property="cityId" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
-    <result column="creator_id" jdbcType="BIGINT" property="creatorId" />
-    <result column="modifier_id" jdbcType="BIGINT" property="modifierId" />
-    <result column="lat" jdbcType="VARCHAR" property="lat" />
-    <result column="lng" jdbcType="VARCHAR" property="lng" />
+    <id column="id"  property="id" />
+    <result column="customer_id"  property="customerId" />
+    <result column="market_id"  property="marketId" />
+    <result column="city_id"  property="cityId" />
+    <result column="address"  property="address" />
     <result column="is_default"  property="isDefault" />
+    <result column="create_time"  property="createTime" />
+    <result column="modify_time"  property="modifyTime" />
+    <result column="creator_id"  property="creatorId" />
+    <result column="modifier_id"  property="modifierId" />
   </resultMap>
-  <sql id="Base_Column_List">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    id, customer_id, name, address, city_id, create_time, modify_time, creator_id, modifier_id, 
-    lat, lng, is_default
-  </sql>
-  <select id="selectBy" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    select 
-    <include refid="Base_Column_List" />
-    from customer_address
-    where id = #{id,jdbcType=BIGINT}
-  </select>
-  <update id="updateBy" parameterType="com.dili.customer.domain.Address">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    update customer_address
-    <set>
-      <if test="customerId != null">
-        customer_id = #{customerId,jdbcType=BIGINT},
-      </if>
-      <if test="name != null">
-        name = #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="address != null">
-        address = #{address,jdbcType=VARCHAR},
-      </if>
-      <if test="cityId != null">
-        city_id = #{cityId,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="modifyTime != null">
-        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="creatorId != null">
-        creator_id = #{creatorId,jdbcType=BIGINT},
-      </if>
-      <if test="modifierId != null">
-        modifier_id = #{modifierId,jdbcType=BIGINT},
-      </if>
-      <if test="lat != null">
-        lat = #{lat,jdbcType=VARCHAR},
-      </if>
-      <if test="lng != null">
-        lng = #{lng,jdbcType=VARCHAR},
-      </if>
-      <if test="isDefault != null">
-        is_default = #{isDefault,jdbcType=BIT},
-      </if>
-    </set>
-    where id = #{id,jdbcType=BIGINT}
-  </update>
+
 </mapper>

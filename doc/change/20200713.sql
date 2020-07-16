@@ -4,8 +4,8 @@ create table tallying_area
    id                   bigint not null auto_increment comment '主键ID',
    customer_id          bigint comment '客户ID',
    market_id            bigint comment '客户理货区市场',
-   department_id        bigint comment '理货区(摊位)所属部门',
-   assets_name          varchar(32) comment '理货区(摊位)名称',
+   assets_id            bigint comment '理货区(资产)ID',
+   assets_name          varchar(32) comment '理货区(资产)名称',
    is_lease             tinyint comment '是否存在租赁关系',
    start_time           datetime comment '租赁开始时间',
    end_time             datetime comment '租赁结束时间',
@@ -15,6 +15,26 @@ create table tallying_area
    primary key (id)
 );
 alter table tallying_area comment '客户理货区关联关系';
+
+drop table if exists address;
+/*==============================================================*/
+/* Table: address                                               */
+/*==============================================================*/
+create table address
+(
+   id                   bigint not null auto_increment comment 'ID',
+   customer_id          bigint comment '客户ID',
+   market_id            bigint comment '所属市场ID',
+   city_id              varchar(20) comment '所在城市',
+   address              varchar(250) comment '地址',
+   is_default           tinyint(1) comment '是否默认地址',
+   create_time          datetime default CURRENT_TIMESTAMP comment '创建时间',
+   modify_time          datetime default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '修改时间',
+   creator_id           bigint comment '创建人',
+   modifier_id          bigint comment '修改人',
+   primary key (id)
+);
+alter table address comment '客户联系地址信息';
 
 ALTER TABLE customer ADD COLUMN `current_city_id` BIGINT DEFAULT NULL COMMENT '现住址城市ID' AFTER is_cellphone_valid;
 ALTER TABLE customer ADD COLUMN `current_city_name` VARCHAR ( 40 ) DEFAULT NULL COMMENT '现住址城市名称' AFTER current_city_id;

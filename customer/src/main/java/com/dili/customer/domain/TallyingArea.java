@@ -41,13 +41,13 @@ public class TallyingArea extends BaseDomain {
     private Long marketId;
 
     /**
-     * 理货区(摊位)所属部门
+     * 客户理货区(资产)ID
      */
-    @Column(name = "`department_id`")
-    private Long departmentId;
+    @Column(name = "`assets_id`")
+    private Long assetsId;
 
     /**
-     * 理货区(摊位)名称
+     * 理货区(资产)名称
      */
     @Column(name = "`assets_name`")
     private String assetsName;

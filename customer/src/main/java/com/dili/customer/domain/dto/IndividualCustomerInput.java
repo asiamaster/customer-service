@@ -1,5 +1,7 @@
 package com.dili.customer.domain.dto;
 
+import com.dili.customer.domain.CustomerMarket;
+import com.dili.customer.domain.TallyingArea;
 import com.dili.customer.sdk.validator.AddView;
 import com.dili.customer.sdk.validator.UpdateView;
 import lombok.Getter;
@@ -13,6 +15,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * <B>Description</B>
@@ -61,12 +64,6 @@ public class IndividualCustomerInput implements Serializable {
     private String name;
 
     /**
-     * 客户等级
-     */
-    @NotNull(message = "客户等级不能为空", groups = {AddView.class,UpdateView.class})
-    private Integer grade;
-
-    /**
      * 来源系统##外部系统来源标识
      */
     @NotBlank(message = "客户来源系统不能为空", groups = {AddView.class})
@@ -78,24 +75,11 @@ public class IndividualCustomerInput implements Serializable {
     @NotBlank(message = "客户来源渠道不能为空", groups = {AddView.class})
     private String sourceChannel;
 
-
     /**
      * 创建人
      */
     @NotNull(message = "操作人ID不能为空", groups = {AddView.class, UpdateView.class})
     private Long operatorId;
-
-    /**
-     * 客户归属人
-     */
-    @NotNull(message = "客户归属人不能为空", groups = {AddView.class, UpdateView.class})
-    private Long ownerId;
-
-    /**
-     * 客户所属市场
-     */
-    @NotNull(message = "所属市场不能为空", groups = {AddView.class,UpdateView.class})
-    private Long marketId;
 
     /**
      * 联系电话
@@ -115,11 +99,6 @@ public class IndividualCustomerInput implements Serializable {
      */
     @NotBlank(message = "客户编码不能为空", groups = {AddView.class})
     private String code;
-
-    /**
-     * 归属部门
-     */
-    private Long departmentId;
 
     /**
      * 是否删除
@@ -167,4 +146,39 @@ public class IndividualCustomerInput implements Serializable {
      */
     private String customerType;
 
+    /**
+     * 现住址城市ID
+     */
+    private Long currentCityId;
+
+    /**
+     * 现住址城市名称
+     */
+    private String currentCityName;
+
+    /**
+     * 现住址详细地址
+     */
+    private String currentAddress;
+
+    /**
+     * 客户所属市场信息
+     */
+    @Valid
+    private CustomerMarket customerMarket;
+
+    /**
+     * 客户理货区
+     */
+    private List<TallyingArea> tallyingAreaList;
+
+    /**
+     * 紧急联系人
+     */
+    private String emergencyContactsName;
+
+    /**
+     * 紧急联系电话
+     */
+    private String emergencyContactsPhone;
 }

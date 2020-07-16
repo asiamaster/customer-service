@@ -5,6 +5,7 @@ import com.dili.ss.domain.BaseDomain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Column;
 import java.time.LocalDateTime;
 
 /**
@@ -31,12 +32,12 @@ public class TallyingArea extends BaseDomain {
     private Long marketId;
 
     /**
-     * 理货区(摊位)所属部门
+     * 客户理货区(资产)ID
      */
-    private Long departmentId;
+    private Long assetsId;
 
     /**
-     * 理货区(摊位)名称
+     * 理货区(资产)名称
      */
     private String assetsName;
 
@@ -102,11 +103,11 @@ public class TallyingArea extends BaseDomain {
     public void setMarketId(Long marketId) {
         this.marketId = marketId;
     }
-    public Long getDepartmentId() {
-        return departmentId;
+    public Long getAssetsId() {
+        return assetsId;
     }
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
+    public void setAssetsId(Long assetsId) {
+        this.assetsId = assetsId;
     }
     public String getAssetsName() {
         return assetsName;

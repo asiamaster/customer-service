@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.dili.customer.domain.Contacts;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.CustomerMarket;
+import com.dili.customer.domain.TallyingArea;
 import com.dili.customer.domain.dto.CustomerCertificateInput;
 import com.dili.customer.domain.dto.CustomerUpdateInput;
 import com.dili.customer.domain.dto.EnterpriseCustomerInput;
@@ -13,6 +14,7 @@ import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
 import com.dili.customer.service.ContactsService;
 import com.dili.customer.service.CustomerMarketService;
 import com.dili.customer.service.CustomerService;
+import com.dili.customer.service.TallyingAreaService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
@@ -20,6 +22,7 @@ import com.dili.ss.domain.PageOutput;
 import com.dili.ss.util.POJOUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +50,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private CustomerMarketService customerMarketService;
     @Autowired
     private ContactsService contactsService;
+    @Autowired
+    private TallyingAreaService tallyingAreaService;
 
 
     @Override
@@ -61,9 +66,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BaseOutput<Customer> saveBaseInfo(EnterpriseCustomerInput baseInfo) {
+    public BaseOutput<Customer> register(EnterpriseCustomerInput baseInfo) {
         //客户归属市场信息
-        CustomerMarket marketInfo = null;
+        CustomerMarket marketInfo = baseInfo.getCustomerMarket();
         //客户基本信息对象
         Customer customer = null;
         /**
@@ -91,9 +96,12 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                     return BaseOutput.failure("已存在相同证件号的客户").setCode(ResultCode.DATA_ERROR);
                 }
                 //查询客户在当前传入市场的信息
-                marketInfo = customerMarketService.queryByMarketAndCustomerId(baseInfo.getMarketId(), customer.getId());
-                if (null != marketInfo) {
+                CustomerMarket temp = customerMarketService.queryByMarketAndCustomerId(marketInfo.getMarketId(), customer.getId());
+                if (Objects.nonNull(temp)) {
                     return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR);
+                } else {
+                    marketInfo.setCreateTime(LocalDateTime.now());
+                    marketInfo.setCreatorId(baseInfo.getOperatorId());
                 }
             }
         } else {
@@ -103,44 +111,39 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 return BaseOutput.failure("已存在相同证件号的客户").setCode(ResultCode.DATA_ERROR);
             }
             //查询客户在当前传入市场的信息
-            marketInfo = customerMarketService.queryByMarketAndCustomerId(baseInfo.getMarketId(), customer.getId());
+            CustomerMarket temp = customerMarketService.queryByMarketAndCustomerId(marketInfo.getMarketId(), customer.getId());
+            if (Objects.isNull(temp)) {
+                marketInfo.setCreateTime(LocalDateTime.now());
+                marketInfo.setCreatorId(baseInfo.getOperatorId());
+            } else {
+                BeanUtils.copyProperties(temp, marketInfo);
+            }
             //保存客户基本信息
             customer.setModifyTime(LocalDateTime.now());
             super.update(customer);
         }
-        if (null == marketInfo) {
-            marketInfo = new CustomerMarket();
-            marketInfo.setCustomerId(customer.getId());
-            marketInfo.setMarketId(baseInfo.getMarketId());
-            marketInfo.setCreateTime(LocalDateTime.now());
-            marketInfo.setCreatorId(baseInfo.getOperatorId());
-            marketInfo.setType(baseInfo.getCustomerType());
-            marketInfo.setGrade(baseInfo.getGrade());
-        }
-        marketInfo.setOwnerId(baseInfo.getOwnerId());
-        marketInfo.setDepartmentId(baseInfo.getDepartmentId());
+        marketInfo.setCustomerId(customer.getId());
         marketInfo.setModifierId(baseInfo.getOperatorId());
         marketInfo.setModifyTime(LocalDateTime.now());
         customerMarketService.saveOrUpdate(marketInfo);
-        //保存客户联系人信息
-        Contacts contacts = new Contacts();
-        contacts.setCustomerId(customer.getId());
-        if (StrUtil.isNotBlank(customer.getContactsName())) {
-            contacts.setName(customer.getContactsName());
-        } else {
-            contacts.setName(customer.getName());
-        }
-        contacts.setPhone(customer.getContactsPhone());
-        contacts.setMarketId(baseInfo.getMarketId());
-        contacts.setCreatorId(baseInfo.getOperatorId());
-        contacts.setModifierId(baseInfo.getOperatorId());
-        BaseOutput saveContacts = contactsService.saveContacts(contacts);
-        if (!saveContacts.isSuccess()) {
-            LOGGER.warn("保存客户联系人失败," + saveContacts.getMessage());
+        //组装并保存客户联系人信息
+        List<Contacts> contactsList = generateContacts(baseInfo, customer);
+        contactsService.batchInsert(contactsList);
+        /**
+         * 如果客户理货区不为空，则保存对应的理货区信息
+         */
+        if (CollectionUtil.isNotEmpty(baseInfo.getTallyingAreaList())) {
+            List<TallyingArea> tallyingAreaList = baseInfo.getTallyingAreaList();
+            tallyingAreaList.forEach(tallyingArea -> {
+                tallyingArea.setCustomerId(marketInfo.getCustomerId());
+                tallyingArea.setMarketId(marketInfo.getMarketId());
+                tallyingArea.setCreateTime(LocalDateTime.now());
+                tallyingArea.setModifyTime(tallyingArea.getCreateTime());
+            });
+            tallyingAreaService.batchInsert(tallyingAreaList);
         }
         return BaseOutput.success().setData(customer);
     }
-
 
     @Override
     public PageOutput<List<Customer>> listForPage(CustomerQueryInput input) {
@@ -231,6 +234,40 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             contactsService.batchInsert(contactsList);
         }
         return BaseOutput.success().setData(customer);
+    }
+
+
+    /**
+     *  组装客户联系人信息
+     * @param baseInfo
+     * @param customer
+     * @return
+     */
+    private List<Contacts> generateContacts(EnterpriseCustomerInput baseInfo, Customer customer) {
+        Contacts contacts = new Contacts();
+        contacts.setCustomerId(customer.getId());
+        if (StrUtil.isNotBlank(customer.getContactsName())) {
+            contacts.setName(customer.getContactsName());
+        } else {
+            contacts.setName(customer.getName());
+        }
+        contacts.setPhone(customer.getContactsPhone());
+        contacts.setMarketId(baseInfo.getCustomerMarket().getMarketId());
+        contacts.setCreatorId(baseInfo.getOperatorId());
+        contacts.setModifierId(baseInfo.getOperatorId());
+        List<Contacts> contactsList = Lists.newArrayList();
+        contactsList.add(contacts);
+        /**
+         * 如果紧急联系人不为空，则构建紧急联系人保存信息
+         */
+        if (Objects.nonNull(baseInfo.getEmergencyContactsName()) && Objects.nonNull(baseInfo.getEmergencyContactsPhone())) {
+            Contacts emergencyContacts = new Contacts();
+            BeanUtils.copyProperties(contacts, emergencyContacts);
+            emergencyContacts.setName(baseInfo.getEmergencyContactsName());
+            emergencyContacts.setPhone(baseInfo.getEmergencyContactsPhone());
+            contactsList.add(emergencyContacts);
+        }
+        return contactsList;
     }
 
 }

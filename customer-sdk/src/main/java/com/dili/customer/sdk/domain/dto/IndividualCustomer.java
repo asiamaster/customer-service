@@ -1,15 +1,20 @@
 package com.dili.customer.sdk.domain.dto;
 
 
+import com.dili.customer.sdk.domain.CustomerMarket;
+import com.dili.customer.sdk.domain.TallyingArea;
 import com.dili.customer.sdk.validator.AddView;
 import com.dili.customer.sdk.validator.UpdateView;
 
+import javax.persistence.Column;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * <B>Description</B>
@@ -164,7 +169,30 @@ public class IndividualCustomer implements Serializable {
      */
     private String currentAddress;
 
+    /**
+     * 客户所属市场信息
+     */
+    private CustomerMarket customerMarket;
 
+    /**
+     * 客户理货区
+     */
+    private List<TallyingArea> tallyingAreaList;
+
+    /**
+     * 紧急联系人
+     */
+    private String emergencyContactsName;
+
+    /**
+     * 紧急联系电话
+     */
+    private String emergencyContactsPhone;
+
+    /**
+     * 客户理货区页面输入值
+     */
+    private String assetsInput;
 
     public Long getId() {
         return id;
@@ -303,5 +331,53 @@ public class IndividualCustomer implements Serializable {
     }
     public void setCustomerType(String customerType) {
         this.customerType = customerType;
+    }
+    public Long getCurrentCityId() {
+        return currentCityId;
+    }
+    public void setCurrentCityId(Long currentCityId) {
+        this.currentCityId = currentCityId;
+    }
+    public String getCurrentCityName() {
+        return currentCityName;
+    }
+    public void setCurrentCityName(String currentCityName) {
+        this.currentCityName = currentCityName;
+    }
+    public String getCurrentAddress() {
+        return currentAddress;
+    }
+    public void setCurrentAddress(String currentAddress) {
+        this.currentAddress = currentAddress;
+    }
+    public String getEmergencyContactsName() {
+        return emergencyContactsName;
+    }
+    public void setEmergencyContactsName(String emergencyContactsName) {
+        this.emergencyContactsName = emergencyContactsName;
+    }
+    public String getEmergencyContactsPhone() {
+        return emergencyContactsPhone;
+    }
+    public void setEmergencyContactsPhone(String emergencyContactsPhone) {
+        this.emergencyContactsPhone = emergencyContactsPhone;
+    }
+    public CustomerMarket getCustomerMarket() {
+        return customerMarket;
+    }
+    public void setCustomerMarket(CustomerMarket customerMarket) {
+        this.customerMarket = customerMarket;
+    }
+    public List<TallyingArea> getTallyingAreaList() {
+        return tallyingAreaList;
+    }
+    public void setTallyingAreaList(List<TallyingArea> tallyingAreaList) {
+        this.tallyingAreaList = tallyingAreaList;
+    }
+    public String getAssetsInput() {
+        return assetsInput;
+    }
+    public void setAssetsInput(String assetsInput) {
+        this.assetsInput = assetsInput;
     }
 }
