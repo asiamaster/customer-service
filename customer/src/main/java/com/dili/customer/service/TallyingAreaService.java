@@ -9,4 +9,12 @@ import com.dili.ss.base.BaseService;
  * @date 2020/7/15 18:30
  */
 public interface TallyingAreaService extends BaseService<TallyingArea, Long> {
+
+    /**
+     * 根据客户及市场，删除对应的理货区信息
+     * @param customerId 客户ID
+     * @param marketId  市场ID
+     * @return
+     */
+    Integer deleteByCustomerId(Long customerId,Long marketId);
 }

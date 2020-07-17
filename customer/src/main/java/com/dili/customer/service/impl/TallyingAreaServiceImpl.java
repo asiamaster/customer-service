@@ -1,13 +1,12 @@
 package com.dili.customer.service.impl;
 
-import com.dili.customer.domain.CustomerMarket;
 import com.dili.customer.domain.TallyingArea;
-import com.dili.customer.mapper.CustomerMarketMapper;
 import com.dili.customer.mapper.TallyingAreaMapper;
-import com.dili.customer.service.CustomerMarketService;
 import com.dili.customer.service.TallyingAreaService;
 import com.dili.ss.base.BaseServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * @author yuehongbo
@@ -19,5 +18,16 @@ public class TallyingAreaServiceImpl extends BaseServiceImpl<TallyingArea, Long>
 
     public TallyingAreaMapper getActualMapper() {
         return (TallyingAreaMapper)getDao();
+    }
+
+    @Override
+    public Integer deleteByCustomerId(Long customerId, Long marketId) {
+        if (Objects.isNull(customerId)) {
+            return 0;
+        }
+        TallyingArea condition = new TallyingArea();
+        condition.setCustomerId(customerId);
+        condition.setMarketId(marketId);
+        return deleteByExample(condition);
     }
 }

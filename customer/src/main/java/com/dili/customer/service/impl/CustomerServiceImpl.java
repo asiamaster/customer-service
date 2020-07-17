@@ -150,6 +150,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 BeanUtils.copyProperties(tallyingArea, temp);
                 tallyingAreaList.add(temp);
             });
+            //不管有没有数据，先删除，再重新加入
+            tallyingAreaService.deleteByCustomerId(customer.getId(),marketInfo.getMarketId());
             tallyingAreaService.batchInsert(tallyingAreaList);
         }
         return BaseOutput.success().setData(customer);

@@ -18,7 +18,7 @@ public interface ContactsService extends BaseService<Contacts, Long> {
     BaseOutput saveContacts(Contacts customerContacts);
 
     /**
-     * 根据客户及市场，删除对应的联系人心
+     * 根据客户及市场，删除对应的联系人信息
      * @param customerId 客户ID
      * @param marketId  市场ID
      * @return
