@@ -47,7 +47,8 @@
     <result column="type" property="customerMarket.type" />
     <result column="department_id" property="customerMarket.departmentId" />
     <result column="profession" property="customerMarket.profession" />
-    <result column="category" property="customerMarket.category" />
+    <result column="category_id" property="customerMarket.categoryId" />
+    <result column="category_name" property="customerMarket.categoryName" />
     <result column="sales_market" property="customerMarket.salesMarket" />
   </resultMap>
 
@@ -67,7 +68,7 @@
     SELECT
         c.*,
         cm.id as customerMarketId, cm.market_id,cm.create_time as marketCreateTime,cm.creator_id AS marketCreatorId,
-        cm.grade,cm.type,cm.department_id,cm.profession,cm.category,cm.sales_market
+        cm.grade,cm.type,cm.department_id,cm.profession,cm.category_id,cm.category_name,cm.sales_market
     FROM
       customer c,customer_market cm
       <where>
