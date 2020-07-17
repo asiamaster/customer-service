@@ -3,8 +3,8 @@ package com.dili.customer.sdk.rpc;
 import com.dili.customer.sdk.domain.Customer;
 import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
 import com.dili.customer.sdk.domain.dto.CustomerUpdateInput;
-import com.dili.customer.sdk.domain.dto.EnterpriseCustomer;
-import com.dili.customer.sdk.domain.dto.IndividualCustomer;
+import com.dili.customer.sdk.domain.dto.EnterpriseCustomerInput;
+import com.dili.customer.sdk.domain.dto.IndividualCustomerInput;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -48,7 +48,7 @@ public interface CustomerRpc {
      * @return
      */
     @RequestMapping(value = "/api/customer/registerEnterprise", method = RequestMethod.POST)
-    BaseOutput<Customer> registerEnterprise(EnterpriseCustomer baseInfo);
+    BaseOutput<Customer> registerEnterprise(EnterpriseCustomerInput baseInfo);
 
     /**
      * 个人用户注册
@@ -56,7 +56,7 @@ public interface CustomerRpc {
      * @return
      */
     @RequestMapping(value = "/api/customer/registerIndividual", method = RequestMethod.POST)
-    BaseOutput<Customer> registerIndividual(IndividualCustomer baseInfo);
+    BaseOutput<Customer> registerIndividual(IndividualCustomerInput baseInfo);
 
 
     /**

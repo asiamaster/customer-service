@@ -6,7 +6,6 @@ import com.dili.customer.sdk.domain.TallyingArea;
 import com.dili.customer.sdk.validator.AddView;
 import com.dili.customer.sdk.validator.UpdateView;
 
-import javax.persistence.Column;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -17,14 +16,14 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * <B>Description</B>
+ * <B>客户新增保存时的基本信息</B>
  * <B>Copyright:本软件源代码版权归农丰时代所有,未经许可不得任意复制与传播.</B>
  * <B>农丰时代科技有限公司</B>
  *
  * @author yuehongbo
  * @date 2020/2/4 9:53
  */
-public class IndividualCustomer implements Serializable {
+public class IndividualCustomerInput implements Serializable {
     private static final long serialVersionUID = -5865840494367827998L;
 
     /**
@@ -85,39 +84,9 @@ public class IndividualCustomer implements Serializable {
     private String code;
 
     /**
-     * 客户等级
-     */
-    private Integer grade;
-
-    /**
      * 创建人
      */
     private Long operatorId;
-
-    /**
-     * 客户归属人
-     */
-    private Long ownerId;
-
-    /**
-     * 客户所属市场
-     */
-    private Long marketId;
-
-    /**
-     * 客户状态
-     */
-    private Integer state;
-
-    /**
-     * 归属部门
-     */
-    private Long departmentId;
-
-    /**
-     * 是否删除
-     */
-    private Integer isDelete;
 
     /**
      * 性别
@@ -150,11 +119,6 @@ public class IndividualCustomer implements Serializable {
     private Integer certificateLongTerm;
 
     /**
-     * 客户身份类型(买家、卖家等)
-     */
-    private String customerType;
-
-    /**
      * 现住址城市ID
      */
     private Long currentCityId;
@@ -172,6 +136,7 @@ public class IndividualCustomer implements Serializable {
     /**
      * 客户所属市场信息
      */
+    @Valid
     private CustomerMarket customerMarket;
 
     /**
@@ -188,11 +153,6 @@ public class IndividualCustomer implements Serializable {
      * 紧急联系电话
      */
     private String emergencyContactsPhone;
-
-    /**
-     * 客户理货区页面输入值
-     */
-    private String assetsInput;
 
     public Long getId() {
         return id;
@@ -248,47 +208,11 @@ public class IndividualCustomer implements Serializable {
     public void setCode(String code) {
         this.code = code;
     }
-    public Integer getGrade() {
-        return grade;
-    }
-    public void setGrade(Integer grade) {
-        this.grade = grade;
-    }
     public Long getOperatorId() {
         return operatorId;
     }
     public void setOperatorId(Long operatorId) {
         this.operatorId = operatorId;
-    }
-    public Long getOwnerId() {
-        return ownerId;
-    }
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
-    }
-    public Long getMarketId() {
-        return marketId;
-    }
-    public void setMarketId(Long marketId) {
-        this.marketId = marketId;
-    }
-    public Integer getState() {
-        return state;
-    }
-    public void setState(Integer state) {
-        this.state = state;
-    }
-    public Long getDepartmentId() {
-        return departmentId;
-    }
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
-    }
-    public Integer getIsDelete() {
-        return isDelete;
-    }
-    public void setIsDelete(Integer isDelete) {
-        this.isDelete = isDelete;
     }
     public Integer getGender() {
         return gender;
@@ -326,12 +250,6 @@ public class IndividualCustomer implements Serializable {
     public void setCertificateLongTerm(Integer certificateLongTerm) {
         this.certificateLongTerm = certificateLongTerm;
     }
-    public String getCustomerType() {
-        return customerType;
-    }
-    public void setCustomerType(String customerType) {
-        this.customerType = customerType;
-    }
     public Long getCurrentCityId() {
         return currentCityId;
     }
@@ -350,18 +268,6 @@ public class IndividualCustomer implements Serializable {
     public void setCurrentAddress(String currentAddress) {
         this.currentAddress = currentAddress;
     }
-    public String getEmergencyContactsName() {
-        return emergencyContactsName;
-    }
-    public void setEmergencyContactsName(String emergencyContactsName) {
-        this.emergencyContactsName = emergencyContactsName;
-    }
-    public String getEmergencyContactsPhone() {
-        return emergencyContactsPhone;
-    }
-    public void setEmergencyContactsPhone(String emergencyContactsPhone) {
-        this.emergencyContactsPhone = emergencyContactsPhone;
-    }
     public CustomerMarket getCustomerMarket() {
         return customerMarket;
     }
@@ -374,10 +280,16 @@ public class IndividualCustomer implements Serializable {
     public void setTallyingAreaList(List<TallyingArea> tallyingAreaList) {
         this.tallyingAreaList = tallyingAreaList;
     }
-    public String getAssetsInput() {
-        return assetsInput;
+    public String getEmergencyContactsName() {
+        return emergencyContactsName;
     }
-    public void setAssetsInput(String assetsInput) {
-        this.assetsInput = assetsInput;
+    public void setEmergencyContactsName(String emergencyContactsName) {
+        this.emergencyContactsName = emergencyContactsName;
+    }
+    public String getEmergencyContactsPhone() {
+        return emergencyContactsPhone;
+    }
+    public void setEmergencyContactsPhone(String emergencyContactsPhone) {
+        this.emergencyContactsPhone = emergencyContactsPhone;
     }
 }

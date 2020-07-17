@@ -8,9 +8,10 @@ import com.dili.customer.domain.CustomerMarket;
 import com.dili.customer.domain.TallyingArea;
 import com.dili.customer.domain.dto.CustomerCertificateInput;
 import com.dili.customer.domain.dto.CustomerUpdateInput;
-import com.dili.customer.domain.dto.EnterpriseCustomerInput;
 import com.dili.customer.mapper.CustomerMapper;
 import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
+import com.dili.customer.sdk.domain.dto.EnterpriseCustomerInput;
+import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.ContactsService;
 import com.dili.customer.service.CustomerMarketService;
 import com.dili.customer.service.CustomerService;
@@ -67,8 +68,12 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public BaseOutput<Customer> register(EnterpriseCustomerInput baseInfo) {
+        if (Objects.isNull(baseInfo.getCustomerMarket())){
+            return BaseOutput.failure("客户所属市场信息丢失");
+        }
         //客户归属市场信息
-        CustomerMarket marketInfo = baseInfo.getCustomerMarket();
+        CustomerMarket marketInfo = new CustomerMarket();
+        BeanUtils.copyProperties(baseInfo.getCustomerMarket(),marketInfo);
         //客户基本信息对象
         Customer customer = null;
         /**
@@ -90,6 +95,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customer.setCreatorId(baseInfo.getOperatorId());
                 customer.setCreateTime(LocalDateTime.now());
                 customer.setModifyTime(customer.getCreateTime());
+                customer.setState(CustomerEnum.State.NORMAL.getCode());
+                customer.setIsDelete(0);
                 super.insertSelective(customer);
             } else {
                 if (!customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())) {
@@ -119,8 +126,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 BeanUtils.copyProperties(temp, marketInfo);
             }
             //保存客户基本信息
-            customer.setModifyTime(LocalDateTime.now());
-            super.update(customer);
+//            customer.setModifyTime(LocalDateTime.now());
+//            super.update(customer);
         }
         marketInfo.setCustomerId(customer.getId());
         marketInfo.setModifierId(baseInfo.getOperatorId());
@@ -133,12 +140,15 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
          * 如果客户理货区不为空，则保存对应的理货区信息
          */
         if (CollectionUtil.isNotEmpty(baseInfo.getTallyingAreaList())) {
-            List<TallyingArea> tallyingAreaList = baseInfo.getTallyingAreaList();
-            tallyingAreaList.forEach(tallyingArea -> {
+            List<TallyingArea> tallyingAreaList = Lists.newArrayList();
+            baseInfo.getTallyingAreaList().forEach(tallyingArea -> {
                 tallyingArea.setCustomerId(marketInfo.getCustomerId());
                 tallyingArea.setMarketId(marketInfo.getMarketId());
                 tallyingArea.setCreateTime(LocalDateTime.now());
                 tallyingArea.setModifyTime(tallyingArea.getCreateTime());
+                TallyingArea temp = new TallyingArea();
+                BeanUtils.copyProperties(tallyingArea, temp);
+                tallyingAreaList.add(temp);
             });
             tallyingAreaService.batchInsert(tallyingAreaList);
         }

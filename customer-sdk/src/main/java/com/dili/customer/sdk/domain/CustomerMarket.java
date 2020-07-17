@@ -2,10 +2,13 @@ package com.dili.customer.sdk.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.customer.sdk.enums.CustomerEnum;
+import com.dili.customer.sdk.validator.AddView;
 import com.dili.ss.domain.BaseDomain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -75,9 +78,14 @@ public class CustomerMarket extends BaseDomain {
     private String otherTitle;
 
     /**
-     * 经营品类
+     * 经营品类ID,多个逗号分隔
      */
-    private String category;
+    private String categoryId;
+
+    /**
+     * 经营品类名称,多个以逗号隔开
+     */
+    private String categoryName;
 
     /**
      * 销售市场
@@ -90,8 +98,9 @@ public class CustomerMarket extends BaseDomain {
     private String alias;
 
     /**
-     * 客户类型##采购、销售、代买等##{provider:"dataDictionaryValueProvider",queryParams:{dd_id:4}}
+     * 客户类型
      */
+    @NotBlank(message = "客户身份不能为空", groups = {AddView.class})
     private String type;
 
     /**
@@ -193,11 +202,17 @@ public class CustomerMarket extends BaseDomain {
     public void setOtherTitle(String otherTitle) {
         this.otherTitle = otherTitle;
     }
-    public String getCategory() {
-        return category;
+    public String getCategoryId() {
+        return categoryId;
     }
-    public void setCategory(String category) {
-        this.category = category;
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
+    public String getCategoryName() {
+        return categoryName;
+    }
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
     public String getSalesMarket() {
         return salesMarket;
