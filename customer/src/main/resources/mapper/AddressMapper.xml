@@ -9,7 +9,9 @@
     <result column="customer_id"  property="customerId" />
     <result column="market_id"  property="marketId" />
     <result column="city_id"  property="cityId" />
+    <result column="city_name"  property="cityName" />
     <result column="address"  property="address" />
+    <result column="is_current"  property="isCurrent" />
     <result column="is_default"  property="isDefault" />
     <result column="create_time"  property="createTime" />
     <result column="modify_time"  property="modifyTime" />

@@ -41,6 +41,12 @@ public class Address extends BaseDomain {
     private String cityId;
 
     /**
+     * 所在城市名称(城市信息合并名称)
+     */
+    @NotNull(message = "所属城市不能为空")
+    private String cityName;
+
+    /**
      * 地址
      */
     @NotBlank(message = "联系地址不能为空")
@@ -48,7 +54,14 @@ public class Address extends BaseDomain {
     private String address;
 
     /**
+     * 是否现住址
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
+     */
+    private Integer isCurrent;
+
+    /**
      * 是否默认
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
      */
     private Integer isDefault;
 
@@ -104,11 +117,23 @@ public class Address extends BaseDomain {
     public void setCityId(String cityId) {
         this.cityId = cityId;
     }
+    public String getCityName() {
+        return cityName;
+    }
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
     public String getAddress() {
         return address;
     }
     public void setAddress(String address) {
         this.address = address;
+    }
+    public Integer getIsCurrent() {
+        return isCurrent;
+    }
+    public void setIsCurrent(Integer isCurrent) {
+        this.isCurrent = isCurrent;
     }
     public Integer getIsDefault() {
         return isDefault;

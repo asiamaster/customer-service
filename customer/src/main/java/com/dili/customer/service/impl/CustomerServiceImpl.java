@@ -2,20 +2,14 @@ package com.dili.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import com.dili.customer.domain.Contacts;
-import com.dili.customer.domain.Customer;
-import com.dili.customer.domain.CustomerMarket;
-import com.dili.customer.domain.TallyingArea;
+import com.dili.customer.domain.*;
 import com.dili.customer.mapper.CustomerMapper;
 import com.dili.customer.sdk.domain.dto.CustomerCertificateInput;
 import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
 import com.dili.customer.sdk.domain.dto.CustomerUpdateInput;
 import com.dili.customer.sdk.domain.dto.EnterpriseCustomerInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
-import com.dili.customer.service.ContactsService;
-import com.dili.customer.service.CustomerMarketService;
-import com.dili.customer.service.CustomerService;
-import com.dili.customer.service.TallyingAreaService;
+import com.dili.customer.service.*;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
@@ -53,6 +47,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private ContactsService contactsService;
     @Autowired
     private TallyingAreaService tallyingAreaService;
+    @Autowired
+    private AddressService addressService;
 
 
     @Override
@@ -136,6 +132,22 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         //组装并保存客户联系人信息
         List<Contacts> contactsList = generateContacts(baseInfo, customer);
         contactsService.batchInsert(contactsList);
+        //如果联系地址不为空，则保存默认联系地址
+        if(Objects.nonNull(baseInfo.getCurrentCityId()) && StrUtil.isNotBlank(baseInfo.getCurrentAddress())){
+            Address address = new Address();
+            address.setCityId(baseInfo.getCurrentCityId());
+            address.setCityName(baseInfo.getCurrentCityName());
+            address.setAddress(baseInfo.getCurrentAddress());
+            address.setCustomerId(customer.getId());
+            address.setMarketId(marketInfo.getMarketId());
+            address.setCreatorId(baseInfo.getOperatorId());
+            address.setModifierId(baseInfo.getOperatorId());
+            address.setCreateTime(LocalDateTime.now());
+            address.setModifyTime(address.getCreateTime());
+            address.setIsDefault(1);
+            address.setIsCurrent(1);
+            addressService.insert(address);
+        }
         /**
          * 如果客户理货区不为空，则保存对应的理货区信息
          */
@@ -304,7 +316,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         /**
          * 如果紧急联系人不为空，则构建紧急联系人保存信息
          */
-        if (Objects.nonNull(baseInfo.getEmergencyContactsName()) && Objects.nonNull(baseInfo.getEmergencyContactsPhone())) {
+        if (StrUtil.isNotBlank(baseInfo.getEmergencyContactsName()) && StrUtil.isNotBlank(baseInfo.getEmergencyContactsPhone())) {
             Contacts emergencyContacts = new Contacts();
             BeanUtils.copyProperties(contacts, emergencyContacts);
             emergencyContacts.setName(baseInfo.getEmergencyContactsName());

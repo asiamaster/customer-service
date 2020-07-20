@@ -49,7 +49,14 @@ public class Address extends BaseDomain {
      */
     @Column(name = "`city_id`")
     @NotNull(message = "所属城市不能为空")
-    private String cityId;
+    private Long cityId;
+
+    /**
+     * 所在城市名称(城市信息合并名称)
+     */
+    @Column(name = "`city_name`")
+    @NotNull(message = "所属城市不能为空")
+    private String cityName;
 
     /**
      * 地址
@@ -59,13 +66,17 @@ public class Address extends BaseDomain {
     @Size(max = 250,message = "联系地址请保持在250个字符以内")
     private String address;
 
+    /**
+     * 是否现住址
+     */
+    @Column(name = "`is_current`")
+    private Integer isCurrent;
 
     /**
      * 是否默认
      */
     @Column(name = "`is_default`")
     private Integer isDefault;
-
 
     /**
      * 创建时间
