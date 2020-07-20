@@ -5,7 +5,6 @@ import com.dili.ss.domain.BaseDomain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Column;
 import java.time.LocalDateTime;
 
 /**
@@ -63,7 +62,7 @@ public class TallyingArea extends BaseDomain {
     private LocalDateTime endTime;
 
     /**
-     * 租赁状态
+     * 租赁状态（1：已创建 2：已取消 3：已提交 4：未生效 5：已生效 6：已停租 7：已退款 8：已过期）
      */
     private Integer state;
 

@@ -1,7 +1,9 @@
 package com.dili.customer.sdk.domain.dto;
 
+import com.dili.customer.sdk.domain.Address;
 import com.dili.customer.sdk.domain.Contacts;
 import com.dili.customer.sdk.domain.CustomerMarket;
+import com.dili.customer.sdk.domain.TallyingArea;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -69,6 +71,15 @@ public class CustomerUpdateInput implements Serializable {
      */
     private Long operatorId;
 
+    /**
+     * 客户理货区
+     */
+    private List<TallyingArea> tallyingAreaList;
+
+    /**
+     * 客户地址
+     */
+    private List<Address> addressList;
 
     public Long getId() {
         return id;
@@ -117,5 +128,17 @@ public class CustomerUpdateInput implements Serializable {
     }
     public void setOperatorId(Long operatorId) {
         this.operatorId = operatorId;
+    }
+    public List<TallyingArea> getTallyingAreaList() {
+        return tallyingAreaList;
+    }
+    public void setTallyingAreaList(List<TallyingArea> tallyingAreaList) {
+        this.tallyingAreaList = tallyingAreaList;
+    }
+    public List<Address> getAddressList() {
+        return addressList;
+    }
+    public void setAddressList(List<Address> addressList) {
+        this.addressList = addressList;
     }
 }

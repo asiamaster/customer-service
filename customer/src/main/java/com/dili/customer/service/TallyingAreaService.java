@@ -3,6 +3,8 @@ package com.dili.customer.service;
 import com.dili.customer.domain.TallyingArea;
 import com.dili.ss.base.BaseService;
 
+import java.util.List;
+
 /**
  * @author yuehongbo
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
@@ -17,4 +19,11 @@ public interface TallyingAreaService extends BaseService<TallyingArea, Long> {
      * @return
      */
     Integer deleteByCustomerId(Long customerId,Long marketId);
+
+    /**
+     * 批量保存客户理货区信息
+     * @param tallyingAreaList
+     * @return
+     */
+    Integer saveInfo(List<TallyingArea> tallyingAreaList);
 }

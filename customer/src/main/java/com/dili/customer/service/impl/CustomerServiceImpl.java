@@ -6,10 +6,10 @@ import com.dili.customer.domain.Contacts;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.CustomerMarket;
 import com.dili.customer.domain.TallyingArea;
-import com.dili.customer.domain.dto.CustomerCertificateInput;
-import com.dili.customer.domain.dto.CustomerUpdateInput;
 import com.dili.customer.mapper.CustomerMapper;
+import com.dili.customer.sdk.domain.dto.CustomerCertificateInput;
 import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
+import com.dili.customer.sdk.domain.dto.CustomerUpdateInput;
 import com.dili.customer.sdk.domain.dto.EnterpriseCustomerInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.ContactsService;
@@ -233,17 +233,49 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         customerMarket.setCustomerId(updateInput.getId());
         customerMarket.setModifierId(updateInput.getOperatorId());
         customerMarketService.saveOrUpdate(customerMarket);
-        //更新联系人信息
-        contactsService.deleteByCustomerId(customer.getId(),updateInput.getCustomerMarket().getMarketId());
-        if (CollectionUtil.isNotEmpty(updateInput.getContactsList())){
-            List<Contacts> contactsList = updateInput.getContactsList();
-            contactsList.forEach(t -> {
-                t.setCustomerId(customer.getId());
-                t.setMarketId(updateInput.getCustomerMarket().getMarketId());
-                t.setCreatorId(updateInput.getOperatorId());
-                t.setModifierId(updateInput.getOperatorId());
+        //声明市场ID变量，以便使用
+        Long marketId = customerMarket.getMarketId();
+        /**
+         * 更改客户联系人信息
+         */
+        if (CollectionUtil.isNotEmpty(updateInput.getContactsList())) {
+            List<Contacts> contactsList = Lists.newArrayList();
+            updateInput.getContactsList().forEach(t -> {
+                Contacts temp = new Contacts();
+                BeanUtils.copyProperties(t, temp);
+                temp.setCustomerId(customer.getId());
+                temp.setMarketId(marketId);
+                temp.setModifyTime(LocalDateTime.now());
+                temp.setModifierId(updateInput.getOperatorId());
+                if (Objects.isNull(temp.getId())){
+                    temp.setCreatorId(updateInput.getOperatorId());
+                    temp.setCreateTime(t.getModifyTime());
+                }
+                contactsList.add(temp);
             });
-            contactsService.batchInsert(contactsList);
+            contactsService.batchSaveOrUpdate(contactsList);
+        } else {
+            //如果传入的联系人信息为空，则删除对应的联系人信息
+            contactsService.deleteByCustomerId(customer.getId(), updateInput.getCustomerMarket().getMarketId());
+        }
+        /**
+         * 如果客户理货区不为空，则保存对应的理货区信息
+         */
+        if (CollectionUtil.isNotEmpty(updateInput.getTallyingAreaList())) {
+            List<TallyingArea> tallyingAreaList = Lists.newArrayList();
+            updateInput.getTallyingAreaList().forEach(tallyingArea -> {
+                tallyingArea.setCustomerId(customer.getId());
+                tallyingArea.setMarketId(marketId);
+                tallyingArea.setCreateTime(LocalDateTime.now());
+                tallyingArea.setModifyTime(tallyingArea.getCreateTime());
+                TallyingArea temp = new TallyingArea();
+                BeanUtils.copyProperties(tallyingArea, temp);
+                tallyingAreaList.add(temp);
+            });
+            tallyingAreaService.saveInfo(tallyingAreaList);
+        } else {
+            //如果传入的客户理货区为空，则表示该客户在该市场没有租赁理货区(手动关联的，可编辑)，所有可以直接删除
+            tallyingAreaService.deleteByCustomerId(customer.getId(), marketId);
         }
         return BaseOutput.success().setData(customer);
     }

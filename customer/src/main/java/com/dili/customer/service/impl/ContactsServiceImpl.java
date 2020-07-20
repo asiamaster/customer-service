@@ -2,15 +2,19 @@ package com.dili.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.dili.customer.domain.Contacts;
+import com.dili.customer.domain.dto.ContactsDto;
 import com.dili.customer.mapper.ContactsMapper;
 import com.dili.customer.service.ContactsService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -65,5 +69,27 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
         condition.setCustomerId(customerId);
         condition.setMarketId(marketId);
         return deleteByExample(condition);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer batchSaveOrUpdate(List<Contacts> contactsList) {
+        if (CollectionUtil.isEmpty(contactsList)) {
+            return 0;
+        }
+        Set<Long> idSet = contactsList.stream().map(t -> t.getId()).filter(Objects::nonNull).collect(Collectors.toSet());
+        ContactsDto dto = new ContactsDto();
+        dto.setIdNotSet(idSet);
+        dto.setCustomerId(contactsList.get(0).getCustomerId());
+        dto.setMarketId(contactsList.get(0).getMarketId());
+        this.deleteByExample(dto);
+        contactsList.forEach(t -> {
+            if (Objects.isNull(t.getId())) {
+                this.insert(t);
+            } else {
+                this.update(t);
+            }
+        });
+        return contactsList.size();
     }
 }
