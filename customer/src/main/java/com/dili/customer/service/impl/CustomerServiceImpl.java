@@ -289,6 +289,28 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             //如果传入的客户理货区为空，则表示该客户在该市场没有租赁理货区(手动关联的，可编辑)，所有可以直接删除
             tallyingAreaService.deleteByCustomerId(customer.getId(), marketId);
         }
+        /**
+         * 更新客户地址信息
+         */
+        if (CollectionUtil.isNotEmpty(updateInput.getAddressList())) {
+            List<Address> addressList = Lists.newArrayList();
+            updateInput.getAddressList().forEach(t -> {
+                Address temp = new Address();
+                BeanUtils.copyProperties(t, temp);
+                temp.setCustomerId(customer.getId());
+                temp.setMarketId(marketId);
+                temp.setModifyTime(LocalDateTime.now());
+                temp.setModifierId(updateInput.getOperatorId());
+                if (Objects.isNull(temp.getId())) {
+                    temp.setCreatorId(updateInput.getOperatorId());
+                    temp.setCreateTime(t.getModifyTime());
+                }
+                addressList.add(temp);
+            });
+            addressService.batchSaveOrUpdate(addressList);
+        } else {
+            addressService.deleteByCustomerAndMarket(customer.getId(), marketId);
+        }
         return BaseOutput.success().setData(customer);
     }
 
@@ -311,6 +333,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         contacts.setMarketId(baseInfo.getCustomerMarket().getMarketId());
         contacts.setCreatorId(baseInfo.getOperatorId());
         contacts.setModifierId(baseInfo.getOperatorId());
+        contacts.setCreateTime(LocalDateTime.now());
+        contacts.setModifyTime(contacts.getCreateTime());
+        contacts.setIsDefault(1);
         List<Contacts> contactsList = Lists.newArrayList();
         contactsList.add(contacts);
         /**
@@ -321,6 +346,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             BeanUtils.copyProperties(contacts, emergencyContacts);
             emergencyContacts.setName(baseInfo.getEmergencyContactsName());
             emergencyContacts.setPhone(baseInfo.getEmergencyContactsPhone());
+            emergencyContacts.setIsDefault(0);
             contactsList.add(emergencyContacts);
         }
         return contactsList;
