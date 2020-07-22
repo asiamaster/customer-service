@@ -40,7 +40,7 @@ alter table address comment '客户联系地址信息';
 
 ALTER TABLE customer ADD COLUMN `current_city_id` BIGINT DEFAULT NULL COMMENT '现住址城市ID' AFTER is_cellphone_valid;
 ALTER TABLE customer ADD COLUMN `current_city_name` VARCHAR ( 40 ) DEFAULT NULL COMMENT '现住址城市名称' AFTER current_city_id;
-ALTER TABLE customer ADD COLUMN `current_address` BIGINT DEFAULT NULL COMMENT '现住址详细地址' AFTER current_city_name;
+ALTER TABLE customer ADD COLUMN `current_address` VARCHAR (255) DEFAULT NULL COMMENT '现住址详细地址' AFTER current_city_name;
 ALTER TABLE customer_market ADD COLUMN `category` VARCHAR ( 512 ) DEFAULT NULL COMMENT '经营品类' AFTER other_title;
 ALTER TABLE customer_market ADD COLUMN `sales_market` VARCHAR ( 40 ) DEFAULT NULL COMMENT '销地市场' AFTER category;
 update customer_market set category = main_category;

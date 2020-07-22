@@ -115,19 +115,17 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             }
             //查询客户在当前传入市场的信息
             CustomerMarket temp = customerMarketService.queryByMarketAndCustomerId(marketInfo.getMarketId(), customer.getId());
-            if (Objects.isNull(temp)) {
-                marketInfo.setCreateTime(LocalDateTime.now());
-                marketInfo.setCreatorId(baseInfo.getOperatorId());
-            } else {
+            if (Objects.nonNull(temp)) {
                 BeanUtils.copyProperties(temp, marketInfo);
             }
-            //保存客户基本信息
-//            customer.setModifyTime(LocalDateTime.now());
-//            super.update(customer);
         }
         marketInfo.setCustomerId(customer.getId());
         marketInfo.setModifierId(baseInfo.getOperatorId());
         marketInfo.setModifyTime(LocalDateTime.now());
+        if (Objects.isNull(marketInfo.getId())) {
+            marketInfo.setCreatorId(baseInfo.getOperatorId());
+            marketInfo.setCreateTime(marketInfo.getModifyTime());
+        }
         customerMarketService.saveOrUpdate(marketInfo);
         //组装并保存客户联系人信息
         List<Contacts> contactsList = generateContacts(baseInfo, customer);
@@ -241,9 +239,14 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (Objects.isNull(customerMarket)){
             customerMarket = new CustomerMarket();
         }
-        BeanUtils.copyProperties(updateInput.getCustomerMarket(),customerMarket);
+        BeanUtils.copyProperties(updateInput.getCustomerMarket(), customerMarket);
         customerMarket.setCustomerId(updateInput.getId());
         customerMarket.setModifierId(updateInput.getOperatorId());
+        customerMarket.setModifyTime(LocalDateTime.now());
+        if (Objects.isNull(customerMarket.getId())) {
+            customerMarket.setCreatorId(updateInput.getOperatorId());
+            customerMarket.setCreateTime(customerMarket.getModifyTime());
+        }
         customerMarketService.saveOrUpdate(customerMarket);
         //声明市场ID变量，以便使用
         Long marketId = customerMarket.getMarketId();
