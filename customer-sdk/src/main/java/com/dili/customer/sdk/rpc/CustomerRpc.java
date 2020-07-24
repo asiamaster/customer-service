@@ -23,7 +23,7 @@ import java.util.List;
  * @date 2020/6/18 15:56
  */
 //@FeignClient(name = "customer-service",contextId = "customerRpc", url = "http://127.0.0.1:8181")
-@FeignClient(name = "customer-service",contextId = "customerRpc")
+@FeignClient(name = "customer-service", contextId = "customerRpc", url = "${customerService.url:}")
 public interface CustomerRpc {
 
     /**

@@ -82,6 +82,12 @@
             #{item}
           </foreach>
         </if>
+        <if test="null != notInIdSet and notInIdSet.size()>0">
+          and c.id not in
+          <foreach collection="notInIdSet" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
         <if test="marketId != null">
           and cm.market_id = #{marketId}
         </if>

@@ -314,6 +314,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         } else {
             addressService.deleteByCustomerAndMarket(customer.getId(), marketId);
         }
+        customer.setCustomerMarket(customerMarket);
         return BaseOutput.success().setData(customer);
     }
 

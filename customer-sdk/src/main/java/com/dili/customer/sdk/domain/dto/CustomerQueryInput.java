@@ -4,6 +4,7 @@ import com.dili.customer.sdk.domain.Customer;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <B>Description</B>
@@ -76,6 +77,11 @@ public class CustomerQueryInput extends Customer {
      */
     private Boolean isGroup;
 
+    /**
+     * 根据ID不存在的条件集过滤
+     */
+    private Set<Long> notInIdSet;
+
     public String getCertificateNumberMatch() {
         return certificateNumberMatch;
     }
@@ -147,5 +153,11 @@ public class CustomerQueryInput extends Customer {
     }
     public void setGroup(Boolean group) {
         isGroup = group;
+    }
+    public Set<Long> getNotInIdSet() {
+        return notInIdSet;
+    }
+    public void setNotInIdSet(Set<Long> notInIdSet) {
+        this.notInIdSet = notInIdSet;
     }
 }

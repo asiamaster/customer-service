@@ -63,6 +63,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.dili</groupId>
             <artifactId>ss-core</artifactId>
             <version>${sharp-sword.version}</version>
