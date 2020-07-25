@@ -3,6 +3,8 @@ package com.dili.customer.sdk.domain.dto;
 import com.dili.customer.sdk.domain.Customer;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -47,6 +49,16 @@ public class CustomerQueryInput extends Customer {
     private Integer grade;
 
     /**
+     * 客户身份类型
+     */
+    private String customerType;
+
+    /**
+     * 归属部门
+     */
+    private Long departmentId;
+
+    /**
      * 客户所属组织
      */
     private Long marketId;
@@ -54,12 +66,12 @@ public class CustomerQueryInput extends Customer {
     /**
      * 客户所属组织集
      */
-    private List<Long> marketIdList;
+    private List<Long> marketIdList = new ArrayList<>();
 
     /**
      * 根据ID集查询
      */
-    private List<Long> idList;
+    private Set<Long> idSet = new HashSet<>();
 
     /**
      * 关键字查询，根据证件号匹配或名称模糊或编号前模糊查询
@@ -80,7 +92,17 @@ public class CustomerQueryInput extends Customer {
     /**
      * 根据ID不存在的条件集过滤
      */
-    private Set<Long> notInIdSet;
+    private Set<Long> notInIdSet = new HashSet<>();
+
+    /**
+     * 理货区货位号
+     */
+    private Set<Long> assetsIdSet = new HashSet<>();
+
+    /**
+     * 是否有(上传)营业执照
+     */
+    private Integer hasLicense;
 
     public String getCertificateNumberMatch() {
         return certificateNumberMatch;
@@ -118,6 +140,12 @@ public class CustomerQueryInput extends Customer {
     public void setGrade(Integer grade) {
         this.grade = grade;
     }
+    public String getCustomerType() {
+        return customerType;
+    }
+    public void setCustomerType(String customerType) {
+        this.customerType = customerType;
+    }
     public Long getMarketId() {
         return marketId;
     }
@@ -130,11 +158,11 @@ public class CustomerQueryInput extends Customer {
     public void setMarketIdList(List<Long> marketIdList) {
         this.marketIdList = marketIdList;
     }
-    public List<Long> getIdList() {
-        return idList;
+    public Set<Long> getIdSet() {
+        return idSet;
     }
-    public void setIdList(List<Long> idList) {
-        this.idList = idList;
+    public void setIdSet(Set<Long> idSet) {
+        this.idSet = idSet;
     }
     public String getKeyword() {
         return keyword;
@@ -159,5 +187,23 @@ public class CustomerQueryInput extends Customer {
     }
     public void setNotInIdSet(Set<Long> notInIdSet) {
         this.notInIdSet = notInIdSet;
+    }
+    public Long getDepartmentId() {
+        return departmentId;
+    }
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
+    }
+    public Set<Long> getAssetsIdSet() {
+        return assetsIdSet;
+    }
+    public void setAssetsIdSet(Set<Long> assetsIdSet) {
+        this.assetsIdSet = assetsIdSet;
+    }
+    public Integer getHasLicense() {
+        return hasLicense;
+    }
+    public void setHasLicense(Integer hasLicense) {
+        this.hasLicense = hasLicense;
     }
 }

@@ -183,4 +183,44 @@ public class CustomerEnum {
             return null;
         }
     }
+
+    /**
+     * 客户附件类别
+     */
+    public enum AttachmentType{
+
+        /**
+         * 营业执照
+         */
+        营业执照(1, "营业执照"),
+        ;
+        private Integer code;
+        private String value;
+
+        public Integer getCode() {
+            return code;
+        }
+        public String getValue() {
+            return value;
+        }
+
+        AttachmentType(Integer code, String value) {
+            this.code = code;
+            this.value = value;
+        }
+
+        /**
+         * 获取某个枚举值实例信息
+         * @param code
+         * @return
+         */
+        public static AttachmentType getInstance(Integer code){
+            for (AttachmentType at : AttachmentType.values()) {
+                if (at.getCode().equals(code)){
+                    return at;
+                }
+            }
+            return null;
+        }
+    }
 }

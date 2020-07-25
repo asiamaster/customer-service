@@ -11,6 +11,7 @@
     <result column="department_id"  property="departmentId" />
     <result column="assets_name"  property="assetsName" />
     <result column="is_lease"  property="isLease" />
+    <result column="is_usable" property="isUsable" />
     <result column="start_time"  property="startTime" />
     <result column="end_time"  property="endTime" />
     <result column="state"  property="state" />
@@ -21,7 +22,7 @@
     <!--
       WARNING - @mbg.generated
     -->
-    id, customer_id, market_id, department_id, assets_name, is_lease, start_time, end_time, 
+    id, customer_id, market_id, department_id, assets_name, is_lease, is_usable, start_time, end_time,
     state, create_time, modify_time
   </sql>
 

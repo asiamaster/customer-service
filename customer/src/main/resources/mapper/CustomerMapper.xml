@@ -76,9 +76,9 @@
         <if test="id != null">
           and c.id = #{id}
         </if>
-        <if test="null != idList and idList.size()>0">
+        <if test="null != idSet and idSet.size()>0">
           and c.id in
-          <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+          <foreach collection="idSet" index="index" item="item" open="(" separator="," close=")">
             #{item}
           </foreach>
         </if>
@@ -91,6 +91,9 @@
         <if test="marketId != null">
           and cm.market_id = #{marketId}
         </if>
+        <if test="departmentId != null">
+          and cm.department_id = #{departmentId}
+        </if>
         <if test="null != marketIdList and marketIdList.size()>0">
           <!-- and c.id in (SELECT cf.customer_id FROM customer_market cf where cf.market_id in -->
           and cm.market_id in
@@ -98,7 +101,7 @@
             #{item}
           </foreach>
         </if>
-        <if test="name != null">
+        <if test="name != null and '' != name">
           and c.name LIKE CONCAT('%',#{name},'%')
         </if>
         <if test="certificateNumber != null">
@@ -115,6 +118,9 @@
         </if>
         <if test="grade != null">
           and cm.grade = #{grade}
+        </if>
+        <if test="customerType != null">
+          and cm.type = #{customerType}
         </if>
         <if test="contactsPhone != null">
           and c.contacts_phone = #{contactsPhone}
@@ -142,6 +148,32 @@
         </if>
         <if test="marketCreatorId != null">
           and cm.creator_id = #{marketCreatorId}
+        </if>
+        <if test="null != assetsIdSet and  assetsIdSet.size() > 0">
+          and c.id in
+          (select customer_id from tallying_area ta where ta.assets_id in
+            <foreach collection="assetsIdSet" index="index" item="item" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+          /*  直接可用的，或者有租赁状态且已生效的 */
+          and (ta.is_usable = 1 or (ta.is_lease=1 and ta.state=5)))
+        </if>
+        <if test="null != currentCityId">
+          and c.current_city_id = #{currentCityId}
+        </if>
+
+        <if test="null != hasLicense">
+          <if test="hasLicense == 1">
+            and c.id in
+          </if>
+          <if test="hasLicense == 0">
+            and c.id not in
+          </if>
+          (select customer_id from attachment att
+            <if test="marketId != null">
+              where att.market_id = #{marketId}
+            </if>
+          )
         </if>
       </where>
       <if test="isGroup != null and isGroup == true">

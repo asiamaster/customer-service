@@ -118,6 +118,15 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             if (Objects.nonNull(temp)) {
                 BeanUtils.copyProperties(temp, marketInfo);
             }
+            /**
+             * 如果在此次创建中，增加了现地址信息
+             */
+            if (Objects.nonNull(baseInfo.getCurrentCityId())) {
+                customer.setCurrentCityId(baseInfo.getCurrentCityId());
+                customer.setCurrentCityName(baseInfo.getCurrentCityName());
+                customer.setCurrentAddress(baseInfo.getCurrentAddress());
+                this.update(customer);
+            }
         }
         marketInfo.setCustomerId(customer.getId());
         marketInfo.setModifierId(baseInfo.getOperatorId());

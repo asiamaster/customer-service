@@ -4,10 +4,7 @@ import com.dili.customer.domain.TallyingArea;
 import com.dili.customer.service.TallyingAreaService;
 import com.dili.ss.domain.BaseOutput;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,5 +33,15 @@ public class TallyingAreaController {
         condition.setCustomerId(customerId);
         condition.setMarketId(marketId);
         return BaseOutput.success().setData(tallyingAreaService.list(condition));
+    }
+
+    /**
+     * 根据条件查询该客户的联系地址信息
+     * @param tallyingArea 查询条件
+     * @return
+     */
+    @RequestMapping(value = "/listByExample", method = {RequestMethod.POST})
+    public BaseOutput<List<TallyingArea>> listByExample(@RequestBody TallyingArea tallyingArea) {
+        return BaseOutput.success().setData(tallyingAreaService.listByExample(tallyingArea));
     }
 }

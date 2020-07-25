@@ -5,7 +5,9 @@ import com.dili.ss.domain.BaseDomain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Column;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * 客户理货区
@@ -31,6 +33,11 @@ public class TallyingArea extends BaseDomain {
     private Long marketId;
 
     /**
+     * 客户理货区所属部门
+     */
+    private Long departmentId;
+
+    /**
      * 客户理货区(资产)ID
      */
     private Long assetsId;
@@ -44,6 +51,11 @@ public class TallyingArea extends BaseDomain {
      * 是否存在租赁关系
      */
     private Integer isLease;
+
+    /**
+     * 是否合法可用(有租赁状态且已生效，或者没有租赁状态 均认为是可用)
+     */
+    private Integer isUsable;
 
     /**
      * 租赁开始时间
@@ -82,6 +94,11 @@ public class TallyingArea extends BaseDomain {
     @DateTimeFormat(pattern = "yyyy-MM-dd HHm:m:ss")
     private LocalDateTime modifyTime;
 
+    /**
+     * 客户数据集
+     */
+    private Set<Long> customerIdSet;
+
     @Override
     public Long getId() {
         return id;
@@ -102,6 +119,12 @@ public class TallyingArea extends BaseDomain {
     public void setMarketId(Long marketId) {
         this.marketId = marketId;
     }
+    public Long getDepartmentId() {
+        return departmentId;
+    }
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
+    }
     public Long getAssetsId() {
         return assetsId;
     }
@@ -119,6 +142,13 @@ public class TallyingArea extends BaseDomain {
     }
     public void setIsLease(Integer isLease) {
         this.isLease = isLease;
+    }
+    public Integer getIsUsable() {
+        return isUsable;
+    }
+
+    public void setIsUsable(Integer isUsable) {
+        this.isUsable = isUsable;
     }
     public LocalDateTime getStartTime() {
         return startTime;
@@ -149,5 +179,11 @@ public class TallyingArea extends BaseDomain {
     }
     public void setModifyTime(LocalDateTime modifyTime) {
         this.modifyTime = modifyTime;
+    }
+    public Set<Long> getCustomerIdSet() {
+        return customerIdSet;
+    }
+    public void setCustomerIdSet(Set<Long> customerIdSet) {
+        this.customerIdSet = customerIdSet;
     }
 }
