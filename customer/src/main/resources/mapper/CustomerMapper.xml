@@ -104,6 +104,9 @@
         <if test="name != null and '' != name">
           and c.name LIKE CONCAT('%',#{name},'%')
         </if>
+        <if test="null != certificateType">
+          and c.certificate_type = #{certificateType}
+        </if>
         <if test="certificateNumber != null">
           and c.certificate_number = #{certificateNumber}
         </if>
