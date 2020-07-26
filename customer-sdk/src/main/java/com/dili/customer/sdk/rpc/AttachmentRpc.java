@@ -25,7 +25,7 @@ public interface AttachmentRpc {
      * @return
      */
     @RequestMapping(value = "/api/attachment/listAttachment", method = RequestMethod.POST)
-    BaseOutput<List<Attachment>> listTallyingArea(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
+    BaseOutput<List<Attachment>> listAttachment(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
 
     /**
      * 根据条件查询该客户的附件信息
