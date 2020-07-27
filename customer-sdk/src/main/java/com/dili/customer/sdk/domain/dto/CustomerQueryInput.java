@@ -66,7 +66,7 @@ public class CustomerQueryInput extends Customer {
     /**
      * 客户所属组织集
      */
-    private List<Long> marketIdList = new ArrayList<>();
+    /*private List<Long> marketIdList = new ArrayList<>();*/
 
     /**
      * 根据ID集查询
@@ -152,12 +152,12 @@ public class CustomerQueryInput extends Customer {
     public void setMarketId(Long marketId) {
         this.marketId = marketId;
     }
-    public List<Long> getMarketIdList() {
+/*    public List<Long> getMarketIdList() {
         return marketIdList;
     }
     public void setMarketIdList(List<Long> marketIdList) {
         this.marketIdList = marketIdList;
-    }
+    }*/
     public Set<Long> getIdSet() {
         return idSet;
     }

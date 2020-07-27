@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -193,6 +194,11 @@ public class Customer extends BaseDomain {
      * 客户证件号打码加*显示
      */
     private String certificateNumberMask;
+
+    /**
+     * 客户理货区
+     */
+    private List<TallyingArea> tallyingAreaList;
 
     @Override
     public Long getId() {
@@ -394,10 +400,15 @@ public class Customer extends BaseDomain {
     public void setCertificateNumberMask(String certificateNumberMask) {
         this.certificateNumberMask = certificateNumberMask;
     }
-
+    public List<TallyingArea> getTallyingAreaList() {
+        return tallyingAreaList;
+    }
+    public void setTallyingAreaList(List<TallyingArea> tallyingAreaList) {
+        this.tallyingAreaList = tallyingAreaList;
+    }
 
     /**
-     * 获取客户级别显示
+     * 获取客户状态显示值
      * @return
      */
     public String getStateValue(){

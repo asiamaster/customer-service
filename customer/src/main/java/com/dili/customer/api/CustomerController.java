@@ -1,6 +1,5 @@
 package com.dili.customer.api;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
@@ -42,7 +41,7 @@ public class CustomerController {
      */
     @RequestMapping(value="/listPage", method = {RequestMethod.POST})
     public PageOutput<List<Customer>> listPage(@RequestBody CustomerQueryInput customer){
-        if (Objects.isNull(customer.getMarketId()) && CollectionUtil.isEmpty(customer.getMarketIdList())) {
+        if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
         return customerService.listForPage(customer);
@@ -56,7 +55,7 @@ public class CustomerController {
      */
     @RequestMapping(value="/listNormalPage", method = {RequestMethod.POST})
     public PageOutput<List<Customer>> listNormalPage(@RequestBody CustomerQueryInput customer){
-        if (Objects.isNull(customer.getMarketId()) && CollectionUtil.isEmpty(customer.getMarketIdList())) {
+        if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
         if (Objects.isNull(customer.getState())) {
@@ -126,7 +125,7 @@ public class CustomerController {
      */
     @RequestMapping(value="/list", method = {RequestMethod.POST})
     public BaseOutput<List<Customer>> list(@RequestBody(required = false) CustomerQueryInput customer) {
-        if (Objects.isNull(customer.getMarketId()) && CollectionUtil.isEmpty(customer.getMarketIdList())) {
+        if (Objects.isNull(customer.getMarketId())) {
             return BaseOutput.failure("客户所属市场不能为空");
         }
         PageOutput pageOutput = customerService.listForPage(customer);

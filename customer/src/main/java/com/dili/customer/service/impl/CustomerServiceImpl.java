@@ -26,7 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -195,6 +198,21 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         //当前页数
         int pageNum = list instanceof Page ? ((Page) list).getPageNum() : 1;
         PageOutput output = PageOutput.success();
+        if (CollectionUtil.isNotEmpty(list)) {
+            Set<Long> collect = list.stream().map(Customer::getId).collect(Collectors.toSet());
+            TallyingArea tallyingArea = new TallyingArea();
+            tallyingArea.setMarketId(input.getMarketId());
+            tallyingArea.setCustomerIdSet(collect);
+            List<TallyingArea> tallyingAreaList = tallyingAreaService.listByExample(tallyingArea);
+            if (CollectionUtil.isNotEmpty(tallyingAreaList)) {
+                Map<Long, List<TallyingArea>> listMap = tallyingAreaList.stream().collect(Collectors.groupingBy(TallyingArea::getCustomerId));
+                list.forEach(t -> {
+                    if (listMap.containsKey(t.getId())) {
+                        t.setTallyingAreaList(listMap.get(t.getId()));
+                    }
+                });
+            }
+        }
         output.setData(list).setPageNum(pageNum).setTotal(total.intValue()).setPageSize(input.getPage()).setPages(totalPage);
         return output;
     }

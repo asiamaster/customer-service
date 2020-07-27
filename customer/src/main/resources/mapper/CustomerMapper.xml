@@ -94,13 +94,13 @@
         <if test="departmentId != null">
           and cm.department_id = #{departmentId}
         </if>
-        <if test="null != marketIdList and marketIdList.size()>0">
-          <!-- and c.id in (SELECT cf.customer_id FROM customer_market cf where cf.market_id in -->
+  <!--      <if test="null != marketIdList and marketIdList.size()>0">
+          &lt;!&ndash; and c.id in (SELECT cf.customer_id FROM customer_market cf where cf.market_id in &ndash;&gt;
           and cm.market_id in
           <foreach collection="marketIdList" index="index" item="item" open="(" separator="," close=")">
             #{item}
           </foreach>
-        </if>
+        </if>-->
         <if test="name != null and '' != name">
           and c.name LIKE CONCAT('%',#{name},'%')
         </if>

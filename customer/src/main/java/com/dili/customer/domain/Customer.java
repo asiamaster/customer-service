@@ -17,6 +17,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -240,6 +241,12 @@ public class Customer extends BaseDomain {
      */
     @Transient
     private CustomerMarket customerMarket;
+
+    /**
+     * 客户理货区信息
+     */
+    @Transient
+    private List<TallyingArea> tallyingAreaList;
 
     /**
      * 客户证件号打码加*显示
