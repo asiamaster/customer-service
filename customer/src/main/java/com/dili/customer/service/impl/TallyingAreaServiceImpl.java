@@ -6,7 +6,9 @@ import com.dili.customer.mapper.TallyingAreaMapper;
 import com.dili.customer.service.TallyingAreaService;
 import com.dili.ss.base.BaseServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -32,18 +34,31 @@ public class TallyingAreaServiceImpl extends BaseServiceImpl<TallyingArea, Long>
         TallyingArea condition = new TallyingArea();
         condition.setCustomerId(customerId);
         condition.setMarketId(marketId);
+        condition.setIsLease(0);
         return deleteByExample(condition);
     }
 
     @Override
-    public Integer saveInfo(List<TallyingArea> tallyingAreaList) {
+    @Transactional(rollbackFor = Exception.class)
+    public Integer saveInfo(List<TallyingArea> tallyingAreaList, Long customerId, Long marketId) {
+        //删除客户的理货区(只删除没有租赁关系的)
+        deleteByCustomerId(customerId, marketId);
         //如果传入的客户理货区为空，则表示该客户在该市场没有租赁理货区(手动关联的，可编辑)，所有可以直接删除
         if (CollectionUtil.isEmpty(tallyingAreaList)) {
             return 0;
         }
+        /**
+         * 设置初始值信息
+         */
+        tallyingAreaList.forEach(t -> {
+            t.setIsLease(0);
+            t.setCustomerId(customerId);
+            t.setMarketId(marketId);
+            t.setCreateTime(LocalDateTime.now());
+            t.setModifyTime(t.getCreateTime());
+            t.setIsUsable(1);
+        });
         //根据客户及市场，查询出该客户在市场中的已有理货区信息
-        Long customerId = tallyingAreaList.get(0).getCustomerId();
-        Long marketId = tallyingAreaList.get(0).getMarketId();
         TallyingArea query = new TallyingArea();
         query.setCustomerId(customerId);
         query.setMarketId(marketId);
@@ -54,17 +69,8 @@ public class TallyingAreaServiceImpl extends BaseServiceImpl<TallyingArea, Long>
             Set<Long> leaseAssetsId = list.stream().filter(t -> 1 == t.getIsLease()).map(t -> t.getAssetsId()).collect(Collectors.toSet());
             //从传入的参数中移除有租赁关系的数据,参数中剩下全无租赁关系的数据
             tallyingAreaList = tallyingAreaList.stream().filter(t -> leaseAssetsId.contains(t.getAssetsId())).collect(Collectors.toList());
-            //删除数据库中，无租赁关系的数据
-            TallyingArea delCondition = new TallyingArea();
-            delCondition.setCustomerId(customerId);
-            delCondition.setMarketId(marketId);
-            delCondition.setIsLease(0);
-            this.deleteByExample(delCondition);
-            //保存所有传入的无租赁关系的理货区
-            this.batchInsert(tallyingAreaList);
-        } else {
-            this.batchInsert(tallyingAreaList);
         }
-        return null;
+        this.batchInsert(tallyingAreaList);
+        return tallyingAreaList.size();
     }
 }

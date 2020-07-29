@@ -13,7 +13,7 @@ import java.util.List;
 public interface TallyingAreaService extends BaseService<TallyingArea, Long> {
 
     /**
-     * 根据客户及市场，删除对应的理货区信息
+     * 根据客户及市场，删除对应的(无租赁关系的)理货区信息
      * @param customerId 客户ID
      * @param marketId  市场ID
      * @return
@@ -22,8 +22,10 @@ public interface TallyingAreaService extends BaseService<TallyingArea, Long> {
 
     /**
      * 批量保存客户理货区信息
-     * @param tallyingAreaList
+     * @param tallyingAreaList 理货区数据
+     * @param customerId       客户ID
+     * @param marketId         市场ID
      * @return
      */
-    Integer saveInfo(List<TallyingArea> tallyingAreaList);
+    Integer saveInfo(List<TallyingArea> tallyingAreaList, Long customerId, Long marketId);
 }

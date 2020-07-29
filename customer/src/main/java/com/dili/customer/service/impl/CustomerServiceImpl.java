@@ -2,6 +2,8 @@ package com.dili.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.dili.customer.domain.*;
 import com.dili.customer.mapper.CustomerMapper;
 import com.dili.customer.sdk.domain.dto.CustomerCertificateInput;
@@ -159,22 +161,11 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             addressService.insert(address);
         }
         /**
-         * 如果客户理货区不为空，则保存对应的理货区信息
+         * 处理理货区数据
          */
-        if (CollectionUtil.isNotEmpty(baseInfo.getTallyingAreaList())) {
-            List<TallyingArea> tallyingAreaList = Lists.newArrayList();
-            baseInfo.getTallyingAreaList().forEach(tallyingArea -> {
-                tallyingArea.setCustomerId(marketInfo.getCustomerId());
-                tallyingArea.setMarketId(marketInfo.getMarketId());
-                tallyingArea.setCreateTime(LocalDateTime.now());
-                tallyingArea.setModifyTime(tallyingArea.getCreateTime());
-                TallyingArea temp = new TallyingArea();
-                BeanUtils.copyProperties(tallyingArea, temp);
-                tallyingAreaList.add(temp);
-            });
-            //不管有没有数据，先删除，再重新加入
-            tallyingAreaService.deleteByCustomerId(customer.getId(),marketInfo.getMarketId());
-            tallyingAreaService.batchInsert(tallyingAreaList);
+        if (CollectionUtil.isNotEmpty(customer.getTallyingAreaList())) {
+            List<TallyingArea> tallyingAreaList = JSONArray.parseArray(JSONObject.toJSONString(baseInfo.getTallyingAreaList()), TallyingArea.class);
+            tallyingAreaService.saveInfo(tallyingAreaList, customer.getId(), marketInfo.getMarketId());
         }
         return BaseOutput.success().setData(customer);
     }
@@ -304,17 +295,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
          * 如果客户理货区不为空，则保存对应的理货区信息
          */
         if (CollectionUtil.isNotEmpty(updateInput.getTallyingAreaList())) {
-            List<TallyingArea> tallyingAreaList = Lists.newArrayList();
-            updateInput.getTallyingAreaList().forEach(tallyingArea -> {
-                tallyingArea.setCustomerId(customer.getId());
-                tallyingArea.setMarketId(marketId);
-                tallyingArea.setCreateTime(LocalDateTime.now());
-                tallyingArea.setModifyTime(tallyingArea.getCreateTime());
-                TallyingArea temp = new TallyingArea();
-                BeanUtils.copyProperties(tallyingArea, temp);
-                tallyingAreaList.add(temp);
-            });
-            tallyingAreaService.saveInfo(tallyingAreaList);
+            List<TallyingArea> tallyingAreaList = JSONArray.parseArray(JSONObject.toJSONString(updateInput.getTallyingAreaList()), TallyingArea.class);
+            tallyingAreaService.saveInfo(tallyingAreaList, customer.getId(), marketId);
         } else {
             //如果传入的客户理货区为空，则表示该客户在该市场没有租赁理货区(手动关联的，可编辑)，所有可以直接删除
             tallyingAreaService.deleteByCustomerId(customer.getId(), marketId);
