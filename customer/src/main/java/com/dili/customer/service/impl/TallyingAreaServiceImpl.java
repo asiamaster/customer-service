@@ -68,9 +68,12 @@ public class TallyingAreaServiceImpl extends BaseServiceImpl<TallyingArea, Long>
             //获取有租赁关系的资产ID
             Set<Long> leaseAssetsId = list.stream().filter(t -> 1 == t.getIsLease()).map(t -> t.getAssetsId()).collect(Collectors.toSet());
             //从传入的参数中移除有租赁关系的数据,参数中剩下全无租赁关系的数据
-            tallyingAreaList = tallyingAreaList.stream().filter(t -> leaseAssetsId.contains(t.getAssetsId())).collect(Collectors.toList());
+            tallyingAreaList = tallyingAreaList.stream().filter(t -> !leaseAssetsId.contains(t.getAssetsId())).collect(Collectors.toList());
         }
-        this.batchInsert(tallyingAreaList);
+        //可能传入的全是有租赁关系的数据，所以，过滤后集合可能为空
+        if (CollectionUtil.isNotEmpty(tallyingAreaList)) {
+            this.batchInsert(tallyingAreaList);
+        }
         return tallyingAreaList.size();
     }
 }
