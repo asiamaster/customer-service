@@ -139,9 +139,10 @@ public class Customer extends BaseDomain {
     private Integer isCellphoneValid;
 
     /**
-     * 现住址城市ID
+     * 现住址城市ID path
+     * 格式为 100000,110000,1111000
      */
-    private Long currentCityId;
+    private String currentCityPath;
 
     /**
      * 现住址城市名称
@@ -340,11 +341,11 @@ public class Customer extends BaseDomain {
     public void setIsCellphoneValid(Integer isCellphoneValid) {
         this.isCellphoneValid = isCellphoneValid;
     }
-    public Long getCurrentCityId() {
-        return currentCityId;
+    public String getCurrentCityPath() {
+        return currentCityPath;
     }
-    public void setCurrentCityId(Long currentCityId) {
-        this.currentCityId = currentCityId;
+    public void setCurrentCityPath(String currentCityPath) {
+        this.currentCityPath = currentCityPath;
     }
     public String getCurrentCityName() {
         return currentCityName;

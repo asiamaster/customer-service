@@ -126,8 +126,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             /**
              * 如果在此次创建中，增加了现地址信息
              */
-            if (Objects.nonNull(baseInfo.getCurrentCityId())) {
-                customer.setCurrentCityId(baseInfo.getCurrentCityId());
+            if (StrUtil.isNotBlank(baseInfo.getCurrentCityPath())) {
+                customer.setCurrentCityPath(baseInfo.getCurrentCityPath());
                 customer.setCurrentCityName(baseInfo.getCurrentCityName());
                 customer.setCurrentAddress(baseInfo.getCurrentAddress());
                 this.update(customer);
@@ -145,9 +145,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         List<Contacts> contactsList = generateContacts(baseInfo, customer);
         contactsService.batchInsert(contactsList);
         //如果联系地址不为空，则保存默认联系地址
-        if(Objects.nonNull(baseInfo.getCurrentCityId()) && StrUtil.isNotBlank(baseInfo.getCurrentAddress())){
+        if(Objects.nonNull(baseInfo.getCurrentCityPath()) && StrUtil.isNotBlank(baseInfo.getCurrentAddress())){
             Address address = new Address();
-            address.setCityId(baseInfo.getCurrentCityId());
+            String[] split = baseInfo.getCurrentCityPath().split(",");
+            address.setCityId(Long.valueOf(split[split.length - 1]));
             address.setCityName(baseInfo.getCurrentCityName());
             address.setAddress(baseInfo.getCurrentAddress());
             address.setCustomerId(customer.getId());

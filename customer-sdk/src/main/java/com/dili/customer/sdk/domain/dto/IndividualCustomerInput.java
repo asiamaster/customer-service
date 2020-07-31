@@ -119,9 +119,10 @@ public class IndividualCustomerInput implements Serializable {
     private Integer certificateLongTerm;
 
     /**
-     * 现住址城市ID
+     * 现住址城市ID路径
+     * 格式为 100000,110000,111100
      */
-    private Long currentCityId;
+    private String currentCityPath;
 
     /**
      * 现住址城市名称
@@ -250,11 +251,11 @@ public class IndividualCustomerInput implements Serializable {
     public void setCertificateLongTerm(Integer certificateLongTerm) {
         this.certificateLongTerm = certificateLongTerm;
     }
-    public Long getCurrentCityId() {
-        return currentCityId;
+    public String getCurrentCityPath() {
+        return currentCityPath;
     }
-    public void setCurrentCityId(Long currentCityId) {
-        this.currentCityId = currentCityId;
+    public void setCurrentCityPath(String currentCityPath) {
+        this.currentCityPath = currentCityPath;
     }
     public String getCurrentCityName() {
         return currentCityName;

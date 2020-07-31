@@ -182,10 +182,11 @@ public class Customer extends BaseDomain {
     private Integer isCellphoneValid;
 
     /**
-     * 现住址城市ID
+     * 现住址城市ID path
+     * 格式为 100000,110000,111100
      */
-    @Column(name = "current_city_id")
-    private Long currentCityId;
+    @Column(name = "current_city_path")
+    private String currentCityPath;
 
     /**
      * 现住址城市名称
