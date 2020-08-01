@@ -1,7 +1,7 @@
 package com.dili.customer.sdk.domain.dto;
 
-import com.dili.customer.sdk.validator.AddView;
 import com.dili.customer.sdk.validator.EnterpriseAddView;
+import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -15,6 +15,7 @@ import java.io.Serializable;
  * @author yuehongbo
  * @date 2020/2/3 17:40
  */
+@Data
 public class EnterpriseCustomerInput extends IndividualCustomerInput implements Serializable {
 
     private static final long serialVersionUID = 4869002082778403248L;
@@ -33,16 +34,4 @@ public class EnterpriseCustomerInput extends IndividualCustomerInput implements 
     @Size(max = 40, message = "法人请保持在40个字以内", groups = {EnterpriseAddView.class})
     private String corporationName;
 
-    public String getContactsName() {
-        return contactsName;
-    }
-    public void setContactsName(String contactsName) {
-        this.contactsName = contactsName;
-    }
-    public String getCorporationName() {
-        return corporationName;
-    }
-    public void setCorporationName(String corporationName) {
-        this.corporationName = corporationName;
-    }
 }

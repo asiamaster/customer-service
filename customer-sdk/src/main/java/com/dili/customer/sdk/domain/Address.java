@@ -3,6 +3,7 @@ package com.dili.customer.sdk.domain;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.ss.domain.BaseDomain;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
@@ -11,10 +12,12 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 /**
+ * 客户地址信息
  * @author yuehongbo
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
  * @date 2020/7/15 18:50
  */
+@Data
 public class Address extends BaseDomain {
 
     /**
@@ -91,78 +94,4 @@ public class Address extends BaseDomain {
      */
     private Long modifierId;
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public Long getCustomerId() {
-        return customerId;
-    }
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
-    }
-    public Long getMarketId() {
-        return marketId;
-    }
-    public void setMarketId(Long marketId) {
-        this.marketId = marketId;
-    }
-    public String getCityId() {
-        return cityId;
-    }
-    public void setCityId(String cityId) {
-        this.cityId = cityId;
-    }
-    public String getCityName() {
-        return cityName;
-    }
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
-    }
-    public String getAddress() {
-        return address;
-    }
-    public void setAddress(String address) {
-        this.address = address;
-    }
-    public Integer getIsCurrent() {
-        return isCurrent;
-    }
-    public void setIsCurrent(Integer isCurrent) {
-        this.isCurrent = isCurrent;
-    }
-    public Integer getIsDefault() {
-        return isDefault;
-    }
-    public void setIsDefault(Integer isDefault) {
-        this.isDefault = isDefault;
-    }
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
-    public LocalDateTime getModifyTime() {
-        return modifyTime;
-    }
-    public void setModifyTime(LocalDateTime modifyTime) {
-        this.modifyTime = modifyTime;
-    }
-    public Long getCreatorId() {
-        return creatorId;
-    }
-    public void setCreatorId(Long creatorId) {
-        this.creatorId = creatorId;
-    }
-    public Long getModifierId() {
-        return modifierId;
-    }
-    public void setModifierId(Long modifierId) {
-        this.modifierId = modifierId;
-    }
 }

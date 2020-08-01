@@ -28,4 +28,11 @@ public interface TallyingAreaService extends BaseService<TallyingArea, Long> {
      * @return
      */
     Integer saveInfo(List<TallyingArea> tallyingAreaList, Long customerId, Long marketId);
+
+    /**
+     * 同步资产租赁信息
+     * @param list 同步数据
+     * @return
+     */
+    Integer syncAssetsLease(List<TallyingArea> list);
 }

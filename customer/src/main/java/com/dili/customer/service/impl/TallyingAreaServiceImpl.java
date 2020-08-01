@@ -5,12 +5,14 @@ import com.dili.customer.domain.TallyingArea;
 import com.dili.customer.mapper.TallyingAreaMapper;
 import com.dili.customer.service.TallyingAreaService;
 import com.dili.ss.base.BaseServiceImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,5 +77,53 @@ public class TallyingAreaServiceImpl extends BaseServiceImpl<TallyingArea, Long>
             this.batchInsert(tallyingAreaList);
         }
         return tallyingAreaList.size();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer syncAssetsLease(List<TallyingArea> list) {
+        if (CollectionUtil.isEmpty(list)) {
+            return 0;
+        }
+        list.forEach(t -> {
+            Optional<TallyingArea> temp = this.getBy(t.getCustomerId(), t.getMarketId(), t.getAssetsId());
+            TallyingArea tallyingArea = new TallyingArea();
+            BeanUtils.copyProperties(t, tallyingArea);
+            if (temp.isPresent()) {
+                tallyingArea.setId(temp.get().getId());
+                tallyingArea.setCreateTime(temp.get().getCreateTime());
+            } else {
+                tallyingArea.setCreateTime(LocalDateTime.now());
+            }
+            tallyingArea.setModifyTime(LocalDateTime.now());
+            if (5 == t.getState()) {
+                tallyingArea.setIsUsable(1);
+            } else {
+                tallyingArea.setIsUsable(0);
+            }
+            tallyingArea.setIsLease(1);
+            saveOrUpdate(tallyingArea);
+        });
+        return list.size();
+    }
+
+
+    /**
+     * 根据客户、市场、资产获取对应的货位新
+     * @param customerId 客户ID
+     * @param marketId 市场ID
+     * @param assetId 资产ID
+     * @return
+     */
+    private Optional<TallyingArea> getBy(Long customerId, Long marketId, Long assetId){
+        TallyingArea condition = new TallyingArea();
+        condition.setCustomerId(customerId);
+        condition.setAssetsId(assetId);
+        condition.setMarketId(marketId);
+        List<TallyingArea> tallyingAreaList = list(condition);
+        if (CollectionUtil.isEmpty(tallyingAreaList)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(tallyingAreaList.get(0));
     }
 }

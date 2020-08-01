@@ -34,4 +34,12 @@ public interface TallyingAreaRpc {
      */
     @RequestMapping(value = "/api/tallyingArea/listByExample", method = RequestMethod.POST)
     BaseOutput<List<TallyingArea>> listByExample(TallyingArea tallyingArea);
+
+    /**
+     * 同步资产租赁信息
+     * @param list 同步数据
+     * @return
+     */
+    @RequestMapping(value = "/api/tallyingArea/syncAssetsLease", method = RequestMethod.POST)
+    BaseOutput<Boolean> syncAssetsLease(List<TallyingArea> list);
 }

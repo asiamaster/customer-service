@@ -5,6 +5,7 @@ import com.dili.customer.sdk.domain.CustomerMarket;
 import com.dili.customer.sdk.domain.TallyingArea;
 import com.dili.customer.sdk.validator.AddView;
 import com.dili.customer.sdk.validator.UpdateView;
+import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -23,6 +24,7 @@ import java.util.List;
  * @author yuehongbo
  * @date 2020/2/4 9:53
  */
+@Data
 public class IndividualCustomerInput implements Serializable {
     private static final long serialVersionUID = -5865840494367827998L;
 
@@ -155,142 +157,4 @@ public class IndividualCustomerInput implements Serializable {
      */
     private String emergencyContactsPhone;
 
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getCertificateNumber() {
-        return certificateNumber;
-    }
-    public void setCertificateNumber(String certificateNumber) {
-        this.certificateNumber = certificateNumber;
-    }
-    public String getCertificateType() {
-        return certificateType;
-    }
-    public void setCertificateType(String certificateType) {
-        this.certificateType = certificateType;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getOrganizationType() {
-        return organizationType;
-    }
-    public void setOrganizationType(String organizationType) {
-        this.organizationType = organizationType;
-    }
-    public String getSourceSystem() {
-        return sourceSystem;
-    }
-    public void setSourceSystem(String sourceSystem) {
-        this.sourceSystem = sourceSystem;
-    }
-    public String getSourceChannel() {
-        return sourceChannel;
-    }
-    public void setSourceChannel(String sourceChannel) {
-        this.sourceChannel = sourceChannel;
-    }
-    public String getContactsPhone() {
-        return contactsPhone;
-    }
-    public void setContactsPhone(String contactsPhone) {
-        this.contactsPhone = contactsPhone;
-    }
-    public String getCode() {
-        return code;
-    }
-    public void setCode(String code) {
-        this.code = code;
-    }
-    public Long getOperatorId() {
-        return operatorId;
-    }
-    public void setOperatorId(Long operatorId) {
-        this.operatorId = operatorId;
-    }
-    public Integer getGender() {
-        return gender;
-    }
-    public void setGender(Integer gender) {
-        this.gender = gender;
-    }
-    public String getPhoto() {
-        return photo;
-    }
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
-    public LocalDate getBirthdate() {
-        return birthdate;
-    }
-    public void setBirthdate(LocalDate birthdate) {
-        this.birthdate = birthdate;
-    }
-    public String getCertificateAddr() {
-        return certificateAddr;
-    }
-    public void setCertificateAddr(String certificateAddr) {
-        this.certificateAddr = certificateAddr;
-    }
-    public String getCertificateRange() {
-        return certificateRange;
-    }
-    public void setCertificateRange(String certificateRange) {
-        this.certificateRange = certificateRange;
-    }
-    public Integer getCertificateLongTerm() {
-        return certificateLongTerm;
-    }
-    public void setCertificateLongTerm(Integer certificateLongTerm) {
-        this.certificateLongTerm = certificateLongTerm;
-    }
-    public String getCurrentCityPath() {
-        return currentCityPath;
-    }
-    public void setCurrentCityPath(String currentCityPath) {
-        this.currentCityPath = currentCityPath;
-    }
-    public String getCurrentCityName() {
-        return currentCityName;
-    }
-    public void setCurrentCityName(String currentCityName) {
-        this.currentCityName = currentCityName;
-    }
-    public String getCurrentAddress() {
-        return currentAddress;
-    }
-    public void setCurrentAddress(String currentAddress) {
-        this.currentAddress = currentAddress;
-    }
-    public CustomerMarket getCustomerMarket() {
-        return customerMarket;
-    }
-    public void setCustomerMarket(CustomerMarket customerMarket) {
-        this.customerMarket = customerMarket;
-    }
-    public List<TallyingArea> getTallyingAreaList() {
-        return tallyingAreaList;
-    }
-    public void setTallyingAreaList(List<TallyingArea> tallyingAreaList) {
-        this.tallyingAreaList = tallyingAreaList;
-    }
-    public String getEmergencyContactsName() {
-        return emergencyContactsName;
-    }
-    public void setEmergencyContactsName(String emergencyContactsName) {
-        this.emergencyContactsName = emergencyContactsName;
-    }
-    public String getEmergencyContactsPhone() {
-        return emergencyContactsPhone;
-    }
-    public void setEmergencyContactsPhone(String emergencyContactsPhone) {
-        this.emergencyContactsPhone = emergencyContactsPhone;
-    }
 }

@@ -44,4 +44,15 @@ public class TallyingAreaController {
     public BaseOutput<List<TallyingArea>> listByExample(@RequestBody TallyingArea tallyingArea) {
         return BaseOutput.success().setData(tallyingAreaService.listByExample(tallyingArea));
     }
+
+    /**
+     * 同步资产租赁信息
+     * @param list 需要同步的数据
+     * @return
+     */
+    @RequestMapping(value = "/syncAssetsLease", method = {RequestMethod.POST})
+    public BaseOutput<Boolean> syncAssetsLease(@RequestBody List<TallyingArea> list) {
+        tallyingAreaService.syncAssetsLease(list);
+        return BaseOutput.success();
+    }
 }

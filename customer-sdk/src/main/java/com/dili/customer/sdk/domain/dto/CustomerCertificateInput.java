@@ -1,10 +1,9 @@
 package com.dili.customer.sdk.domain.dto;
 
 
-
 import com.dili.customer.sdk.validator.EnterpriseView;
+import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -16,6 +15,7 @@ import java.io.Serializable;
  * @author yuehongbo
  * @date 2020/2/27 22:28
  */
+@Data
 public class CustomerCertificateInput implements Serializable {
     private static final long serialVersionUID = -1109726068008219787L;
 
@@ -59,59 +59,4 @@ public class CustomerCertificateInput implements Serializable {
     @Size(max = 40, message = "法人姓名请保持在40个字符以内", groups = {EnterpriseView.class})
     private String corporationName;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCertificateRange() {
-        return certificateRange;
-    }
-
-    public void setCertificateRange(String certificateRange) {
-        this.certificateRange = certificateRange;
-    }
-
-    public Integer getCertificateLongTerm() {
-        return certificateLongTerm;
-    }
-
-    public void setCertificateLongTerm(Integer certificateLongTerm) {
-        this.certificateLongTerm = certificateLongTerm;
-    }
-
-    public String getCertificateAddr() {
-        return certificateAddr;
-    }
-
-    public void setCertificateAddr(String certificateAddr) {
-        this.certificateAddr = certificateAddr;
-    }
-
-    public String getCorporationCertificateType() {
-        return corporationCertificateType;
-    }
-
-    public void setCorporationCertificateType(String corporationCertificateType) {
-        this.corporationCertificateType = corporationCertificateType;
-    }
-
-    public String getCorporationCertificateNumber() {
-        return corporationCertificateNumber;
-    }
-
-    public void setCorporationCertificateNumber(String corporationCertificateNumber) {
-        this.corporationCertificateNumber = corporationCertificateNumber;
-    }
-
-    public String getCorporationName() {
-        return corporationName;
-    }
-
-    public void setCorporationName(String corporationName) {
-        this.corporationName = corporationName;
-    }
 }

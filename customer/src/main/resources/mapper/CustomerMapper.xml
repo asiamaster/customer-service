@@ -27,7 +27,7 @@
     <result column="corporation_certificate_number"  property="corporationCertificateNumber" />
     <result column="corporation_name"  property="corporationName" />
     <result column="is_cellphone_valid"  property="isCellphoneValid" />
-    <result column="current_city_id" property="currentCityId" />
+    <result column="current_city_path" property="currentCityPath" />
     <result column="current_city_name" property="currentCityName" />
     <result column="current_address" property="currentAddress" />
     <result column="creator_id"  property="creatorId" />
@@ -161,10 +161,9 @@
           /*  直接可用的，或者有租赁状态且已生效的 */
           and (ta.is_usable = 1 or (ta.is_lease=1 and ta.state=5)))
         </if>
-        <if test="null != currentCityId">
-          and c.current_city_id = #{currentCityId}
+        <if test="null != currentCityPath and '' != currentCityPath">
+          and FIND_IN_SET(#{currentCityPath},c.current_city_id)
         </if>
-
         <if test="null != hasLicense">
           <if test="hasLicense == 1">
             and c.id in
