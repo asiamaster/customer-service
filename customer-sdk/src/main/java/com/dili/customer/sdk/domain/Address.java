@@ -63,12 +63,6 @@ public class Address extends BaseDomain {
     private Integer isCurrent;
 
     /**
-     * 是否默认
-     * {@link com.dili.commons.glossary.YesOrNoEnum}
-     */
-    private Integer isDefault;
-
-    /**
      * 创建时间
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

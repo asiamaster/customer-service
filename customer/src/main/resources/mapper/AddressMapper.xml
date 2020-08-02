@@ -12,7 +12,6 @@
     <result column="city_name"  property="cityName" />
     <result column="address"  property="address" />
     <result column="is_current"  property="isCurrent" />
-    <result column="is_default"  property="isDefault" />
     <result column="create_time"  property="createTime" />
     <result column="modify_time"  property="modifyTime" />
     <result column="creator_id"  property="creatorId" />

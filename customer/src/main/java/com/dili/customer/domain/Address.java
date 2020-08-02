@@ -73,12 +73,6 @@ public class Address extends BaseDomain {
     private Integer isCurrent;
 
     /**
-     * 是否默认
-     */
-    @Column(name = "`is_default`")
-    private Integer isDefault;
-
-    /**
      * 创建时间
      */
     @Column(name = "`create_time`", updatable = false)

@@ -31,7 +31,6 @@ create table address
    city_name            varchar(50) comment '所在城市合并名称',
    address              varchar(250) comment '地址',
    is_current           tinyint comment '是否现住址',
-   is_default           tinyint comment '是否默认地址',
    create_time          datetime default CURRENT_TIMESTAMP comment '创建时间',
    modify_time          datetime default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '修改时间',
    creator_id           bigint comment '创建人',

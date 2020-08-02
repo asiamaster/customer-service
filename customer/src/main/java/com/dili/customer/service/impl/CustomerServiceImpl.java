@@ -157,7 +157,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             address.setModifierId(baseInfo.getOperatorId());
             address.setCreateTime(LocalDateTime.now());
             address.setModifyTime(address.getCreateTime());
-            address.setIsDefault(1);
             address.setIsCurrent(1);
             addressService.insert(address);
         }
