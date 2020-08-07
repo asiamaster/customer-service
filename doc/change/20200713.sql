@@ -57,7 +57,7 @@ create table attachment
 alter table attachment comment '客户上传的附件信息';
 
 ALTER TABLE customer ADD COLUMN `current_city_path` VARCHAR ( 40 ) DEFAULT NULL COMMENT '现住址城市ID路径' AFTER is_cellphone_valid;
-ALTER TABLE customer ADD COLUMN `current_city_name` VARCHAR ( 40 ) DEFAULT NULL COMMENT '现住址城市名称' AFTER current_city_id;
+ALTER TABLE customer ADD COLUMN `current_city_name` VARCHAR ( 40 ) DEFAULT NULL COMMENT '现住址城市名称' AFTER current_city_path;
 ALTER TABLE customer ADD COLUMN `current_address` VARCHAR (255) DEFAULT NULL COMMENT '现住址详细地址' AFTER current_city_name;
 ALTER TABLE customer_market ADD COLUMN `category` VARCHAR ( 512 ) DEFAULT NULL COMMENT '经营品类' AFTER other_title;
 ALTER TABLE customer_market ADD COLUMN `sales_market` VARCHAR ( 40 ) DEFAULT NULL COMMENT '销地市场' AFTER category;

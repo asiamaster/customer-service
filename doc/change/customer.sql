@@ -70,7 +70,7 @@ create table contacts
 (
    id                   bigint not null auto_increment comment 'ID',
    customer_id          bigint comment '所属客户',
-   firm_id              bigint comment '归属市场',
+   market_id              bigint comment '归属市场',
    name                 varchar(20) comment '姓名',
    gender               tinyint(1) comment '性别男，女',
    phone                varchar(20) comment '电话',
@@ -102,7 +102,7 @@ create index idx_c_market_id on contacts
 );
 
 /*==============================================================*/
-/* Table: customer_firm                                    */
+/* Table: customer_market                                    */
 /*==============================================================*/
 create table customer_market
 (
