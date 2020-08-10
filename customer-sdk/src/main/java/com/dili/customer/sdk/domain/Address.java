@@ -38,10 +38,10 @@ public class Address extends BaseDomain {
     private Long marketId;
 
     /**
-     * 所在城市
+     * 所在城市ID路径
      */
     @NotNull(message = "所属城市不能为空")
-    private String cityId;
+    private String cityPath;
 
     /**
      * 所在城市名称(城市信息合并名称)

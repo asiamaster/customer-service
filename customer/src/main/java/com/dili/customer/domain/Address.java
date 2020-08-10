@@ -45,11 +45,11 @@ public class Address extends BaseDomain {
     private Long marketId;
 
     /**
-     * 所在城市
+     * 所在城市ID路径
      */
-    @Column(name = "`city_id`")
+    @Column(name = "`city_path`")
     @NotNull(message = "所属城市不能为空")
-    private Long cityId;
+    private String cityPath;
 
     /**
      * 所在城市名称(城市信息合并名称)

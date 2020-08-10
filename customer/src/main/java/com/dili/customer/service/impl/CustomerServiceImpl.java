@@ -147,8 +147,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         //如果联系地址不为空，则保存默认联系地址
         if(Objects.nonNull(baseInfo.getCurrentCityPath()) && StrUtil.isNotBlank(baseInfo.getCurrentAddress())){
             Address address = new Address();
-            String[] split = baseInfo.getCurrentCityPath().split(",");
-            address.setCityId(Long.valueOf(split[split.length - 1]));
+            address.setCityPath(baseInfo.getCurrentCityPath());
             address.setCityName(baseInfo.getCurrentCityName());
             address.setAddress(baseInfo.getCurrentAddress());
             address.setCustomerId(customer.getId());

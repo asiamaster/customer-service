@@ -27,7 +27,7 @@ create table address
    id                   bigint not null auto_increment comment 'ID',
    customer_id          bigint comment '客户ID',
    market_id            bigint comment '所属市场ID',
-   city_id              bigint comment '所在城市ID',
+   city_path            varchar(30) comment '所在城市ID路径',
    city_name            varchar(50) comment '所在城市合并名称',
    address              varchar(250) comment '地址',
    is_current           tinyint comment '是否现住址',
