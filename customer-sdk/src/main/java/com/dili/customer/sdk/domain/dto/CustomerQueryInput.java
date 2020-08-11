@@ -43,30 +43,9 @@ public class CustomerQueryInput extends Customer {
     private LocalDate marketCreateTimeEnd;
 
     /**
-     * 客户等级
-     * {@link com.dili.customer.sdk.enums.CustomerEnum.Grade}
-     */
-    private Integer grade;
-
-    /**
-     * 客户身份类型
-     */
-    private String customerType;
-
-    /**
-     * 归属部门
-     */
-    private Long departmentId;
-
-    /**
      * 客户所属组织
      */
     private Long marketId;
-
-    /**
-     * 客户所属组织集
-     */
-    /*private List<Long> marketIdList = new ArrayList<>();*/
 
     /**
      * 根据ID集查询
@@ -77,11 +56,6 @@ public class CustomerQueryInput extends Customer {
      * 关键字查询，根据证件号匹配或名称模糊或编号前模糊查询
      */
     private String keyword;
-
-    /**
-     * 客户所在市场的客户创建人
-     */
-    private Long marketCreatorId;
 
     /**
      * 当客户在多市场时，是否分组只返回一条客户主数据

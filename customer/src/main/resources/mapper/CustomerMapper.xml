@@ -52,17 +52,6 @@
     <result column="sales_market" property="customerMarket.salesMarket" />
   </resultMap>
 
-  <sql id="Base_Column_List">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    id, code, certificate_number, certificate_type, certificate_range, certificate_addr, 
-    name, birthdate, gender, photo, cellphone, organization_type, source_system, registered_capital,
-    employee_number, corporation_certificate_type, corporation_certificate_number, corporation_name, 
-    is_cellphone_valid, creator_id, create_time, modify_time, is_delete, state
-  </sql>
-
-
   <!--- 联合查询分页信息 -->
   <select id="listForPage" parameterType="com.dili.customer.sdk.domain.dto.CustomerQueryInput"  resultMap="listResultMap">
     SELECT
@@ -91,16 +80,6 @@
         <if test="marketId != null">
           and cm.market_id = #{marketId}
         </if>
-        <if test="departmentId != null">
-          and cm.department_id = #{departmentId}
-        </if>
-  <!--      <if test="null != marketIdList and marketIdList.size()>0">
-          &lt;!&ndash; and c.id in (SELECT cf.customer_id FROM customer_market cf where cf.market_id in &ndash;&gt;
-          and cm.market_id in
-          <foreach collection="marketIdList" index="index" item="item" open="(" separator="," close=")">
-            #{item}
-          </foreach>
-        </if>-->
         <if test="name != null and '' != name">
           and c.name LIKE CONCAT('%',#{name},'%')
         </if>
@@ -118,12 +97,6 @@
         </if>
         <if test="organizationType != null">
           and c.organization_type = #{organizationType}
-        </if>
-        <if test="grade != null">
-          and cm.grade = #{grade}
-        </if>
-        <if test="customerType != null">
-          and cm.type = #{customerType}
         </if>
         <if test="contactsPhone != null">
           and c.contacts_phone = #{contactsPhone}
@@ -149,9 +122,6 @@
         <if test="keyword != null">
           and ( c.certificate_number =  #{keyword} or c.name like concat('%', #{keyword}, '%') or c.code like concat('%', #{keyword}, '') )
         </if>
-        <if test="marketCreatorId != null">
-          and cm.creator_id = #{marketCreatorId}
-        </if>
         <if test="null != assetsIdSet and  assetsIdSet.size() > 0">
           and c.id in
           (select customer_id from tallying_area ta where ta.assets_id in
@@ -165,17 +135,34 @@
           and FIND_IN_SET(#{currentCityPath},c.current_city_id)
         </if>
         <if test="null != hasLicense">
-          <if test="hasLicense == 1">
-            and c.id in
-          </if>
-          <if test="hasLicense == 0">
-            and c.id not in
-          </if>
-          (select customer_id from attachment att
-            <if test="marketId != null">
-              where att.market_id = #{marketId}
+            <if test="hasLicense == 1">
+              and c.id in
             </if>
-          )
+            <if test="hasLicense == 0">
+              and c.id not in
+            </if>
+            (select customer_id from attachment att
+              <if test="marketId != null">
+                where att.market_id = #{marketId}
+              </if>
+            )
+        </if>
+        <if test="null != customerMarket">
+          <if test="null != customerMarket.salesMarket and ''!=customerMarket.salesMarket">
+            and cm.sales_market = #{customerMarket.salesMarket}
+          </if>
+          <if test="customerMarket.departmentId != null">
+            and cm.department_id = #{customerMarket.departmentId}
+          </if>
+          <if test="customerMarket.grade != null">
+            and cm.grade = #{customerMarket.grade}
+          </if>
+          <if test="customerMarket.type != null">
+            and cm.type = #{customerMarket.type}
+          </if>
+          <if test="customerMarket.creatorId != null">
+            and cm.creator_id = #{customerMarket.creatorId}
+          </if>
         </if>
       </where>
       <if test="isGroup != null and isGroup == true">

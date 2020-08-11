@@ -50,6 +50,7 @@ public class CustomerMarket extends BaseDomain {
 
     /**
      * 客户等级
+     * {@link com.dili.customer.sdk.enums.CustomerEnum.Grade}
      */
     private Integer grade;
 

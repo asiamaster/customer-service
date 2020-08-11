@@ -314,7 +314,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 temp.setModifierId(updateInput.getOperatorId());
                 if (Objects.isNull(temp.getId())) {
                     temp.setCreatorId(updateInput.getOperatorId());
-                    temp.setCreateTime(t.getModifyTime());
+                    temp.setCreateTime(temp.getModifyTime());
                 }
                 addressList.add(temp);
             });
