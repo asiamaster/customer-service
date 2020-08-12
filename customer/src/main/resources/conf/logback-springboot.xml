@@ -26,7 +26,6 @@
                 <pattern>[${LOG_NAME}-dev] %d |-%highlight(%-5level) [%t] [%c:%L] -| %msg%n</pattern>
             </encoder>
         </appender>
-        <logger name="com.dili.customer" level="DEBUG"/>
         <jmxConfigurator/>
     </springProfile>
     <!-- 测试环境 -->

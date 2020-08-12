@@ -3,6 +3,7 @@ package com.dili.customer.domain;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.customer.utils.CustomerInfoUtil;
+import com.dili.ss.dao.sql.DateNextVersion;
 import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.domain.annotation.Like;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -10,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+import tk.mybatis.mapper.annotation.Version;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -222,6 +224,7 @@ public class Customer extends BaseDomain {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HHm:m:ss")
+    @Version(nextVersion = DateNextVersion.class)
     private LocalDateTime modifyTime;
 
     /**
