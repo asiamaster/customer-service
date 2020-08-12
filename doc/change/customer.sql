@@ -74,6 +74,7 @@ create table contacts
    name                 varchar(20) comment '姓名',
    gender               tinyint(1) comment '性别男，女',
    phone                varchar(20) comment '电话',
+   nation               int(11) DEFAULT NULL COMMENT '民族',
    address              varchar(250) comment '地址',
    position             varchar(100) comment '职务/关系',
    birthdate            date comment '出生日期',
