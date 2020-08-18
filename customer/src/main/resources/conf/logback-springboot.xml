@@ -83,7 +83,6 @@
         </appender>
     </springProfile>
     <root level="info">
-        <appender-ref ref="appender"/>
         <appender-ref ref="FILE"/>
     </root>
 </configuration>
