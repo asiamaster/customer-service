@@ -1,6 +1,8 @@
 package com.dili.customer.api;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.dili.customer.domain.Attachment;
+import com.dili.customer.domain.dto.AttachmentDto;
 import com.dili.customer.service.AttachmentService;
 import com.dili.ss.domain.BaseOutput;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * 客户附件信息
@@ -43,7 +47,39 @@ public class AttachmentController {
      * @return
      */
     @RequestMapping(value = "/listByExample", method = {RequestMethod.POST})
-    public BaseOutput<List<Attachment>> listByExample(@RequestBody Attachment attachment) {
+    public BaseOutput<List<Attachment>> listByExample(@RequestBody AttachmentDto attachment) {
         return BaseOutput.success().setData(attachmentService.listByExample(attachment));
     }
+
+    /**
+     * 根据条件删除客户的附件信息
+     * @param customerId 客户ID
+     * @param marketId 市场ID
+     * @return 删除结果
+     */
+    @RequestMapping(value = "/delete", method = {RequestMethod.POST})
+    public BaseOutput delete(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam(name = "idSet",required = false) Set<Long> idSet) {
+        if (Objects.nonNull(customerId) && Objects.nonNull(marketId)) {
+            AttachmentDto condition = new AttachmentDto();
+            condition.setCustomerId(customerId);
+            condition.setMarketId(marketId);
+            if (CollectionUtil.isNotEmpty(idSet)) {
+                condition.setIdSet(idSet);
+            }
+            attachmentService.deleteByExample(condition);
+            return BaseOutput.success().setData(true);
+        }
+        return BaseOutput.failure("必要参数丢失").setData(false);
+    }
+
+    /**
+     * 批量保存客户附件信息
+     * @param attachmentList 附件信息
+     * @return
+     */
+    @RequestMapping(value = "/batchSave", method = {RequestMethod.POST})
+    public BaseOutput batchSave(@RequestBody List<Attachment> attachmentList) {
+        return BaseOutput.success().setData(attachmentService.batchSave(attachmentList));
+    }
+
 }

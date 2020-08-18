@@ -2,7 +2,6 @@ package com.dili.customer.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.ss.domain.BaseDomain;
-import com.dili.ss.domain.annotation.Operator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +10,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -73,12 +71,4 @@ public class Attachment extends BaseDomain {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HHm:m:ss")
     private LocalDateTime modifyTime;
-
-    /**
-     * 客户ID集
-     */
-    @Transient
-    @Column(name = "customer_id")
-    @Operator(Operator.IN)
-    private Set<Long> customerIdSet;
 }

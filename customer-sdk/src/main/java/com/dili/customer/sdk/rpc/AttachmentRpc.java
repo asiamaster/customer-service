@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 客户附件信息服务
@@ -22,7 +23,7 @@ public interface AttachmentRpc {
      * 根据客户ID查询该客户的附件信息
      * @param customerId 客户ID
      * @param marketId 市场ID
-     * @return
+     * @return 客户附件信息
      */
     @RequestMapping(value = "/api/attachment/listAttachment", method = RequestMethod.POST)
     BaseOutput<List<Attachment>> listAttachment(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
@@ -30,8 +31,25 @@ public interface AttachmentRpc {
     /**
      * 根据条件查询该客户的附件信息
      * @param attachment 查询条件
-     * @return
+     * @return 客户附件信息
      */
     @RequestMapping(value = "/api/attachment/listByExample", method = RequestMethod.POST)
     BaseOutput<List<Attachment>> listByExample(Attachment attachment);
+
+    /**
+     * 根据客户信息删除该客户的附件信息
+     * @param customerId 客户ID
+     * @param marketId   市场ID
+     * @return 是否删除成功
+     */
+    @RequestMapping(value = "/api/attachment/delete", method = RequestMethod.POST)
+    BaseOutput<Boolean> delete(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam(name = "idSet", required = false) Set<Long> idSet);
+
+    /**
+     * 批量保存客户附件信息
+     * @param attachmentList 客户附件信息
+     * @return 保存结果
+     */
+    @RequestMapping(value = "/api/attachment/batchSave", method = RequestMethod.POST)
+    BaseOutput batchSave(List<Attachment> attachmentList);
 }

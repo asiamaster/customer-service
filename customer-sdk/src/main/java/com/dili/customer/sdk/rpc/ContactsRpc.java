@@ -35,6 +35,6 @@ public interface ContactsRpc {
      * @return
      */
     @RequestMapping(value = "/api/contacts/saveContacts", method = RequestMethod.POST)
-    List<Contacts> saveContacts(Contacts customerContacts);
+    BaseOutput saveContacts(Contacts customerContacts);
 
 }
