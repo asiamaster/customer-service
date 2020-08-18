@@ -55,6 +55,11 @@ public class Attachment extends BaseDomain {
     private String address;
 
     /**
+     * 文件名称
+     */
+    @Column(name = "file_name")
+    private String fileName;
+    /**
      * 创建时间
      */
     @Column(name = "create_time")

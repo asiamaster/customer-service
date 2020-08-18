@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -42,6 +43,11 @@ public class Attachment extends BaseDomain {
      * 附件地址
      */
     private String address;
+
+    /**
+     * 文件名称
+     */
+    private String fileName;
 
     /**
      * 创建时间
