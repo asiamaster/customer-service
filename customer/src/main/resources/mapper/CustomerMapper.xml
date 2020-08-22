@@ -120,7 +120,7 @@
           and c.is_delete = #{isDelete}
         </if>
         <if test="keyword != null">
-          and ( c.certificate_number =  #{keyword} or c.name like concat('%', #{keyword}, '%') or c.code like concat('%', #{keyword}, '') )
+          and ( c.certificate_number =  #{keyword} or c.name like concat('%', #{keyword}, '%') or c.code like concat('%', #{keyword}, '') or c.contacts_phone like concat('', #{keyword}, '%') )
         </if>
         <if test="null != assetsIdSet and  assetsIdSet.size() > 0">
           and c.id in

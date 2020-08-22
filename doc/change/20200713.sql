@@ -1,3 +1,7 @@
+/*==============================================================*/
+/* Table: tallying_area                                         */
+/*==============================================================*/
+drop index idx_ta_customer_id on tallying_area;
 drop table if exists tallying_area;
 create table tallying_area
 (
@@ -17,11 +21,20 @@ create table tallying_area
    primary key (id)
 );
 alter table tallying_area comment '客户理货区关联关系';
+/*==============================================================*/
+/* Index: idx_ta_customer_id                                    */
+/*==============================================================*/
+create index idx_ta_customer_id on tallying_area
+(
+   customer_id
+);
 
-drop table if exists address;
 /*==============================================================*/
 /* Table: address                                               */
 /*==============================================================*/
+drop index idx_a_customer_id on address;
+drop index idx_a_market_id on address;
+drop table if exists address;
 create table address
 (
    id                   bigint not null auto_increment comment 'ID',
@@ -38,11 +51,25 @@ create table address
    primary key (id)
 );
 alter table address comment '客户联系地址信息';
+/*==============================================================*/
+/* Index: idx_a_market_id                                       */
+/*==============================================================*/
+create index idx_a_market_id on address
+(
+   market_id
+);
+/*==============================================================*/
+/* Index: idx_a_customer_id                                     */
+/*==============================================================*/
+create index idx_a_customer_id on address
+(
+   customer_id
+);
 
-drop table if exists attachment;
 /*==============================================================*/
 /* Table: attachment                                            */
 /*==============================================================*/
+drop table if exists attachment;
 create table attachment
 (
    id                   bigint not null auto_increment comment 'ID',
@@ -50,6 +77,7 @@ create table attachment
    market_id            bigint comment '所属市场ID',
    file_type            integer comment '附件类型',
    address              varchar(255) comment '附件地址',
+   file_name            varchar(255) comment '源文件名称',
    create_time          datetime default CURRENT_TIMESTAMP comment '创建时间',
    modify_time           datetime default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '修改时间',
    primary key (id)
