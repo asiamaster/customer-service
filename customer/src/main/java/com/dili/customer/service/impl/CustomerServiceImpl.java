@@ -256,7 +256,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (Objects.isNull(customerMarket)){
             customerMarket = new CustomerMarket();
         }
-        BeanUtils.copyProperties(updateInput.getCustomerMarket(), customerMarket);
+        BeanUtils.copyProperties(updateInput.getCustomerMarket(), customerMarket,"grade");
         customerMarket.setCustomerId(updateInput.getId());
         customerMarket.setModifierId(updateInput.getOperatorId());
         customerMarket.setModifyTime(LocalDateTime.now());
