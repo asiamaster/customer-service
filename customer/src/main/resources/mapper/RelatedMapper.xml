@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dili.customer.mapper.RelatedMapper">
+    <resultMap id="BaseResultMap" type="com.dili.customer.domain.Related">
+                <result column="id" jdbcType="BIGINT"
+                        property="id"/>
+                <result column="customer_id" jdbcType="BIGINT"
+                        property="customerId"/>
+                <result column="parent" jdbcType="BIGINT"
+                        property="parent"/>
+                <result column="market_id" jdbcType="BIGINT"
+                        property="marketId"/>
+                <result column="modify_time" jdbcType="TIMESTAMP"
+                        property="modifyTime"/>
+                <result column="related_time_start" jdbcType="TIMESTAMP"
+                        property="relatedTimeStart"/>
+                <result column="related_time_end" jdbcType="TIMESTAMP"
+                        property="relatedTimeEnd"/>
+                <result column="category" jdbcType="VARCHAR"
+                        property="category"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+                    id,
+                    customer_id,
+                    parent,
+                    market_id,
+                    modify_time,
+                    related_time_start,
+                    related_time_end,
+                    category
+    </sql>
+    <select id="selectByQuery" parameterType="com.dili.customer.sdk.dto.RelatedQuery" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from related
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+</mapper>
