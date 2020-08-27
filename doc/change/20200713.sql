@@ -92,3 +92,4 @@ ALTER TABLE customer_market ADD COLUMN `category_name` VARCHAR ( 512 ) DEFAULT N
 ALTER TABLE customer_market ADD COLUMN `sales_market` VARCHAR ( 40 ) DEFAULT NULL COMMENT '销地市场' AFTER category_name;
 update customer_market set category = main_category;
 ALTER TABLE customer_market drop COLUMN `main_category`;
+ALTER TABLE customer drop COLUMN `cellphone`;

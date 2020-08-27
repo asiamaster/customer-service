@@ -81,11 +81,6 @@ public class Customer extends BaseDomain {
     private String photo;
 
     /**
-     * 手机号
-     */
-    private String cellphone;
-
-    /**
      * 联系电话
      */
     private String contactsPhone;

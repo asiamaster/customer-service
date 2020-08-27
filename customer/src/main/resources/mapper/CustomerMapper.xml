@@ -15,7 +15,6 @@
     <result column="birthdate"  property="birthdate" />
     <result column="gender"  property="gender" />
     <result column="photo"  property="photo" />
-    <result column="cellphone"  property="cellphone" />
     <result column="contacts_phone" property="contactsPhone" />
     <result column="contacts_name" property="contactsName" />
     <result column="organization_type"  property="organizationType" />

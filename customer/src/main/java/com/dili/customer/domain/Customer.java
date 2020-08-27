@@ -106,12 +106,6 @@ public class Customer extends BaseDomain {
     private String photo;
 
     /**
-     * 手机号
-     */
-    @Column(name = "`cellphone`")
-    private String cellphone;
-
-    /**
      * 联系电话
      */
     @Column(name = "`contacts_phone`")
