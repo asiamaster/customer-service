@@ -87,9 +87,38 @@ alter table attachment comment '客户上传的附件信息';
 ALTER TABLE customer ADD COLUMN `current_city_path` VARCHAR ( 40 ) DEFAULT NULL COMMENT '现住址城市ID路径' AFTER is_cellphone_valid;
 ALTER TABLE customer ADD COLUMN `current_city_name` VARCHAR ( 40 ) DEFAULT NULL COMMENT '现住址城市名称' AFTER current_city_path;
 ALTER TABLE customer ADD COLUMN `current_address` VARCHAR (255) DEFAULT NULL COMMENT '现住址详细地址' AFTER current_city_name;
-ALTER TABLE customer_market ADD COLUMN `category_id` VARCHAR ( 512 ) DEFAULT NULL COMMENT '经营品类ID,多个逗号隔开' AFTER other_title;
-ALTER TABLE customer_market ADD COLUMN `category_name` VARCHAR ( 512 ) DEFAULT NULL COMMENT '经营品类名称,多个逗号隔开' AFTER category_id;
-ALTER TABLE customer_market ADD COLUMN `sales_market` VARCHAR ( 40 ) DEFAULT NULL COMMENT '销地市场' AFTER category_name;
-update customer_market set category = main_category;
+ALTER TABLE customer_market ADD COLUMN `sales_market` VARCHAR ( 40 ) DEFAULT NULL COMMENT '销地市场' AFTER other_title;
 ALTER TABLE customer_market drop COLUMN `main_category`;
 ALTER TABLE customer drop COLUMN `cellphone`;
+
+/*==============================================================*/
+/* Table: business_category                                     */
+/*==============================================================*/
+drop index idx_bc_market_id on business_category;
+drop index inx_bc_customer_id on business_category;
+drop table if exists business_category;
+create table business_category
+(
+   id                   bigint not null comment 'ID',
+   customer_id          bigint comment '客户ID',
+   market_id            bigint comment '所属市场ID',
+   category_path        varchar(100) comment '经营品类ID路径',
+   category_name_path   varchar(200) comment '经营品类名称全路径',
+   modify_time          datetime comment '最后修改时间',
+   primary key (id)
+);
+alter table business_category comment '客户经营品类信息';
+/*==============================================================*/
+/* Index: inx_bc_customer_id                                    */
+/*==============================================================*/
+create index inx_bc_customer_id on business_category
+(
+   customer_id
+);
+/*==============================================================*/
+/* Index: idx_bc_market_id                                      */
+/*==============================================================*/
+create index idx_bc_market_id on business_category
+(
+   market_id
+);
