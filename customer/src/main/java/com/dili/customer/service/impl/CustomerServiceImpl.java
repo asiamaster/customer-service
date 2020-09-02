@@ -323,6 +323,11 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         } else {
             addressService.deleteByCustomerAndMarket(customer.getId(), marketId);
         }
+        //更新客户经营品类信息
+        if (CollectionUtil.isNotEmpty(updateInput.getBusinessCategoryList())) {
+            List<BusinessCategory> businessCategoryList = JSONArray.parseArray(JSONObject.toJSONString(updateInput.getBusinessCategoryList()), BusinessCategory.class);
+            businessCategoryService.saveInfo(businessCategoryList, customer.getId(), marketId);
+        }
         customer.setCustomerMarket(customerMarket);
         return BaseOutput.success().setData(customer);
     }

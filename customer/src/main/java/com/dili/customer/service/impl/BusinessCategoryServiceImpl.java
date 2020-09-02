@@ -1,7 +1,7 @@
 package com.dili.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.IdUtil;
 import com.dili.customer.domain.BusinessCategory;
 import com.dili.customer.mapper.BusinessCategoryMapper;
 import com.dili.customer.service.BusinessCategoryService;
@@ -39,7 +39,7 @@ public class BusinessCategoryServiceImpl extends BaseServiceImpl<BusinessCategor
         if (CollectionUtil.isNotEmpty(businessCategoryList)) {
             businessCategoryList.forEach(t -> {
                 LocalDateTime now = LocalDateTime.now();
-                t.setId(LocalDateTimeUtil.toEpochMilli(now));
+                t.setId(IdUtil.getSnowflake(1, 1).nextId());
                 t.setMarketId(marketId);
                 t.setCustomerId(customerId);
                 t.setModifyTime(now);

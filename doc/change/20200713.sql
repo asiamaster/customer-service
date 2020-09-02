@@ -104,7 +104,8 @@ create table business_category
    market_id            bigint comment '所属市场ID',
    category_path        varchar(100) comment '经营品类ID路径',
    category_name_path   varchar(200) comment '经营品类名称全路径',
-   modify_time          datetime comment '最后修改时间',
+   create_time          datetime default CURRENT_TIMESTAMP comment '创建时间',
+   modify_time          datetime default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '最后修改时间',
    primary key (id)
 );
 alter table business_category comment '客户经营品类信息';

@@ -7,7 +7,6 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
@@ -21,7 +20,6 @@ public class BusinessCategory extends BaseDomain {
     /**
      * ID
      */
-    @Id
     @Column(name = "`id`")
     private Long id;
 
