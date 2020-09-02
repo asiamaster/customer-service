@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.domain.*;
 import com.dili.customer.mapper.CustomerMapper;
 import com.dili.customer.sdk.domain.dto.CustomerCertificateInput;
@@ -251,7 +252,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             customer.setCorporationCertificateNumber(customerCertificate.getCorporationCertificateNumber());
             customer.setCorporationName(customerCertificate.getCorporationName());
         }
-        super.update(customer);
         //更改市场归属信息
         CustomerMarket customerMarket = customerMarketService.queryByMarketAndCustomerId(updateInput.getCustomerMarket().getMarketId(), updateInput.getId());
         if (Objects.isNull(customerMarket)){
@@ -318,6 +318,12 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                     temp.setCreateTime(temp.getModifyTime());
                 }
                 addressList.add(temp);
+                //如果此地址为当前居住地，则需更新客户主表上的现住址
+                if (YesOrNoEnum.YES.getCode().equals(t.getIsCurrent())) {
+                    customer.setCurrentCityPath(t.getCityPath());
+                    customer.setCurrentCityName(t.getCityName());
+                    customer.setCurrentAddress(t.getAddress());
+                }
             });
             addressService.batchSaveOrUpdate(addressList);
         } else {
@@ -328,6 +334,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             List<BusinessCategory> businessCategoryList = JSONArray.parseArray(JSONObject.toJSONString(updateInput.getBusinessCategoryList()), BusinessCategory.class);
             businessCategoryService.saveInfo(businessCategoryList, customer.getId(), marketId);
         }
+        super.update(customer);
         customer.setCustomerMarket(customerMarket);
         return BaseOutput.success().setData(customer);
     }

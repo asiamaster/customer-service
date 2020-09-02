@@ -107,6 +107,9 @@
         <if test="state != null">
           and c.state = #{state}
         </if>
+        <if test="currentCityId !=null">
+          and FIND_IN_SET(#{currentCityId},c.current_city_path)
+        </if>
         <if test="marketCreateTimeStart != null">
           and cm.create_time >= #{marketCreateTimeStart}
         </if>

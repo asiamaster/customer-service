@@ -77,4 +77,9 @@ public class CustomerQueryInput extends Customer {
      * 是否有(上传)营业执照
      */
     private Integer hasLicense;
+
+    /**
+     * 当前城市ID
+     */
+    private Integer currentCityId;
 }
