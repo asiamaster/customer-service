@@ -124,7 +124,7 @@
         </if>
         <if test="null != assetsIdSet and  assetsIdSet.size() > 0">
           and c.id in
-          (select customer_id from tallying_area ta where ta.assets_id in
+          (select customer_id from tallying_area ta where ta.market_id=#{marketId} and ta.assets_id in
             <foreach collection="assetsIdSet" index="index" item="item" open="(" separator="," close=")">
               #{item}
             </foreach>
