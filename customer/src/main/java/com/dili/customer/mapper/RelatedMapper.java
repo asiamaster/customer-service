@@ -15,6 +15,7 @@
 */
 package com.dili.customer.mapper;
 
+import com.dili.customer.domain.dto.RelatedList;
 import com.dili.ss.base.MyMapper;
 import com.dili.customer.domain.Related;
 import com.dili.customer.sdk.dto.RelatedQuery;
@@ -27,5 +28,5 @@ import java.util.List;
 **/
 public interface RelatedMapper extends MyMapper<Related> {
 
-    List<Related> selectByQuery(RelatedQuery query);
+    List<RelatedList> selectByQuery(RelatedQuery query);
 }

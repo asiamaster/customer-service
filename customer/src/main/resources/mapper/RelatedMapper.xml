@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.dili.customer.mapper.RelatedMapper">
-    <resultMap id="BaseResultMap" type="com.dili.customer.domain.Related">
-                <result column="id" jdbcType="BIGINT"
-                        property="id"/>
-                <result column="customer_id" jdbcType="BIGINT"
-                        property="customerId"/>
-                <result column="parent" jdbcType="BIGINT"
-                        property="parent"/>
-                <result column="market_id" jdbcType="BIGINT"
-                        property="marketId"/>
-                <result column="modify_time" jdbcType="TIMESTAMP"
-                        property="modifyTime"/>
-                <result column="related_time_start" jdbcType="TIMESTAMP"
-                        property="relatedTimeStart"/>
-                <result column="related_time_end" jdbcType="TIMESTAMP"
-                        property="relatedTimeEnd"/>
-                <result column="category" jdbcType="VARCHAR"
-                        property="category"/>
+    <resultMap id="BaseResultMap" type="com.dili.customer.domain.dto.RelatedList">
+        <result column="parent" jdbcType="BIGINT"
+                property="customerId"/>
+        <result column="customer_count" jdbcType="BIGINT"
+                property="customerCount"/>
+        <result column="department_id" jdbcType="BIGINT"
+                property="departmentId"/>
+        <result column="modify_time" jdbcType="TIMESTAMP"
+                property="modifyTime"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -34,11 +26,9 @@
                     category
     </sql>
     <select id="selectByQuery" parameterType="com.dili.customer.sdk.dto.RelatedQuery" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from related
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
+        SELECT parent, count(customer_id) as customer_count,
+        (SELECT department_id FROM customer_market WHERE customer_id = r.parent) as department_id, modify_time
+        FROM related r
+        WHERE market_id = #{marketId} GROUP BY parent
     </select>
 </mapper>

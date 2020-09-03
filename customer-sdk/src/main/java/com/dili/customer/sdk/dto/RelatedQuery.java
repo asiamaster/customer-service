@@ -41,4 +41,9 @@ public class RelatedQuery{
     /** provider */
     private Map metadata;
 
+    /**
+     * 市场
+     */
+    private Long marketId;
+
 }

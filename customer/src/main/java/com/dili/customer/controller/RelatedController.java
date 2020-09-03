@@ -17,6 +17,7 @@ package com.dili.customer.controller;
 
 import com.dili.commons.bstable.TableResult;
 import com.dili.customer.domain.Related;
+import com.dili.customer.domain.dto.RelatedList;
 import com.dili.customer.sdk.dto.RelatedDto;
 import com.dili.customer.service.RelatedService;
 import com.dili.customer.sdk.dto.RelatedQuery;
@@ -24,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 import com.dili.ss.domain.BaseOutput;
 import org.springframework.web.bind.annotation.*;
 import com.github.pagehelper.PageInfo;
+
+import java.util.List;
 
 /**
 * @website http://shaofan.org
@@ -44,9 +47,9 @@ public class RelatedController {
     * @return PageInfo<Related>
     */
     @PostMapping("/query")
-    public Object query(RelatedQuery query){
-        PageInfo<Related> page = relatedService.queryAll(query);
-        TableResult<Related> result = new TableResult<>(page.getPageNum(), page.getTotal(), page.getList());
+    public Object query(@RequestBody RelatedQuery query){
+        PageInfo<RelatedList> page = relatedService.queryAll(query);
+        TableResult<RelatedList> result = new TableResult<>(page.getPageNum(), page.getTotal(), page.getList());
         return result;
     }
 
@@ -69,6 +72,16 @@ public class RelatedController {
     }
 
     /**
+     * listByExample
+     * @param related
+     * @return
+     */
+    @PostMapping("/listByExample")
+    public List<Related> listByExample(@RequestBody Related related){
+        return relatedService.listByExample(related);
+    }
+
+    /**
     * 获取
     */
     @PostMapping("/get")
@@ -80,8 +93,8 @@ public class RelatedController {
     * 多选删除
     */
     @PostMapping("/deleteAll")
-    public BaseOutput deleteAll(@RequestBody Long[] ids) {
-        relatedService.deleteAll(ids);
+    public BaseOutput deleteAll(@RequestBody Long parent) {
+        relatedService.deleteAll(parent);
         return BaseOutput.success();
     }
 

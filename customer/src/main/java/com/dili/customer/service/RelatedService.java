@@ -16,6 +16,7 @@
 package com.dili.customer.service;
 
 import com.dili.customer.domain.Related;
+import com.dili.customer.domain.dto.RelatedList;
 import com.dili.customer.sdk.dto.RelatedQuery;
 import com.dili.ss.domain.BaseOutput;
 import com.github.pagehelper.PageInfo;
@@ -35,14 +36,14 @@ public interface RelatedService extends BaseService<Related, Long> {
     * @param query 条件
     * @return PageInfo<Related>
     */
-    PageInfo<Related> queryAll(RelatedQuery query);
+    PageInfo<RelatedList> queryAll(RelatedQuery query);
 
 
     /**
     * 多选删除
     * @param ids /
     */
-    void deleteAll(Long[] ids);
+    void deleteAll(Long parent);
 
     /**
     * 多选启用
