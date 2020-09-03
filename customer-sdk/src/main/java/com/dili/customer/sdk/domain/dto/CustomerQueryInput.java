@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -77,4 +78,9 @@ public class CustomerQueryInput extends Customer {
      * 是否有(上传)营业执照
      */
     private Integer hasLicense;
+
+    /**
+     * 客户编号列表
+     */
+    private List<String> codeList;
 }

@@ -163,6 +163,12 @@
             and cm.creator_id = #{customerMarket.creatorId}
           </if>
         </if>
+        <if test="codeList !=null and codeList.size() > 0">
+          and c.code in
+          <foreach collection="codeList" item="temp" open="(" close=")" separator=",">
+            #{temp}
+          </foreach>
+        </if>
       </where>
       <if test="isGroup != null and isGroup == true">
          group by c.id
