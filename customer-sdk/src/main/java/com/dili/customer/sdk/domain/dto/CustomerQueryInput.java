@@ -80,6 +80,11 @@ public class CustomerQueryInput extends Customer {
     private Integer hasLicense;
 
     /**
+     * 当前城市ID
+     */
+    private Integer currentCityId;
+
+    /**
      * 客户编号列表
      */
     private List<String> codeList;

@@ -46,8 +46,6 @@
     <result column="type" property="customerMarket.type" />
     <result column="department_id" property="customerMarket.departmentId" />
     <result column="profession" property="customerMarket.profession" />
-    <result column="category_id" property="customerMarket.categoryId" />
-    <result column="category_name" property="customerMarket.categoryName" />
     <result column="sales_market" property="customerMarket.salesMarket" />
   </resultMap>
 
@@ -56,7 +54,7 @@
     SELECT
         c.*,
         cm.id as customerMarketId, cm.market_id,cm.create_time as marketCreateTime,cm.creator_id AS marketCreatorId,
-        cm.grade,cm.type,cm.department_id,cm.profession,cm.category_id,cm.category_name,cm.sales_market
+        cm.grade,cm.type,cm.department_id,cm.profession,cm.sales_market
     FROM
       customer c,customer_market cm
       <where>
@@ -109,6 +107,9 @@
         <if test="state != null">
           and c.state = #{state}
         </if>
+        <if test="currentCityId !=null">
+          and FIND_IN_SET(#{currentCityId},c.current_city_path)
+        </if>
         <if test="marketCreateTimeStart != null">
           and cm.create_time >= #{marketCreateTimeStart}
         </if>
@@ -119,7 +120,7 @@
           and c.is_delete = #{isDelete}
         </if>
         <if test="keyword != null">
-          and ( c.certificate_number =  #{keyword} or c.name like concat('%', #{keyword}, '%') or c.code like concat('%', #{keyword}, '') or c.contacts_phone like concat('', #{keyword}, '%') )
+          and ( c.certificate_number =  #{keyword} or c.name like concat('%', #{keyword}, '%') or c.code like concat('%', #{keyword}, '%') or c.contacts_phone like concat('', #{keyword}, '%') )
         </if>
         <if test="null != assetsIdSet and  assetsIdSet.size() > 0">
           and c.id in

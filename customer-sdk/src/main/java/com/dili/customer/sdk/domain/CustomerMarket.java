@@ -80,16 +80,6 @@ public class CustomerMarket extends BaseDomain {
     private String otherTitle;
 
     /**
-     * 经营品类ID,多个逗号分隔
-     */
-    private String categoryId;
-
-    /**
-     * 经营品类名称,多个以逗号隔开
-     */
-    private String categoryName;
-
-    /**
      * 销售市场
      */
     private String salesMarket;

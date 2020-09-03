@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.domain.*;
 import com.dili.customer.mapper.CustomerMapper;
 import com.dili.customer.sdk.domain.dto.CustomerCertificateInput;
@@ -20,9 +21,9 @@ import com.dili.ss.util.POJOUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
  *
  * @author yuehongbo
  */
+@RequiredArgsConstructor
 @Service
 public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> implements CustomerService {
 
@@ -46,15 +48,11 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         return (CustomerMapper) getDao();
     }
 
-    @Autowired
-    private CustomerMarketService customerMarketService;
-    @Autowired
-    private ContactsService contactsService;
-    @Autowired
-    private TallyingAreaService tallyingAreaService;
-    @Autowired
-    private AddressService addressService;
-
+    private final CustomerMarketService customerMarketService;
+    private final ContactsService contactsService;
+    private final TallyingAreaService tallyingAreaService;
+    private final AddressService addressService;
+    private final BusinessCategoryService businessCategoryService;
 
     @Override
     public Customer getBaseInfoByCertificateNumber(String certificateNumber) {
@@ -84,13 +82,13 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             //根据证件号判断客户是否已存在
             customer = getBaseInfoByCertificateNumber(baseInfo.getCertificateNumber());
             if (null == customer) {
-//                //身份证号对应的客户不存在，手机号对应的客户已存在，则认为手机号已被使用
-//                Customer queryPhone = new Customer();
-//                queryPhone.setCellphone(baseInfo.getCellphone());
-//                List<Customer> phoneExist = list(queryPhone);
-//                if (CollectionUtil.isNotEmpty(phoneExist)) {
-//                    return BaseOutput.failure("此手机号已被注册");
-//                }
+                //身份证号对应的客户不存在，手机号对应的客户已存在，则认为手机号已被使用
+                Customer queryPhone = new Customer();
+                queryPhone.setContactsPhone(baseInfo.getContactsPhone());
+                List<Customer> phoneExist = list(queryPhone);
+                if (CollectionUtil.isNotEmpty(phoneExist)) {
+                    return BaseOutput.failure("此手机号对应的客户已存在");
+                }
                 customer = new Customer();
                 BeanUtils.copyProperties(baseInfo, customer);
                 customer.setCreatorId(baseInfo.getOperatorId());
@@ -165,6 +163,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (CollectionUtil.isNotEmpty(customer.getTallyingAreaList())) {
             List<TallyingArea> tallyingAreaList = JSONArray.parseArray(JSONObject.toJSONString(baseInfo.getTallyingAreaList()), TallyingArea.class);
             tallyingAreaService.saveInfo(tallyingAreaList, customer.getId(), marketInfo.getMarketId());
+        }
+        if (CollectionUtil.isNotEmpty(baseInfo.getBusinessCategoryList())){
+            List<BusinessCategory> businessCategoryList = JSONArray.parseArray(JSONObject.toJSONString(baseInfo.getBusinessCategoryList()), BusinessCategory.class);
+            businessCategoryService.saveInfo(businessCategoryList, customer.getId(), marketInfo.getMarketId());
         }
         return BaseOutput.success().setData(customer);
     }
@@ -250,7 +252,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             customer.setCorporationCertificateNumber(customerCertificate.getCorporationCertificateNumber());
             customer.setCorporationName(customerCertificate.getCorporationName());
         }
-        super.update(customer);
         //更改市场归属信息
         CustomerMarket customerMarket = customerMarketService.queryByMarketAndCustomerId(updateInput.getCustomerMarket().getMarketId(), updateInput.getId());
         if (Objects.isNull(customerMarket)){
@@ -317,11 +318,23 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                     temp.setCreateTime(temp.getModifyTime());
                 }
                 addressList.add(temp);
+                //如果此地址为当前居住地，则需更新客户主表上的现住址
+                if (YesOrNoEnum.YES.getCode().equals(t.getIsCurrent())) {
+                    customer.setCurrentCityPath(t.getCityPath());
+                    customer.setCurrentCityName(t.getCityName());
+                    customer.setCurrentAddress(t.getAddress());
+                }
             });
             addressService.batchSaveOrUpdate(addressList);
         } else {
             addressService.deleteByCustomerAndMarket(customer.getId(), marketId);
         }
+        //更新客户经营品类信息
+        if (CollectionUtil.isNotEmpty(updateInput.getBusinessCategoryList())) {
+            List<BusinessCategory> businessCategoryList = JSONArray.parseArray(JSONObject.toJSONString(updateInput.getBusinessCategoryList()), BusinessCategory.class);
+            businessCategoryService.saveInfo(businessCategoryList, customer.getId(), marketId);
+        }
+        super.update(customer);
         customer.setCustomerMarket(customerMarket);
         return BaseOutput.success().setData(customer);
     }

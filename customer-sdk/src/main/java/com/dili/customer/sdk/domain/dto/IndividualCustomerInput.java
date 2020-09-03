@@ -1,6 +1,7 @@
 package com.dili.customer.sdk.domain.dto;
 
 
+import com.dili.customer.sdk.domain.BusinessCategory;
 import com.dili.customer.sdk.domain.CustomerMarket;
 import com.dili.customer.sdk.domain.TallyingArea;
 import com.dili.customer.sdk.validator.AddView;
@@ -156,5 +157,10 @@ public class IndividualCustomerInput implements Serializable {
      * 紧急联系电话
      */
     private String emergencyContactsPhone;
+
+    /**
+     * 客户经营品类信息
+     */
+    private List<BusinessCategory> businessCategoryList;
 
 }

@@ -1,9 +1,6 @@
 package com.dili.customer.sdk.domain.dto;
 
-import com.dili.customer.sdk.domain.Address;
-import com.dili.customer.sdk.domain.Contacts;
-import com.dili.customer.sdk.domain.CustomerMarket;
-import com.dili.customer.sdk.domain.TallyingArea;
+import com.dili.customer.sdk.domain.*;
 import lombok.Data;
 
 import javax.validation.Valid;
@@ -82,5 +79,10 @@ public class CustomerUpdateInput implements Serializable {
      * 客户地址
      */
     private List<Address> addressList;
+
+    /**
+     * 客户经营品类信息
+     */
+    private List<BusinessCategory> businessCategoryList;
 
 }
