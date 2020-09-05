@@ -27,7 +27,7 @@
     </sql>
     <select id="selectByQuery" parameterType="com.dili.customer.sdk.dto.RelatedQuery" resultMap="BaseResultMap">
         SELECT parent, count(customer_id) as customer_count,
-        (SELECT department_id FROM customer_market WHERE customer_id = r.parent) as department_id, modify_time
+        (SELECT department_id FROM customer_market WHERE customer_id = r.parent and market_id = #{marketId}) as department_id, modify_time
         FROM related r
         WHERE market_id = #{marketId} GROUP BY parent
     </select>
