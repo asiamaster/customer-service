@@ -168,6 +168,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             List<BusinessCategory> businessCategoryList = JSONArray.parseArray(JSONObject.toJSONString(baseInfo.getBusinessCategoryList()), BusinessCategory.class);
             businessCategoryService.saveInfo(businessCategoryList, customer.getId(), marketInfo.getMarketId());
         }
+        customer.setCustomerMarket(marketInfo);
         return BaseOutput.success().setData(customer);
     }
 
