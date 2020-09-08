@@ -26,4 +26,13 @@ public interface CustomerMarketRpc {
      */
     @RequestMapping(value = "api/customerMarket/getByCustomerAndMarket", method = RequestMethod.POST)
     BaseOutput<CustomerMarket> getByCustomerAndMarket(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
+
+    /**
+     * 更改客户所在市场的客户等级
+     * @param customerId 客户ID
+     * @param marketId 所属市场ID
+     * @param nextGrade 想要更新成的等级
+     */
+    @RequestMapping("/changeGrade")
+    BaseOutput changeGrade(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam("grade") Integer nextGrade);
 }

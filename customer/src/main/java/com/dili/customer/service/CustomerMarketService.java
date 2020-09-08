@@ -1,6 +1,7 @@
 package com.dili.customer.service;
 
 import com.dili.customer.domain.CustomerMarket;
+import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.ss.base.BaseService;
 
 /**
@@ -17,4 +18,12 @@ public interface CustomerMarketService extends BaseService<CustomerMarket, Long>
      * @return
      */
     CustomerMarket queryByMarketAndCustomerId(Long marketId, Long customerId);
+
+    /**
+     * 更改客户所在市场的客户等级
+     * @param customerId 客户ID
+     * @param marketId 所属市场ID
+     * @param nextGrade 想要更新成的等级
+     */
+    void changeGrade(Long customerId, Long marketId, CustomerEnum.Grade nextGrade);
 }
