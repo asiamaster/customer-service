@@ -3,8 +3,7 @@ package com.dili.customer.sdk.rpc;
 import com.dili.customer.sdk.domain.Attachment;
 import com.dili.ss.domain.BaseOutput;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public interface AttachmentRpc {
      * @param marketId 市场ID
      * @return 客户附件信息
      */
-    @RequestMapping(value = "/api/attachment/listAttachment", method = RequestMethod.POST)
+    @PostMapping(value = "/api/attachment/listAttachment")
     BaseOutput<List<Attachment>> listAttachment(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
 
     /**
@@ -33,7 +32,7 @@ public interface AttachmentRpc {
      * @param attachment 查询条件
      * @return 客户附件信息
      */
-    @RequestMapping(value = "/api/attachment/listByExample", method = RequestMethod.POST)
+    @PostMapping(value = "/api/attachment/listByExample")
     BaseOutput<List<Attachment>> listByExample(Attachment attachment);
 
     /**
@@ -42,7 +41,7 @@ public interface AttachmentRpc {
      * @param marketId   市场ID
      * @return 是否删除成功
      */
-    @RequestMapping(value = "/api/attachment/delete", method = RequestMethod.POST)
+    @PostMapping(value = "/api/attachment/delete")
     BaseOutput<Boolean> delete(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam(name = "idSet", required = false) Set<Long> idSet);
 
     /**
@@ -50,6 +49,6 @@ public interface AttachmentRpc {
      * @param attachmentList 客户附件信息
      * @return 保存结果
      */
-    @RequestMapping(value = "/api/attachment/batchSave", method = RequestMethod.POST)
+    @PostMapping(value = "/api/attachment/batchSave")
     BaseOutput batchSave(List<Attachment> attachmentList);
 }

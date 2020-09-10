@@ -5,8 +5,8 @@ import com.dili.customer.domain.Attachment;
 import com.dili.customer.domain.dto.AttachmentDto;
 import com.dili.customer.service.AttachmentService;
 import com.dili.ss.domain.BaseOutput;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,13 +19,13 @@ import java.util.Set;
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
  * @date 2020/7/25 17:20
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/attachment")
 @Slf4j
 public class AttachmentController {
 
-    @Autowired
-    private AttachmentService attachmentService;
+    private final AttachmentService attachmentService;
 
     /**
      * 根据客户ID查询该客户的附件信息
@@ -33,7 +33,7 @@ public class AttachmentController {
      * @param marketId 所属市场
      * @return
      */
-    @RequestMapping(value = "/listAttachment", method = {RequestMethod.POST})
+    @PostMapping(value = "/listAttachment")
     public BaseOutput<List<Attachment>> listAttachment(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId) {
         Attachment condition = new Attachment();
         condition.setCustomerId(customerId);
@@ -46,7 +46,7 @@ public class AttachmentController {
      * @param attachment 查询条件
      * @return
      */
-    @RequestMapping(value = "/listByExample", method = {RequestMethod.POST})
+    @PostMapping(value = "/listByExample")
     public BaseOutput<List<Attachment>> listByExample(@RequestBody AttachmentDto attachment) {
         return BaseOutput.success().setData(attachmentService.listByExample(attachment));
     }
@@ -57,7 +57,7 @@ public class AttachmentController {
      * @param marketId 市场ID
      * @return 删除结果
      */
-    @RequestMapping(value = "/delete", method = {RequestMethod.POST})
+    @PostMapping(value = "/delete")
     public BaseOutput delete(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam(name = "idSet",required = false) Set<Long> idSet) {
         if (Objects.nonNull(customerId) && Objects.nonNull(marketId)) {
             AttachmentDto condition = new AttachmentDto();
@@ -77,7 +77,7 @@ public class AttachmentController {
      * @param attachmentList 附件信息
      * @return
      */
-    @RequestMapping(value = "/batchSave", method = {RequestMethod.POST})
+    @PostMapping(value = "/batchSave")
     public BaseOutput batchSave(@RequestBody List<Attachment> attachmentList) {
         return BaseOutput.success().setData(attachmentService.batchSave(attachmentList));
     }

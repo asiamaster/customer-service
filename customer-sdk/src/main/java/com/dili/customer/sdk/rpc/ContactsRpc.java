@@ -3,8 +3,7 @@ package com.dili.customer.sdk.rpc;
 import com.dili.customer.sdk.domain.Contacts;
 import com.dili.ss.domain.BaseOutput;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public interface ContactsRpc {
      * @param marketId 市场ID
      * @return
      */
-    @RequestMapping(value = "/api/contacts/listAllContacts", method = RequestMethod.POST)
+    @PostMapping(value = "/api/contacts/listAllContacts")
     BaseOutput<List<Contacts>> listAllContacts(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
 
     /**
@@ -34,7 +33,7 @@ public interface ContactsRpc {
      * @param customerContacts 客户联系人
      * @return
      */
-    @RequestMapping(value = "/api/contacts/saveContacts", method = RequestMethod.POST)
+    @PostMapping(value = "/api/contacts/saveContacts")
     BaseOutput saveContacts(Contacts customerContacts);
 
 }

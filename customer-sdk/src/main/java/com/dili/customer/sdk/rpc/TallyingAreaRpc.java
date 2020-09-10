@@ -3,8 +3,7 @@ package com.dili.customer.sdk.rpc;
 import com.dili.customer.sdk.domain.TallyingArea;
 import com.dili.ss.domain.BaseOutput;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public interface TallyingAreaRpc {
      * @param marketId 市场ID
      * @return
      */
-    @RequestMapping(value = "/api/tallyingArea/listTallyingArea", method = RequestMethod.POST)
+    @PostMapping(value = "/api/tallyingArea/listTallyingArea")
     BaseOutput<List<TallyingArea>> listTallyingArea(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
 
     /**
@@ -32,7 +31,7 @@ public interface TallyingAreaRpc {
      * @param tallyingArea 查询条件
      * @return
      */
-    @RequestMapping(value = "/api/tallyingArea/listByExample", method = RequestMethod.POST)
+    @PostMapping(value = "/api/tallyingArea/listByExample")
     BaseOutput<List<TallyingArea>> listByExample(TallyingArea tallyingArea);
 
     /**
@@ -40,6 +39,6 @@ public interface TallyingAreaRpc {
      * @param list 同步数据
      * @return
      */
-    @RequestMapping(value = "/api/tallyingArea/syncAssetsLease", method = RequestMethod.POST)
+    @PostMapping(value = "/api/tallyingArea/syncAssetsLease")
     BaseOutput<Boolean> syncAssetsLease(List<TallyingArea> list);
 }

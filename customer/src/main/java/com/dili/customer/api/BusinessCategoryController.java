@@ -4,8 +4,8 @@ import com.dili.customer.domain.BusinessCategory;
 import com.dili.customer.service.BusinessCategoryService;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +29,7 @@ public class BusinessCategoryController {
      * @param marketId 所属市场
      * @return
      */
-    @RequestMapping(value = "/list", method = {RequestMethod.POST})
+    @PostMapping(value = "/list")
     public BaseOutput<List<BusinessCategory>> list(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId) {
         BusinessCategory condition = new BusinessCategory();
         condition.setCustomerId(customerId);

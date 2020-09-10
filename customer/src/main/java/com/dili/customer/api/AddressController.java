@@ -4,10 +4,7 @@ import com.dili.customer.domain.Address;
 import com.dili.customer.service.AddressService;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,7 +26,7 @@ public class AddressController {
      * @param marketId 所属市场
      * @return 客户地址信息数据
      */
-    @RequestMapping(value = "/listAllAddress", method = {RequestMethod.POST})
+    @PostMapping(value = "/listAllAddress")
     public BaseOutput<List<Address>> listAllAddress(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId) {
         Address condition = new Address();
         condition.setCustomerId(customerId);

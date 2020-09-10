@@ -3,7 +3,7 @@ package com.dili.customer.api;
 import com.dili.customer.domain.TallyingArea;
 import com.dili.customer.service.TallyingAreaService;
 import com.dili.ss.domain.BaseOutput;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,12 +14,12 @@ import java.util.List;
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
  * @date 2020/7/18 16:43
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/tallyingArea")
 public class TallyingAreaController {
-
-    @Autowired
-    private TallyingAreaService tallyingAreaService;
+    
+    private final TallyingAreaService tallyingAreaService;
 
     /**
      * 根据客户ID查询该客户的联系地址信息
@@ -27,7 +27,7 @@ public class TallyingAreaController {
      * @param marketId 所属市场
      * @return
      */
-    @RequestMapping(value = "/listTallyingArea", method = {RequestMethod.POST})
+    @PostMapping(value = "/listTallyingArea")
     public BaseOutput<List<TallyingArea>> listTallyingArea(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId) {
         TallyingArea condition = new TallyingArea();
         condition.setCustomerId(customerId);
@@ -40,7 +40,7 @@ public class TallyingAreaController {
      * @param tallyingArea 查询条件
      * @return
      */
-    @RequestMapping(value = "/listByExample", method = {RequestMethod.POST})
+    @PostMapping(value = "/listByExample")
     public BaseOutput<List<TallyingArea>> listByExample(@RequestBody TallyingArea tallyingArea) {
         return BaseOutput.success().setData(tallyingAreaService.listByExample(tallyingArea));
     }
@@ -50,7 +50,7 @@ public class TallyingAreaController {
      * @param list 需要同步的数据
      * @return
      */
-    @RequestMapping(value = "/syncAssetsLease", method = {RequestMethod.POST})
+    @PostMapping(value = "/syncAssetsLease")
     public BaseOutput<Boolean> syncAssetsLease(@RequestBody List<TallyingArea> list) {
         tallyingAreaService.syncAssetsLease(list);
         return BaseOutput.success();

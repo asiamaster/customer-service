@@ -3,8 +3,7 @@ package com.dili.customer.sdk.rpc;
 import com.dili.customer.sdk.domain.BusinessCategory;
 import com.dili.ss.domain.BaseOutput;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -24,6 +23,6 @@ public interface BusinessCategoryRpc {
      * @param marketId 市场ID
      * @return
      */
-    @RequestMapping(value = "/api/businessCategory/list", method = RequestMethod.POST)
+    @PostMapping(value = "/api/businessCategory/list")
     BaseOutput<List<BusinessCategory>> list(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
 }
