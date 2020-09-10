@@ -7,6 +7,7 @@ import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +33,7 @@ public class CustomerMarketController {
      * @param marketId 市场ID
      * @return
      */
-    @RequestMapping("/getByCustomerAndMarket")
+    @PostMapping("/getByCustomerAndMarket")
     public BaseOutput<CustomerMarket> getByCustomerAndMarket(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId){
         return BaseOutput.success().setData(customerMarketService.queryByMarketAndCustomerId(marketId,customerId));
     }
@@ -43,7 +44,7 @@ public class CustomerMarketController {
      * @param marketId 所属市场ID
      * @param nextGrade 想要更新成的等级
      */
-    @RequestMapping("/changeGrade")
+    @PostMapping("/changeGrade")
     public BaseOutput changeGrade(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam("grade") Integer nextGrade) {
         try {
             CustomerEnum.Grade instance = CustomerEnum.Grade.getInstance(nextGrade);

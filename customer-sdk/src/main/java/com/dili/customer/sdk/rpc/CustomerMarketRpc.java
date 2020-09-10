@@ -3,8 +3,7 @@ package com.dili.customer.sdk.rpc;
 import com.dili.customer.sdk.domain.CustomerMarket;
 import com.dili.ss.domain.BaseOutput;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
@@ -24,7 +23,7 @@ public interface CustomerMarketRpc {
      * @param marketId 市场ID
      * @return
      */
-    @RequestMapping(value = "api/customerMarket/getByCustomerAndMarket", method = RequestMethod.POST)
+    @PostMapping(value = "/api/customerMarket/getByCustomerAndMarket")
     BaseOutput<CustomerMarket> getByCustomerAndMarket(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
 
     /**
@@ -33,6 +32,6 @@ public interface CustomerMarketRpc {
      * @param marketId 所属市场ID
      * @param nextGrade 想要更新成的等级
      */
-    @RequestMapping("/changeGrade")
+    @PostMapping("/api/customerMarket/changeGrade")
     BaseOutput changeGrade(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam("grade") Integer nextGrade);
 }
