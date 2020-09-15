@@ -275,17 +275,19 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (CollectionUtil.isNotEmpty(updateInput.getContactsList())) {
             List<Contacts> contactsList = Lists.newArrayList();
             updateInput.getContactsList().forEach(t -> {
-                Contacts temp = new Contacts();
-                BeanUtils.copyProperties(t, temp);
-                temp.setCustomerId(customer.getId());
-                temp.setMarketId(marketId);
-                temp.setModifyTime(LocalDateTime.now());
-                temp.setModifierId(updateInput.getOperatorId());
-                if (Objects.isNull(temp.getId())){
-                    temp.setCreatorId(updateInput.getOperatorId());
-                    temp.setCreateTime(t.getModifyTime());
+                if (Objects.nonNull(t)) {
+                    Contacts temp = new Contacts();
+                    BeanUtils.copyProperties(t, temp);
+                    temp.setCustomerId(customer.getId());
+                    temp.setMarketId(marketId);
+                    temp.setModifyTime(LocalDateTime.now());
+                    temp.setModifierId(updateInput.getOperatorId());
+                    if (Objects.isNull(temp.getId())) {
+                        temp.setCreatorId(updateInput.getOperatorId());
+                        temp.setCreateTime(t.getModifyTime());
+                    }
+                    contactsList.add(temp);
                 }
-                contactsList.add(temp);
             });
             contactsService.batchSaveOrUpdate(contactsList);
         } else {
@@ -308,22 +310,24 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (CollectionUtil.isNotEmpty(updateInput.getAddressList())) {
             List<Address> addressList = Lists.newArrayList();
             updateInput.getAddressList().forEach(t -> {
-                Address temp = new Address();
-                BeanUtils.copyProperties(t, temp);
-                temp.setCustomerId(customer.getId());
-                temp.setMarketId(marketId);
-                temp.setModifyTime(LocalDateTime.now());
-                temp.setModifierId(updateInput.getOperatorId());
-                if (Objects.isNull(temp.getId())) {
-                    temp.setCreatorId(updateInput.getOperatorId());
-                    temp.setCreateTime(temp.getModifyTime());
-                }
-                addressList.add(temp);
-                //如果此地址为当前居住地，则需更新客户主表上的现住址
-                if (YesOrNoEnum.YES.getCode().equals(t.getIsCurrent())) {
-                    customer.setCurrentCityPath(t.getCityPath());
-                    customer.setCurrentCityName(t.getCityName());
-                    customer.setCurrentAddress(t.getAddress());
+                if (Objects.nonNull(t)) {
+                    Address temp = new Address();
+                    BeanUtils.copyProperties(t, temp);
+                    temp.setCustomerId(customer.getId());
+                    temp.setMarketId(marketId);
+                    temp.setModifyTime(LocalDateTime.now());
+                    temp.setModifierId(updateInput.getOperatorId());
+                    if (Objects.isNull(temp.getId())) {
+                        temp.setCreatorId(updateInput.getOperatorId());
+                        temp.setCreateTime(temp.getModifyTime());
+                    }
+                    addressList.add(temp);
+                    //如果此地址为当前居住地，则需更新客户主表上的现住址
+                    if (YesOrNoEnum.YES.getCode().equals(t.getIsCurrent())) {
+                        customer.setCurrentCityPath(t.getCityPath());
+                        customer.setCurrentCityName(t.getCityName());
+                        customer.setCurrentAddress(t.getAddress());
+                    }
                 }
             });
             addressService.batchSaveOrUpdate(addressList);
