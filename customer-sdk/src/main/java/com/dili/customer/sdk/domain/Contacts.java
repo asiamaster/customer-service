@@ -43,7 +43,7 @@ public class Contacts extends BaseDomain {
      * 姓名
      */
     @NotBlank(message = "联系人姓名不能为空", groups = {EnterpriseView.class})
-    @Size(max = 20, message = "联系人姓名请保持在20个字符以内", groups = {EnterpriseView.class})
+    @Size(max = 40, message = "联系人姓名请保持在40个字符以内", groups = {EnterpriseView.class})
     private String name;
 
     /**
