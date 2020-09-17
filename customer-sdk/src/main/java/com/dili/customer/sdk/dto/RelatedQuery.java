@@ -46,4 +46,9 @@ public class RelatedQuery{
      */
     private Long marketId;
 
+    /**
+     * customerId
+     */
+    private Long customerId;
+
 }
