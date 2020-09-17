@@ -44,7 +44,7 @@ public interface RelatedRpc {
      * 查询关联客户数据分页
      */
     @RequestMapping(value = "/api/related/getParent", method = RequestMethod.POST)
-    TableResult<RelatedList> getParent(RelatedQuery query);
+    BaseOutput<List<RelatedDto>> getParent(RelatedQuery query);
 
     /**
     * 新增关联客户
