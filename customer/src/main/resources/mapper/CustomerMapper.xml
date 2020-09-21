@@ -15,7 +15,6 @@
     <result column="birthdate"  property="birthdate" />
     <result column="gender"  property="gender" />
     <result column="photo"  property="photo" />
-    <result column="cellphone"  property="cellphone" />
     <result column="contacts_phone" property="contactsPhone" />
     <result column="contacts_name" property="contactsName" />
     <result column="organization_type"  property="organizationType" />
@@ -27,6 +26,9 @@
     <result column="corporation_certificate_number"  property="corporationCertificateNumber" />
     <result column="corporation_name"  property="corporationName" />
     <result column="is_cellphone_valid"  property="isCellphoneValid" />
+    <result column="current_city_path" property="currentCityPath" />
+    <result column="current_city_name" property="currentCityName" />
+    <result column="current_address" property="currentAddress" />
     <result column="creator_id"  property="creatorId" />
     <result column="create_time"  property="createTime" />
     <result column="modify_time"  property="modifyTime" />
@@ -44,26 +46,15 @@
     <result column="type" property="customerMarket.type" />
     <result column="department_id" property="customerMarket.departmentId" />
     <result column="profession" property="customerMarket.profession" />
-    <result column="main_category" property="customerMarket.mainCategory" />
+    <result column="sales_market" property="customerMarket.salesMarket" />
   </resultMap>
-
-  <sql id="Base_Column_List">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    id, code, certificate_number, certificate_type, certificate_range, certificate_addr, 
-    name, birthdate, gender, photo, cellphone, organization_type, source_system, registered_capital,
-    employee_number, corporation_certificate_type, corporation_certificate_number, corporation_name, 
-    is_cellphone_valid, creator_id, create_time, modify_time, is_delete, state
-  </sql>
-
 
   <!--- 联合查询分页信息 -->
   <select id="listForPage" parameterType="com.dili.customer.sdk.domain.dto.CustomerQueryInput"  resultMap="listResultMap">
     SELECT
         c.*,
         cm.id as customerMarketId, cm.market_id,cm.create_time as marketCreateTime,cm.creator_id AS marketCreatorId,
-        cm.grade,cm.type,cm.department_id,cm.profession,cm.main_category
+        cm.grade,cm.type,cm.department_id,cm.profession,cm.sales_market
     FROM
       customer c,customer_market cm
       <where>
@@ -71,24 +62,26 @@
         <if test="id != null">
           and c.id = #{id}
         </if>
-        <if test="null != idList and idList.size()>0">
+        <if test="null != idSet and idSet.size()>0">
           and c.id in
-          <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+          <foreach collection="idSet" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+        <if test="null != notInIdSet and notInIdSet.size()>0">
+          and c.id not in
+          <foreach collection="notInIdSet" index="index" item="item" open="(" separator="," close=")">
             #{item}
           </foreach>
         </if>
         <if test="marketId != null">
           and cm.market_id = #{marketId}
         </if>
-        <if test="null != marketIdList and marketIdList.size()>0">
-          <!-- and c.id in (SELECT cf.customer_id FROM customer_market cf where cf.market_id in -->
-          and cm.market_id in
-          <foreach collection="marketIdList" index="index" item="item" open="(" separator="," close=")">
-            #{item}
-          </foreach>
-        </if>
-        <if test="name != null">
+        <if test="name != null and '' != name">
           and c.name LIKE CONCAT('%',#{name},'%')
+        </if>
+        <if test="null != certificateType">
+          and c.certificate_type = #{certificateType}
         </if>
         <if test="certificateNumber != null">
           and c.certificate_number = #{certificateNumber}
@@ -102,9 +95,6 @@
         <if test="organizationType != null">
           and c.organization_type = #{organizationType}
         </if>
-        <if test="grade != null">
-          and cm.grade = #{grade}
-        </if>
         <if test="contactsPhone != null">
           and c.contacts_phone = #{contactsPhone}
         </if>
@@ -117,6 +107,9 @@
         <if test="state != null">
           and c.state = #{state}
         </if>
+        <if test="currentCityId !=null">
+          and FIND_IN_SET(#{currentCityId},c.current_city_path)
+        </if>
         <if test="marketCreateTimeStart != null">
           and cm.create_time >= #{marketCreateTimeStart}
         </if>
@@ -127,10 +120,55 @@
           and c.is_delete = #{isDelete}
         </if>
         <if test="keyword != null">
-          and ( c.certificate_number =  #{keyword} or c.name like concat('%', #{keyword}, '%') or c.code like concat('%', #{keyword}, '') )
+          and ( c.certificate_number =  #{keyword} or c.name like concat('%', #{keyword}, '%') or c.code like concat('%', #{keyword}, '%') or c.contacts_phone like concat('', #{keyword}, '%') )
         </if>
-        <if test="marketCreatorId != null">
-          and cm.creator_id = #{marketCreatorId}
+        <if test="null != assetsIdSet and  assetsIdSet.size() > 0">
+          and c.id in
+          (select customer_id from tallying_area ta where ta.market_id=#{marketId} and ta.assets_id in
+            <foreach collection="assetsIdSet" index="index" item="item" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+          /*  直接可用的，或者有租赁状态且已生效的 */
+          and (ta.is_usable = 1 or (ta.is_lease=1 and ta.state=5)))
+        </if>
+        <if test="null != currentCityPath and '' != currentCityPath">
+          and FIND_IN_SET(#{currentCityPath},c.current_city_id)
+        </if>
+        <if test="null != hasLicense">
+            <if test="hasLicense == 1">
+              and c.id in
+            </if>
+            <if test="hasLicense == 0">
+              and c.id not in
+            </if>
+            (select customer_id from attachment att
+              <if test="marketId != null">
+                where att.market_id = #{marketId}
+              </if>
+            )
+        </if>
+        <if test="null != customerMarket">
+          <if test="null != customerMarket.salesMarket and ''!=customerMarket.salesMarket">
+            and cm.sales_market = #{customerMarket.salesMarket}
+          </if>
+          <if test="customerMarket.departmentId != null">
+            and cm.department_id = #{customerMarket.departmentId}
+          </if>
+          <if test="customerMarket.grade != null">
+            and cm.grade = #{customerMarket.grade}
+          </if>
+          <if test="customerMarket.type != null">
+            and cm.type = #{customerMarket.type}
+          </if>
+          <if test="customerMarket.creatorId != null">
+            and cm.creator_id = #{customerMarket.creatorId}
+          </if>
+        </if>
+        <if test="codeList !=null and codeList.size() > 0">
+          and c.code in
+          <foreach collection="codeList" item="temp" open="(" close=")" separator=",">
+            #{temp}
+          </foreach>
         </if>
       </where>
       <if test="isGroup != null and isGroup == true">

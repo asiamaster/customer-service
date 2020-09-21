@@ -29,8 +29,11 @@ ALTER TABLE customer drop COLUMN `operating_lat`;
 ALTER TABLE customer drop COLUMN `other_title`;
 ALTER TABLE customer drop COLUMN `main_category`;
 
+#修改客户联系人中姓名字段的长度
+alter table contacts modify column name varchar(40);
+
 #数据字典配置
-INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `level`, `system_code`, `description`, `created`, `modified`) VALUES ('cus_customer_type', '客户身份类型信息', NULL, 'CUSTOMER', '客户身份类型信息', now(), now());
+INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `system_code`, `description`, `created`, `modified`) VALUES ('cus_customer_type', '客户身份类型信息', 'CUSTOMER', '客户身份类型信息', now(), now());
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`) VALUES ('cus_customer_type', 1, '园内买家', 'inside_buyer', NULL, now(), now());
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`) VALUES ('cus_customer_type', 2, '园内卖家', 'inside_seller', NULL, now(), now());
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`) VALUES ('cus_customer_type', 3, '买卖家', 'purchaseSale', NULL, now(), now());

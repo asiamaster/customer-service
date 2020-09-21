@@ -3,31 +3,30 @@ package com.dili.customer.api;
 import com.dili.customer.domain.Contacts;
 import com.dili.customer.service.ContactsService;
 import com.dili.ss.domain.BaseOutput;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
- * 由MyBatis Generator工具自动生成
+ * 客户联系人信息
  * This file was generated on 2020-01-02 16:18:39.
  * @author yuehongbo
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/contacts")
 public class ContactsController {
-
-    @Autowired
-    private ContactsService contactsService;
+    
+    private final ContactsService contactsService;
 
     /**
      * 删除CustomerContacts
      * @param id
      * @return BaseOutput
      */
-    @RequestMapping(value = "/delete", method = {RequestMethod.GET, RequestMethod.POST})
+    @PostMapping(value = "/delete")
     @ResponseBody
     public BaseOutput delete(Long id) {
         contactsService.delete(id);
@@ -39,7 +38,7 @@ public class ContactsController {
      * @param customerContacts 联系人信息
      * @return BaseOutput
      */
-    @RequestMapping(value = "/saveContacts", method = {RequestMethod.POST})
+    @PostMapping(value = "/saveContacts")
     public BaseOutput saveContacts(@Validated @RequestBody Contacts customerContacts) {
         return contactsService.saveContacts(customerContacts);
     }
@@ -49,7 +48,7 @@ public class ContactsController {
      * @param customerId 客户ID
      * @return
      */
-    @RequestMapping(value = "/listAllContacts", method = {RequestMethod.POST})
+    @PostMapping(value = "/listAllContacts")
     public BaseOutput<List<Contacts>> listAllContacts(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId) {
         Contacts condition = new Contacts();
         condition.setCustomerId(customerId);

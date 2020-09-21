@@ -4,10 +4,12 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.ss.domain.BaseDomain;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -18,6 +20,7 @@ import java.util.Objects;
  * @author yuehongbo
  * @date 2020/6/18 15:22
  */
+@Data
 public class Customer extends BaseDomain {
 
     private static final long serialVersionUID = -8221228310573544779L;
@@ -78,11 +81,6 @@ public class Customer extends BaseDomain {
     private String photo;
 
     /**
-     * 手机号
-     */
-    private String cellphone;
-
-    /**
      * 联系电话
      */
     private String contactsPhone;
@@ -138,6 +136,22 @@ public class Customer extends BaseDomain {
     private Integer isCellphoneValid;
 
     /**
+     * 现住址城市ID path
+     * 格式为 100000,110000,1111000
+     */
+    private String currentCityPath;
+
+    /**
+     * 现住址城市名称
+     */
+    private String currentCityName;
+
+    /**
+     * 现住址详细地址
+     */
+    private String currentAddress;
+
+    /**
      * 创建人
      */
     private Long creatorId;
@@ -179,192 +193,13 @@ public class Customer extends BaseDomain {
      */
     private String certificateNumberMask;
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getCode() {
-        return code;
-    }
-    public void setCode(String code) {
-        this.code = code;
-    }
-    public String getCertificateNumber() {
-        return certificateNumber;
-    }
-    public void setCertificateNumber(String certificateNumber) {
-        this.certificateNumber = certificateNumber;
-    }
-    public String getCertificateType() {
-        return certificateType;
-    }
-    public void setCertificateType(String certificateType) {
-        this.certificateType = certificateType;
-    }
-    public String getCertificateRange() {
-        return certificateRange;
-    }
-    public void setCertificateRange(String certificateRange) {
-        this.certificateRange = certificateRange;
-    }
-    public Integer getCertificateLongTerm() {
-        return certificateLongTerm;
-    }
-    public void setCertificateLongTerm(Integer certificateLongTerm) {
-        this.certificateLongTerm = certificateLongTerm;
-    }
-    public String getCertificateAddr() {
-        return certificateAddr;
-    }
-    public void setCertificateAddr(String certificateAddr) {
-        this.certificateAddr = certificateAddr;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public LocalDate getBirthdate() {
-        return birthdate;
-    }
-    public void setBirthdate(LocalDate birthdate) {
-        this.birthdate = birthdate;
-    }
-    public Integer getGender() {
-        return gender;
-    }
-    public void setGender(Integer gender) {
-        this.gender = gender;
-    }
-    public String getPhoto() {
-        return photo;
-    }
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
-    public String getCellphone() {
-        return cellphone;
-    }
-    public void setCellphone(String cellphone) {
-        this.cellphone = cellphone;
-    }
-    public String getContactsPhone() {
-        return contactsPhone;
-    }
-    public void setContactsPhone(String contactsPhone) {
-        this.contactsPhone = contactsPhone;
-    }
-    public String getContactsName() {
-        return contactsName;
-    }
-    public void setContactsName(String contactsName) {
-        this.contactsName = contactsName;
-    }
-    public String getOrganizationType() {
-        return organizationType;
-    }
-    public void setOrganizationType(String organizationType) {
-        this.organizationType = organizationType;
-    }
-    public String getSourceSystem() {
-        return sourceSystem;
-    }
-    public void setSourceSystem(String sourceSystem) {
-        this.sourceSystem = sourceSystem;
-    }
-    public String getSourceChannel() {
-        return sourceChannel;
-    }
-    public void setSourceChannel(String sourceChannel) {
-        this.sourceChannel = sourceChannel;
-    }
-    public Long getRegisteredCapital() {
-        return registeredCapital;
-    }
-    public void setRegisteredCapital(Long registeredCapital) {
-        this.registeredCapital = registeredCapital;
-    }
-    public String getEmployeeNumber() {
-        return employeeNumber;
-    }
-    public void setEmployeeNumber(String employeeNumber) {
-        this.employeeNumber = employeeNumber;
-    }
-    public String getCorporationCertificateType() {
-        return corporationCertificateType;
-    }
-    public void setCorporationCertificateType(String corporationCertificateType) {
-        this.corporationCertificateType = corporationCertificateType;
-    }
-    public String getCorporationCertificateNumber() {
-        return corporationCertificateNumber;
-    }
-    public void setCorporationCertificateNumber(String corporationCertificateNumber) {
-        this.corporationCertificateNumber = corporationCertificateNumber;
-    }
-    public String getCorporationName() {
-        return corporationName;
-    }
-    public void setCorporationName(String corporationName) {
-        this.corporationName = corporationName;
-    }
-    public Integer getIsCellphoneValid() {
-        return isCellphoneValid;
-    }
-    public void setIsCellphoneValid(Integer isCellphoneValid) {
-        this.isCellphoneValid = isCellphoneValid;
-    }
-    public Long getCreatorId() {
-        return creatorId;
-    }
-    public void setCreatorId(Long creatorId) {
-        this.creatorId = creatorId;
-    }
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
-    public LocalDateTime getModifyTime() {
-        return modifyTime;
-    }
-    public void setModifyTime(LocalDateTime modifyTime) {
-        this.modifyTime = modifyTime;
-    }
-    public Integer getIsDelete() {
-        return isDelete;
-    }
-    public void setIsDelete(Integer isDelete) {
-        this.isDelete = isDelete;
-    }
-    public Integer getState() {
-        return state;
-    }
-    public void setState(Integer state) {
-        this.state = state;
-    }
-    public CustomerMarket getCustomerMarket() {
-        return customerMarket;
-    }
-    public void setCustomerMarket(CustomerMarket customerMarket) {
-        this.customerMarket = customerMarket;
-    }
-    public String getCertificateNumberMask() {
-        return certificateNumberMask;
-    }
-    public void setCertificateNumberMask(String certificateNumberMask) {
-        this.certificateNumberMask = certificateNumberMask;
-    }
-
+    /**
+     * 客户理货区
+     */
+    private List<TallyingArea> tallyingAreaList;
 
     /**
-     * 获取客户级别显示
+     * 获取客户状态显示值
      * @return
      */
     public String getStateValue(){

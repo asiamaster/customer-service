@@ -1,7 +1,7 @@
 package com.dili.customer.sdk.domain.dto;
 
-import com.dili.customer.sdk.domain.Contacts;
-import com.dili.customer.sdk.domain.CustomerMarket;
+import com.dili.customer.sdk.domain.*;
+import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -18,6 +18,7 @@ import java.util.List;
  * @author yuehongbo
  * @date 2020/2/27 22:21
  */
+@Data
 public class CustomerUpdateInput implements Serializable {
 
     private static final long serialVersionUID = 5391152354038473151L;
@@ -69,53 +70,19 @@ public class CustomerUpdateInput implements Serializable {
      */
     private Long operatorId;
 
+    /**
+     * 客户理货区
+     */
+    private List<TallyingArea> tallyingAreaList;
 
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public Integer getState() {
-        return state;
-    }
-    public void setState(Integer state) {
-        this.state = state;
-    }
-    public String getContactsPhone() {
-        return contactsPhone;
-    }
-    public void setContactsPhone(String contactsPhone) {
-        this.contactsPhone = contactsPhone;
-    }
-    public CustomerMarket getCustomerMarket() {
-        return customerMarket;
-    }
-    public void setCustomerMarket(CustomerMarket customerMarket) {
-        this.customerMarket = customerMarket;
-    }
-    public CustomerCertificateInput getCustomerCertificate() {
-        return customerCertificate;
-    }
-    public void setCustomerCertificate(CustomerCertificateInput customerCertificate) {
-        this.customerCertificate = customerCertificate;
-    }
-    public List<Contacts> getContactsList() {
-        return contactsList;
-    }
-    public void setContactsList(List<Contacts> contactsList) {
-        this.contactsList = contactsList;
-    }
-    public Long getOperatorId() {
-        return operatorId;
-    }
-    public void setOperatorId(Long operatorId) {
-        this.operatorId = operatorId;
-    }
+    /**
+     * 客户地址
+     */
+    private List<Address> addressList;
+
+    /**
+     * 客户经营品类信息
+     */
+    private List<BusinessCategory> businessCategoryList;
+
 }

@@ -1,10 +1,12 @@
-package com.dili.customer.domain.dto;
+package com.dili.customer.sdk.domain.dto;
 
+
+import com.dili.customer.sdk.domain.BusinessCategory;
+import com.dili.customer.sdk.domain.CustomerMarket;
+import com.dili.customer.sdk.domain.TallyingArea;
 import com.dili.customer.sdk.validator.AddView;
 import com.dili.customer.sdk.validator.UpdateView;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -13,38 +15,25 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
- * <B>Description</B>
+ * <B>客户新增保存时的基本信息</B>
  * <B>Copyright:本软件源代码版权归农丰时代所有,未经许可不得任意复制与传播.</B>
  * <B>农丰时代科技有限公司</B>
  *
  * @author yuehongbo
- * @date 2020/2/21 18:01
+ * @date 2020/2/4 9:53
  */
-@Getter
-@Setter
-@ToString
+@Data
 public class IndividualCustomerInput implements Serializable {
-    private static final long serialVersionUID = 3300214922552754245L;
+    private static final long serialVersionUID = -5865840494367827998L;
 
     /**
      * 客户ID
      */
     @NotNull(message = "业务关键ID不能为空",groups = {UpdateView.class})
     private Long id;
-
-    /**
-     * 组织类型,个人/企业
-     */
-    @NotBlank(message = "组织类型不能为空", groups = {AddView.class})
-    private String organizationType;
-
-    /**
-     * 证件类型
-     */
-    @NotBlank(message = "证件类型不能为空", groups = {AddView.class})
-    private String certificateType;
 
     /**
      * 证件号
@@ -54,6 +43,12 @@ public class IndividualCustomerInput implements Serializable {
     private String certificateNumber;
 
     /**
+     * 证件类型
+     */
+    @NotBlank(message = "证件类型不能为空", groups = {AddView.class})
+    private String certificateType;
+
+    /**
      * 客户名称
      */
     @NotBlank(message = "客户名称不能为空", groups = {AddView.class,UpdateView.class})
@@ -61,10 +56,10 @@ public class IndividualCustomerInput implements Serializable {
     private String name;
 
     /**
-     * 客户等级
+     * 组织类型,个人/企业
      */
-    @NotNull(message = "客户等级不能为空", groups = {AddView.class,UpdateView.class})
-    private Integer grade;
+    @NotBlank(message = "组织类型不能为空", groups = {AddView.class})
+    private String organizationType;
 
     /**
      * 来源系统##外部系统来源标识
@@ -80,24 +75,6 @@ public class IndividualCustomerInput implements Serializable {
 
 
     /**
-     * 创建人
-     */
-    @NotNull(message = "操作人ID不能为空", groups = {AddView.class, UpdateView.class})
-    private Long operatorId;
-
-    /**
-     * 客户归属人
-     */
-    @NotNull(message = "客户归属人不能为空", groups = {AddView.class, UpdateView.class})
-    private Long ownerId;
-
-    /**
-     * 客户所属市场
-     */
-    @NotNull(message = "所属市场不能为空", groups = {AddView.class,UpdateView.class})
-    private Long marketId;
-
-    /**
      * 联系电话
      */
     @NotBlank(message = "联系电话不能为空", groups = {AddView.class,UpdateView.class})
@@ -105,26 +82,14 @@ public class IndividualCustomerInput implements Serializable {
     private String contactsPhone;
 
     /**
-     * 客户状态
-     */
-    @NotNull(message = "客户状态不能为空", groups = {UpdateView.class})
-    private Integer state;
-
-    /**
      * 客户编码
      */
-    @NotBlank(message = "客户编码不能为空", groups = {AddView.class})
     private String code;
 
     /**
-     * 归属部门
+     * 创建人
      */
-    private Long departmentId;
-
-    /**
-     * 是否删除
-     */
-    private Integer isDelete;
+    private Long operatorId;
 
     /**
      * 性别
@@ -157,14 +122,45 @@ public class IndividualCustomerInput implements Serializable {
     private Integer certificateLongTerm;
 
     /**
-     * 客户证件信息
+     * 现住址城市ID路径
+     * 格式为 100000,110000,111100
      */
-    @Valid
-    private CustomerCertificateInput customerCertificate;
+    private String currentCityPath;
 
     /**
-     * 客户身份类型(买家、卖家等)
+     * 现住址城市名称
      */
-    private String customerType;
+    private String currentCityName;
+
+    /**
+     * 现住址详细地址
+     */
+    private String currentAddress;
+
+    /**
+     * 客户所属市场信息
+     */
+    @Valid
+    private CustomerMarket customerMarket;
+
+    /**
+     * 客户理货区
+     */
+    private List<TallyingArea> tallyingAreaList;
+
+    /**
+     * 紧急联系人
+     */
+    private String emergencyContactsName;
+
+    /**
+     * 紧急联系电话
+     */
+    private String emergencyContactsPhone;
+
+    /**
+     * 客户经营品类信息
+     */
+    private List<BusinessCategory> businessCategoryList;
 
 }

@@ -90,10 +90,10 @@ public class CustomerMarket extends BaseDomain {
     private String otherTitle;
 
     /**
-     * 主营品类
+     * 销售市场
      */
-    @Column(name = "`main_category`")
-    private String mainCategory;
+    @Column(name = "sales_market")
+    private String salesMarket;
 
     /**
      * 客户别名

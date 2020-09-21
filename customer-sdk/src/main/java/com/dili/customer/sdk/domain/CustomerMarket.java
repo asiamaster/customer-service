@@ -2,10 +2,13 @@ package com.dili.customer.sdk.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.customer.sdk.enums.CustomerEnum;
+import com.dili.customer.sdk.validator.AddView;
 import com.dili.ss.domain.BaseDomain;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -17,6 +20,7 @@ import java.util.Objects;
  * @author yuehongbo
  * @date 2020/6/18 15:53
  */
+@Data
 public class CustomerMarket extends BaseDomain {
 
     /**
@@ -46,6 +50,7 @@ public class CustomerMarket extends BaseDomain {
 
     /**
      * 客户等级
+     * {@link com.dili.customer.sdk.enums.CustomerEnum.Grade}
      */
     private Integer grade;
 
@@ -75,9 +80,9 @@ public class CustomerMarket extends BaseDomain {
     private String otherTitle;
 
     /**
-     * 主营品类
+     * 销售市场
      */
-    private String mainCategory;
+    private String salesMarket;
 
     /**
      * 客户别名
@@ -85,8 +90,9 @@ public class CustomerMarket extends BaseDomain {
     private String alias;
 
     /**
-     * 客户类型##采购、销售、代买等##{provider:"dataDictionaryValueProvider",queryParams:{dd_id:4}}
+     * 客户类型
      */
+    @NotBlank(message = "客户身份不能为空", groups = {AddView.class})
     private String type;
 
     /**
@@ -119,124 +125,6 @@ public class CustomerMarket extends BaseDomain {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyTime;
-
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public Long getMarketId() {
-        return marketId;
-    }
-    public void setMarketId(Long marketId) {
-        this.marketId = marketId;
-    }
-    public Long getDepartmentId() {
-        return departmentId;
-    }
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
-    }
-    public Long getCustomerId() {
-        return customerId;
-    }
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
-    }
-    public Long getOwnerId() {
-        return ownerId;
-    }
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
-    }
-    public Integer getGrade() {
-        return grade;
-    }
-    public void setGrade(Integer grade) {
-        this.grade = grade;
-    }
-    public String getProfession() {
-        return profession;
-    }
-    public void setProfession(String profession) {
-        this.profession = profession;
-    }
-    public String getOperatingArea() {
-        return operatingArea;
-    }
-    public void setOperatingArea(String operatingArea) {
-        this.operatingArea = operatingArea;
-    }
-    public String getOperatingLng() {
-        return operatingLng;
-    }
-    public void setOperatingLng(String operatingLng) {
-        this.operatingLng = operatingLng;
-    }
-    public String getOperatingLat() {
-        return operatingLat;
-    }
-    public void setOperatingLat(String operatingLat) {
-        this.operatingLat = operatingLat;
-    }
-    public String getOtherTitle() {
-        return otherTitle;
-    }
-    public void setOtherTitle(String otherTitle) {
-        this.otherTitle = otherTitle;
-    }
-    public String getMainCategory() {
-        return mainCategory;
-    }
-    public void setMainCategory(String mainCategory) {
-        this.mainCategory = mainCategory;
-    }
-    public String getAlias() {
-        return alias;
-    }
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-    public String getType() {
-        return type;
-    }
-    public void setType(String type) {
-        this.type = type;
-    }
-    public String getNotes() {
-        return notes;
-    }
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-    public Long getCreatorId() {
-        return creatorId;
-    }
-    public void setCreatorId(Long creatorId) {
-        this.creatorId = creatorId;
-    }
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
-    public Long getModifierId() {
-        return modifierId;
-    }
-    public void setModifierId(Long modifierId) {
-        this.modifierId = modifierId;
-    }
-    public LocalDateTime getModifyTime() {
-        return modifyTime;
-    }
-    public void setModifyTime(LocalDateTime modifyTime) {
-        this.modifyTime = modifyTime;
-    }
 
 
     /**

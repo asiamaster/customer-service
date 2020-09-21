@@ -3,12 +3,15 @@ package com.dili.customer.domain;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.customer.utils.CustomerInfoUtil;
+import com.dili.ss.dao.sql.DateNextVersion;
 import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.domain.annotation.Like;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+import tk.mybatis.mapper.annotation.Version;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -16,6 +19,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -102,12 +106,6 @@ public class Customer extends BaseDomain {
     private String photo;
 
     /**
-     * 手机号
-     */
-    @Column(name = "`cellphone`")
-    private String cellphone;
-
-    /**
      * 联系电话
      */
     @Column(name = "`contacts_phone`")
@@ -180,6 +178,25 @@ public class Customer extends BaseDomain {
     private Integer isCellphoneValid;
 
     /**
+     * 现住址城市ID path
+     * 格式为 100000,110000,111100
+     */
+    @Column(name = "current_city_path")
+    private String currentCityPath;
+
+    /**
+     * 现住址城市名称
+     */
+    @Column(name = "current_city_name")
+    private String currentCityName;
+
+    /**
+     * 现住址详细地址
+     */
+    @Column(name = "current_address")
+    private String currentAddress;
+
+    /**
      * 创建人
      */
     @Column(name = "`creator_id`",updatable = false)
@@ -190,6 +207,7 @@ public class Customer extends BaseDomain {
      */
     @Column(name = "`create_time`",updatable = false)
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
@@ -198,7 +216,9 @@ public class Customer extends BaseDomain {
      */
     @Column(name = "`modify_time`")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HHm:m:ss")
+    @Version(nextVersion = DateNextVersion.class)
     private LocalDateTime modifyTime;
 
     /**
@@ -219,6 +239,12 @@ public class Customer extends BaseDomain {
      */
     @Transient
     private CustomerMarket customerMarket;
+
+    /**
+     * 客户理货区信息
+     */
+    @Transient
+    private List<TallyingArea> tallyingAreaList;
 
     /**
      * 客户证件号打码加*显示

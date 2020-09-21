@@ -49,7 +49,7 @@ public class Contacts extends BaseDomain {
      */
     @Column(name = "`name`")
     @NotBlank(message = "联系人姓名不能为空")
-    @Size(max = 20,message = "联系人姓名请保持在20个字符以内")
+    @Size(max = 40,message = "联系人姓名请保持在40个字符以内")
     private String name;
 
     /**

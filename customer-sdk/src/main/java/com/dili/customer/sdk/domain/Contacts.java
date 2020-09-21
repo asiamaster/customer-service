@@ -4,6 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.customer.sdk.validator.EnterpriseView;
 import com.dili.ss.domain.BaseDomain;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
  * @author yuehongbo
  * @date 2020/6/18 15:45
  */
+@Data
 public class Contacts extends BaseDomain {
 
     /**
@@ -41,7 +43,7 @@ public class Contacts extends BaseDomain {
      * 姓名
      */
     @NotBlank(message = "联系人姓名不能为空", groups = {EnterpriseView.class})
-    @Size(max = 20, message = "联系人姓名请保持在20个字符以内", groups = {EnterpriseView.class})
+    @Size(max = 40, message = "联系人姓名请保持在40个字符以内", groups = {EnterpriseView.class})
     private String name;
 
     /**
@@ -119,102 +121,4 @@ public class Contacts extends BaseDomain {
      */
     private Long modifierId;
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public Long getCustomerId() {
-        return customerId;
-    }
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
-    }
-    public Long getMarketId() {
-        return marketId;
-    }
-    public void setMarketId(Long marketId) {
-        this.marketId = marketId;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public Integer getGender() {
-        return gender;
-    }
-    public void setGender(Integer gender) {
-        this.gender = gender;
-    }
-    public String getPhone() {
-        return phone;
-    }
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-    public Integer getNation() {
-        return nation;
-    }
-    public void setNation(Integer nation) {
-        this.nation = nation;
-    }
-    public String getAddress() {
-        return address;
-    }
-    public void setAddress(String address) {
-        this.address = address;
-    }
-    public String getPosition() {
-        return position;
-    }
-    public void setPosition(String position) {
-        this.position = position;
-    }
-    public LocalDate getBirthdate() {
-        return birthdate;
-    }
-    public void setBirthdate(LocalDate birthdate) {
-        this.birthdate = birthdate;
-    }
-    public String getNotes() {
-        return notes;
-    }
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-    public Integer getIsDefault() {
-        return isDefault;
-    }
-    public void setIsDefault(Integer isDefault) {
-        this.isDefault = isDefault;
-    }
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
-    public LocalDateTime getModifyTime() {
-        return modifyTime;
-    }
-    public void setModifyTime(LocalDateTime modifyTime) {
-        this.modifyTime = modifyTime;
-    }
-    public Long getCreatorId() {
-        return creatorId;
-    }
-    public void setCreatorId(Long creatorId) {
-        this.creatorId = creatorId;
-    }
-    public Long getModifierId() {
-        return modifierId;
-    }
-    public void setModifierId(Long modifierId) {
-        this.modifierId = modifierId;
-    }
 }

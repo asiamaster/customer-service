@@ -3,13 +3,12 @@ package com.dili.customer.sdk.rpc;
 import com.dili.customer.sdk.domain.Customer;
 import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
 import com.dili.customer.sdk.domain.dto.CustomerUpdateInput;
-import com.dili.customer.sdk.domain.dto.EnterpriseCustomer;
-import com.dili.customer.sdk.domain.dto.IndividualCustomer;
+import com.dili.customer.sdk.domain.dto.EnterpriseCustomerInput;
+import com.dili.customer.sdk.domain.dto.IndividualCustomerInput;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -22,8 +21,7 @@ import java.util.List;
  * @author yuehongbo
  * @date 2020/6/18 15:56
  */
-//@FeignClient(name = "customer-service",contextId = "customerRpc", url = "http://127.0.0.1:8181")
-@FeignClient(name = "customer-service",contextId = "customerRpc")
+@FeignClient(name = "customer-service", contextId = "customerRpc", url = "${customerService.url:}")
 public interface CustomerRpc {
 
     /**
@@ -31,7 +29,7 @@ public interface CustomerRpc {
      * @param customer
      * @return
      */
-    @RequestMapping(value = "/api/customer/listPage", method = RequestMethod.POST)
+    @PostMapping(value = "/api/customer/listPage")
     PageOutput<List<Customer>> listPage(CustomerQueryInput customer);
 
     /**
@@ -39,7 +37,7 @@ public interface CustomerRpc {
      * @param customer
      * @return
      */
-    @RequestMapping(value = "/api/customer/list", method = RequestMethod.POST)
+    @PostMapping(value = "/api/customer/list")
     BaseOutput<List<Customer>> list(CustomerQueryInput customer);
 
     /**
@@ -47,16 +45,16 @@ public interface CustomerRpc {
      * @param baseInfo
      * @return
      */
-    @RequestMapping(value = "/api/customer/registerEnterprise", method = RequestMethod.POST)
-    BaseOutput<Customer> registerEnterprise(EnterpriseCustomer baseInfo);
+    @PostMapping(value = "/api/customer/registerEnterprise")
+    BaseOutput<Customer> registerEnterprise(EnterpriseCustomerInput baseInfo);
 
     /**
      * 个人用户注册
      * @param baseInfo
      * @return
      */
-    @RequestMapping(value = "/api/customer/registerIndividual", method = RequestMethod.POST)
-    BaseOutput<Customer> registerIndividual(IndividualCustomer baseInfo);
+    @PostMapping(value = "/api/customer/registerIndividual")
+    BaseOutput<Customer> registerIndividual(IndividualCustomerInput baseInfo);
 
 
     /**
@@ -64,7 +62,7 @@ public interface CustomerRpc {
      * @param updateInput 客户更新数据
      * @return
      */
-    @RequestMapping(value = "/api/customer/update", method = RequestMethod.POST)
+    @PostMapping(value = "/api/customer/update")
     BaseOutput<Customer> update(CustomerUpdateInput updateInput);
 
     /**
@@ -73,7 +71,7 @@ public interface CustomerRpc {
      * @param state      状态值
      * @return
      */
-    @RequestMapping(value = "/api/customer/updateState", method = {RequestMethod.POST})
+    @PostMapping(value = "/api/customer/updateState")
     BaseOutput<Customer> updateState(@RequestParam("customerId") Long customerId, @RequestParam("state") Integer state);
 
     /**
@@ -82,7 +80,7 @@ public interface CustomerRpc {
      * @param marketId 市场ID
      * @return 如果客户在当前市场已存在，则返回错误(false)信息，如果不存在，则返回客户信息(若客户信息存在)
      */
-    @RequestMapping(value = "/api/customer/checkExistByNoAndMarket", method = RequestMethod.POST)
+    @PostMapping(value = "/api/customer/checkExistByNoAndMarket")
     BaseOutput<Customer> checkExistByNoAndMarket(@RequestParam(value = "certificateNumber") String certificateNumber,@RequestParam(value = "marketId") Long marketId);
 
     /**
@@ -91,7 +89,16 @@ public interface CustomerRpc {
      * @param marketId 市场ID
      * @return
      */
-    @RequestMapping(value="/api/customer/get", method = {RequestMethod.POST})
+    @PostMapping(value="/api/customer/get")
     BaseOutput<Customer> get(@RequestParam("id") Long id, @RequestParam("marketId") Long marketId);
+
+    /**
+     * 根据证件号及市场，查询客户的信息
+     * @param certificateNumber 客户证件号
+     * @param marketId 市场ID
+     * @return
+     */
+    @PostMapping(value="/api/customer/getByCertificateNumber")
+    BaseOutput<Customer> getByCertificateNumber(@RequestParam("certificateNumber") String certificateNumber, @RequestParam("marketId") Long marketId);
 
 }

@@ -1,21 +1,20 @@
 package com.dili.customer.api;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.dili.customer.domain.Customer;
-import com.dili.customer.domain.dto.CustomerUpdateInput;
-import com.dili.customer.domain.dto.EnterpriseCustomerInput;
-import com.dili.customer.domain.dto.IndividualCustomerInput;
 import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
+import com.dili.customer.sdk.domain.dto.CustomerUpdateInput;
+import com.dili.customer.sdk.domain.dto.EnterpriseCustomerInput;
+import com.dili.customer.sdk.domain.dto.IndividualCustomerInput;
 import com.dili.customer.sdk.validator.AddView;
 import com.dili.customer.sdk.validator.EnterpriseView;
 import com.dili.customer.service.CustomerService;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,25 +23,26 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 由MyBatis Generator工具自动生成
+ * 客户基础信息
  * This file was generated on 2019-12-27 14:43:13.
  * @author yuehongbo
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/customer")
 @Slf4j
 public class CustomerController {
-    @Autowired
-    private CustomerService customerService;
+
+    private final CustomerService customerService;
 
     /**
      * 分页查询客户数据集
      * @param customer
      * @return
      */
-    @RequestMapping(value="/listPage", method = {RequestMethod.POST})
+    @PostMapping(value="/listPage")
     public PageOutput<List<Customer>> listPage(@RequestBody CustomerQueryInput customer){
-        if (Objects.isNull(customer.getMarketId()) && CollectionUtil.isEmpty(customer.getMarketIdList())) {
+        if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
         return customerService.listForPage(customer);
@@ -54,9 +54,9 @@ public class CustomerController {
      * @param customer
      * @return
      */
-    @RequestMapping(value="/listNormalPage", method = {RequestMethod.POST})
+    @PostMapping(value="/listNormalPage")
     public PageOutput<List<Customer>> listNormalPage(@RequestBody CustomerQueryInput customer){
-        if (Objects.isNull(customer.getMarketId()) && CollectionUtil.isEmpty(customer.getMarketIdList())) {
+        if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
         if (Objects.isNull(customer.getState())) {
@@ -72,7 +72,7 @@ public class CustomerController {
      * @param marketId 市场ID
      * @return
      */
-    @RequestMapping(value="/get", method = {RequestMethod.POST})
+    @PostMapping(value="/get")
     public BaseOutput<Customer> get(@RequestParam("id") Long id, @RequestParam("marketId") Long marketId){
         if (Objects.isNull(id) || Objects.isNull(marketId)) {
             return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
@@ -91,7 +91,7 @@ public class CustomerController {
      * @param marketId 市场ID
      * @return
      */
-    @RequestMapping(value="/getByCertificateNumber", method = {RequestMethod.POST})
+    @PostMapping(value="/getByCertificateNumber")
     public BaseOutput<Customer> getByCertificateNumber(@RequestParam("certificateNumber") String certificateNumber, @RequestParam("marketId") Long marketId){
         if (StrUtil.isBlank(certificateNumber) || Objects.isNull(marketId)) {
             return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
@@ -110,7 +110,7 @@ public class CustomerController {
      * @param state      状态值
      * @return
      */
-    @RequestMapping(value = "/updateState", method = {RequestMethod.POST})
+    @PostMapping(value = "/updateState")
     public BaseOutput<Customer> updateState(@RequestParam("customerId") Long customerId, @RequestParam("state") Integer state) {
         Customer data = customerService.get(customerId);
         data.setId(customerId);
@@ -124,12 +124,12 @@ public class CustomerController {
      * @param customer
      * @return
      */
-    @RequestMapping(value="/list", method = {RequestMethod.POST})
+    @PostMapping(value="/list")
     public BaseOutput<List<Customer>> list(@RequestBody(required = false) CustomerQueryInput customer) {
-        if (Objects.isNull(customer.getMarketId()) && CollectionUtil.isEmpty(customer.getMarketIdList())) {
+        if (Objects.isNull(customer.getMarketId())) {
             return BaseOutput.failure("客户所属市场不能为空");
         }
-        PageOutput pageOutput = customerService.listForPage(customer);
+        PageOutput<List<Customer>> pageOutput = customerService.listForPage(customer);
         return BaseOutput.success().setData(pageOutput.getData());
     }
 
@@ -138,7 +138,7 @@ public class CustomerController {
      * @param updateInput 更新数据
      * @return BaseOutput
      */
-    @RequestMapping(value="/update", method = {RequestMethod.POST})
+    @PostMapping(value="/update")
     public BaseOutput<Customer> update(@Validated @RequestBody CustomerUpdateInput updateInput, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
@@ -151,12 +151,12 @@ public class CustomerController {
      * @param customer
      * @return BaseOutput
      */
-    @RequestMapping(value="/registerEnterprise", method = {RequestMethod.POST})
+    @PostMapping(value="/registerEnterprise")
     public BaseOutput<Customer> registerEnterprise(@Validated({AddView.class, EnterpriseView.class}) @RequestBody EnterpriseCustomerInput customer, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
-        return customerService.saveBaseInfo(customer);
+        return customerService.register(customer);
     }
 
     /**
@@ -164,14 +164,14 @@ public class CustomerController {
      * @param customer
      * @return BaseOutput
      */
-    @RequestMapping(value="/registerIndividual", method = {RequestMethod.POST})
+    @PostMapping(value="/registerIndividual")
     public BaseOutput<Customer> registerIndividual(@Validated({AddView.class}) @RequestBody IndividualCustomerInput customer, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
         EnterpriseCustomerInput input = new EnterpriseCustomerInput();
         BeanUtils.copyProperties(customer,input);
-        return customerService.saveBaseInfo(input);
+        return customerService.register(input);
     }
 
 
@@ -181,7 +181,7 @@ public class CustomerController {
      * @param marketId 市场ID
      * @return 如果客户在当前市场已存在，则返回错误(false)信息，如果不存在，则返回客户信息(若客户信息存在)
      */
-    @RequestMapping(value="/checkExistByNoAndMarket", method = {RequestMethod.GET, RequestMethod.POST})
+    @PostMapping(value="/checkExistByNoAndMarket")
     public BaseOutput<Customer> checkExistByNoAndMarket(@RequestParam(value = "certificateNumber") String certificateNumber,@RequestParam(value = "marketId") Long marketId) {
         return customerService.checkExistByNoAndMarket(certificateNumber,marketId);
     }

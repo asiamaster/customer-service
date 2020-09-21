@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dili.customer.mapper.RelatedMapper">
+    <resultMap id="BaseResultMap" type="com.dili.customer.domain.dto.RelatedList">
+        <result column="parent" jdbcType="BIGINT"
+                property="customerId"/>
+        <result column="customer_count" jdbcType="BIGINT"
+                property="customerCount"/>
+        <result column="department_id" jdbcType="BIGINT"
+                property="departmentId"/>
+        <result column="modify_time" jdbcType="TIMESTAMP"
+                property="modifyTime"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+                    id,
+                    customer_id,
+                    parent,
+                    market_id,
+                    modify_time,
+                    related_time_start,
+                    related_time_end,
+                    category
+    </sql>
+    <select id="selectByQuery" parameterType="com.dili.customer.sdk.dto.RelatedQuery" resultMap="BaseResultMap">
+        SELECT parent, count(customer_id) as customer_count,
+        (SELECT department_id FROM customer_market WHERE customer_id = r.parent and market_id = #{marketId}) as department_id, modify_time
+        FROM related r
+        WHERE market_id = #{marketId} GROUP BY parent
+    </select>
+</mapper>

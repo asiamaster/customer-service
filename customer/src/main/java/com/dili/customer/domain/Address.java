@@ -2,6 +2,7 @@ package com.dili.customer.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.ss.domain.BaseDomain;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,7 +14,7 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 /**
- * 由MyBatis Generator工具自动生成
+ * 客户联系地址信息
  * 
  * This file was generated on 2020-01-09 17:46:13.
  */
@@ -30,17 +31,32 @@ public class Address extends BaseDomain {
     private Long id;
 
     /**
-     * 客户
+     * 所属客户
      */
     @Column(name = "`customer_id`", updatable = false)
     @NotNull(message = "所属客户不能为空")
     private Long customerId;
 
     /**
-     * 名称
+     * 客户地址所属市场
      */
-    @Column(name = "`name`")
-    private String name;
+    @Column(name = "`market_id`", updatable = false)
+    @NotNull(message = "所属市场不能为空")
+    private Long marketId;
+
+    /**
+     * 所在城市ID路径
+     */
+    @Column(name = "`city_path`")
+    @NotNull(message = "所属城市不能为空")
+    private String cityPath;
+
+    /**
+     * 所在城市名称(城市信息合并名称)
+     */
+    @Column(name = "`city_name`")
+    @NotNull(message = "所属城市不能为空")
+    private String cityName;
 
     /**
      * 地址
@@ -51,17 +67,17 @@ public class Address extends BaseDomain {
     private String address;
 
     /**
-     * 所在城市
+     * 是否现住址
      */
-    @Column(name = "`city_id`")
-    @NotNull(message = "所属城市不能为空")
-    private String cityId;
+    @Column(name = "`is_current`")
+    private Integer isCurrent;
 
     /**
      * 创建时间
      */
     @Column(name = "`create_time`", updatable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
@@ -70,6 +86,7 @@ public class Address extends BaseDomain {
      */
     @Column(name = "`modify_time`")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyTime;
 
@@ -85,14 +102,5 @@ public class Address extends BaseDomain {
     @Column(name = "`modifier_id`")
     @NotNull(message = "操作人不能为空")
     private Long modifierId;
-
-    @Column(name = "`lat`")
-    private String lat;
-
-    @Column(name = "`lng`")
-    private String lng;
-
-    @Column(name = "`is_default`")
-    private Integer isDefault;
 
 }
