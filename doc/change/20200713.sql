@@ -1,7 +1,6 @@
 /*==============================================================*/
 /* Table: tallying_area                                         */
 /*==============================================================*/
-drop index idx_ta_customer_id on tallying_area;
 drop table if exists tallying_area;
 create table tallying_area
 (
@@ -32,8 +31,6 @@ create index idx_ta_customer_id on tallying_area
 /*==============================================================*/
 /* Table: address                                               */
 /*==============================================================*/
-drop index idx_a_customer_id on address;
-drop index idx_a_market_id on address;
 drop table if exists address;
 create table address
 (
@@ -94,8 +91,6 @@ ALTER TABLE customer drop COLUMN `cellphone`;
 /*==============================================================*/
 /* Table: business_category                                     */
 /*==============================================================*/
-drop index idx_bc_market_id on business_category;
-drop index inx_bc_customer_id on business_category;
 drop table if exists business_category;
 create table business_category
 (
@@ -123,3 +118,27 @@ create index idx_bc_market_id on business_category
 (
    market_id
 );
+
+CREATE TABLE `related` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `customer_id` bigint(20) DEFAULT NULL COMMENT '客户',
+  `parent` bigint(20) DEFAULT NULL COMMENT '父客户',
+  `market_id` bigint(20) DEFAULT NULL COMMENT '市场id',
+  `modify_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `related_time_start` datetime DEFAULT NULL COMMENT '关联时间开始',
+  `related_time_end` datetime DEFAULT NULL COMMENT '关联时间结束',
+  `category` varchar(255) DEFAULT NULL COMMENT '关联商品',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  COMMENT=' 关联客户';
+
+CREATE TABLE `related_log` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `customer_name` varchar(20) DEFAULT NULL COMMENT '客户名称',
+  `phone` varchar(20)  DEFAULT NULL COMMENT '联系电话',
+  `cardNo` varchar(20)  DEFAULT NULL COMMENT '园区卡',
+  `modify_time` datetime DEFAULT NULL COMMENT '时间',
+  `creator` varchar(20) DEFAULT NULL COMMENT '操作员',
+  `notes` varchar(100)  DEFAULT NULL COMMENT '操作详情',
+  `parent` bigint(255) DEFAULT NULL COMMENT '上级客户',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 COMMENT=' 关联客户';
