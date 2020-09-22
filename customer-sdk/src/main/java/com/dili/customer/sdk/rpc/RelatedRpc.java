@@ -88,4 +88,10 @@ public interface RelatedRpc {
     @RequestMapping(value = "/api/related/listByExample", method = RequestMethod.POST)
     List<RelatedDto> listByExample(RelatedDto dto);
 
+    /**
+     * 删除关联客户
+     */
+    @RequestMapping(value = "/api/related/delete", method = RequestMethod.POST)
+    BaseOutput delete(Long parentId);
+
 }

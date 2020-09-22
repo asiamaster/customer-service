@@ -51,4 +51,16 @@ public class RelatedQuery{
      */
     private Long customerId;
 
+    /** BETWEEN */
+    private List<LocalDateTime> modifyTime;
+
+    /** 卡号 */
+    private String cardNo;
+    private String customerName;
+    private String customerCode;
+    private String customerContactsPhone;
+    private String customerMarketType;
+
+    private List<Long> ids;
+
 }
