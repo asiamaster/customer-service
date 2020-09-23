@@ -132,4 +132,13 @@ public class RelatedController {
         relatedService.disableAll(ids);
         return BaseOutput.success();
     }
+
+    /**
+     * 删除
+     */
+    @PostMapping("/delete")
+    public BaseOutput delete(@RequestBody Long id) {
+        relatedService.delete(id);
+        return BaseOutput.success();
+    }
 }

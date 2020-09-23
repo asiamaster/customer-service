@@ -13,6 +13,20 @@
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
+            <if test="modifyTime != null">
+                and modify_time between
+                <foreach collection="modifyTime" index="index" item="item">
+                    <if test="index ==0">
+                        #{item}
+                    </if>
+                </foreach>
+                and
+                <foreach collection="modifyTime" index="index" item="item">
+                    <if test="index ==1">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
         </where>
     </sql>
     <sql id="Base_Column_List">
@@ -29,6 +43,27 @@
         SELECT parent, count(customer_id) as customer_count,
         (SELECT department_id FROM customer_market WHERE customer_id = r.parent and market_id = #{marketId}) as department_id, modify_time
         FROM related r
-        WHERE market_id = #{marketId} GROUP BY parent
+        WHERE market_id = #{marketId}
+        <if test="null != ids and ids.size()>0">
+            and parent in
+            <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="modifyTime != null">
+            and modify_time between
+            <foreach collection="modifyTime" index="index" item="item">
+                <if test="index ==0">
+                    #{item}
+                </if>
+            </foreach>
+            and
+            <foreach collection="modifyTime" index="index" item="item">
+                <if test="index ==1">
+                    #{item}
+                </if>
+            </foreach>
+        </if>
+        GROUP BY parent
     </select>
 </mapper>
