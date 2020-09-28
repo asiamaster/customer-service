@@ -35,12 +35,12 @@ public class BusinessCategory extends BaseDomain {
     /**
      * 经营品类ID路径
      */
-    private String categoryPath;
+    private String categoryId;
 
     /**
      * 经营品类名称全路径
      */
-    private String categoryNamePath;
+    private String categoryName;
 
     /**
      * 创建时间

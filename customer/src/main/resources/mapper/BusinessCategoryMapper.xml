@@ -8,8 +8,8 @@
     <result column="id" property="id" />
     <result column="customer_id" property="customerId" />
     <result column="market_id"  property="marketId" />
-    <result column="category_path"  property="categoryPath" />
-    <result column="category_name_path"  property="categoryNamePath" />
+    <result column="category_id"  property="categoryId" />
+    <result column="category_name"  property="categoryName" />
     <result column="create_time"  property="createTime" />
     <result column="modify_time"  property="modifyTime" />
   </resultMap>
@@ -17,6 +17,6 @@
     <!--
       WARNING - @mbg.generated
     -->
-    id, customer_id, market_id, category_path, category_name_path, create_time, modify_time
+    id, customer_id, market_id, category_id, category_name, create_time, modify_time
   </sql>
 </mapper>

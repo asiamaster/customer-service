@@ -38,14 +38,14 @@ public class BusinessCategory extends BaseDomain {
     /**
      * 经营品类ID路径
      */
-    @Column(name = "`category_path`")
-    private String categoryPath;
+    @Column(name = "`category_id`")
+    private String categoryId;
 
     /**
      * 经营品类名称全路径
      */
-    @Column(name = "`category_name_path`")
-    private String categoryNamePath;
+    @Column(name = "`category_name`")
+    private String categoryName;
 
     /**
      * 创建时间
