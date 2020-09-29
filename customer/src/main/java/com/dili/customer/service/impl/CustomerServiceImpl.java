@@ -83,10 +83,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             customer = getBaseInfoByCertificateNumber(baseInfo.getCertificateNumber());
             if (null == customer) {
                 //身份证号对应的客户不存在，手机号对应的客户已存在，则认为手机号已被使用
-                Customer queryPhone = new Customer();
-                queryPhone.setOrganizationType(baseInfo.getOrganizationType());
-                queryPhone.setContactsPhone(baseInfo.getContactsPhone());
-                List<Customer> phoneExist = list(queryPhone);
+                List<Customer> phoneExist = getByContactsPhone(baseInfo.getContactsPhone());
                 if (CollectionUtil.isNotEmpty(phoneExist)) {
                     return BaseOutput.failure("此手机号对应的客户已存在");
                 }
@@ -243,10 +240,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         }
         //如果更新了客户电话，则需要验证电话是否已存在
         if (!updateInput.getContactsPhone().equals(customer.getContactsPhone())) {
-            Customer queryPhone = new Customer();
-            queryPhone.setOrganizationType(updateInput.getOrganizationType());
-            queryPhone.setContactsPhone(updateInput.getContactsPhone());
-            List<Customer> phoneExist = list(queryPhone);
+            List<Customer> phoneExist = getByContactsPhone(updateInput.getContactsPhone());
             if (CollectionUtil.isNotEmpty(phoneExist)) {
                 if (phoneExist.size() > 1) {
                     return BaseOutput.failure("联系手机号已存在").setCode(ResultCode.DATA_ERROR);
@@ -397,6 +391,18 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             contactsList.add(emergencyContacts);
         }
         return contactsList;
+    }
+
+    /**
+     * 根据手机号获取客户信息
+     * @param contactsPhone 客户手机号
+     * @return
+     */
+    private List<Customer> getByContactsPhone(String contactsPhone) {
+        Customer queryPhone = new Customer();
+//            queryPhone.setOrganizationType(updateInput.getOrganizationType());
+        queryPhone.setContactsPhone(contactsPhone);
+        return list(queryPhone);
     }
 
 }
