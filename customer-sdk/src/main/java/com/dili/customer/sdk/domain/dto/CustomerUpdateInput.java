@@ -49,6 +49,12 @@ public class CustomerUpdateInput implements Serializable {
     private String contactsPhone;
 
     /**
+     * 客户组织类型(个人、企业等)
+     */
+    @NotBlank(message = "组织类型不能为空")
+    private String organizationType;
+
+    /**
      * 客户市场信息
      */
     @Valid

@@ -84,6 +84,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             if (null == customer) {
                 //身份证号对应的客户不存在，手机号对应的客户已存在，则认为手机号已被使用
                 Customer queryPhone = new Customer();
+                queryPhone.setOrganizationType(baseInfo.getOrganizationType());
                 queryPhone.setContactsPhone(baseInfo.getContactsPhone());
                 List<Customer> phoneExist = list(queryPhone);
                 if (CollectionUtil.isNotEmpty(phoneExist)) {
@@ -239,6 +240,22 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         Customer customer = this.get(updateInput.getId());
         if (Objects.isNull(customer)) {
             return BaseOutput.failure("客户信息已不存在").setCode(ResultCode.DATA_ERROR);
+        }
+        //如果更新了客户电话，则需要验证电话是否已存在
+        if (!updateInput.getContactsPhone().equals(customer.getContactsPhone())) {
+            Customer queryPhone = new Customer();
+            queryPhone.setOrganizationType(updateInput.getOrganizationType());
+            queryPhone.setContactsPhone(updateInput.getContactsPhone());
+            List<Customer> phoneExist = list(queryPhone);
+            if (CollectionUtil.isNotEmpty(phoneExist)) {
+                if (phoneExist.size() > 1) {
+                    return BaseOutput.failure("联系手机号已存在").setCode(ResultCode.DATA_ERROR);
+                }
+                Customer temp = phoneExist.get(0);
+                if (!temp.getId().equals(customer.getId())) {
+                    return BaseOutput.failure("联系手机号已存在").setCode(ResultCode.DATA_ERROR);
+                }
+            }
         }
         customer.setName(updateInput.getName());
         customer.setState(updateInput.getState());
