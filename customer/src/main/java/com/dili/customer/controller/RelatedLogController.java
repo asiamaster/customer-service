@@ -44,7 +44,7 @@ public class RelatedLogController {
     * @return PageInfo<RelatedLog>
     */
     @PostMapping("/query")
-    public Object query(RelatedLogQuery query){
+    public Object query(@RequestBody RelatedLogQuery query){
         PageInfo<RelatedLog> page = relatedLogService.queryAll(query);
         TableResult<RelatedLog> result = new TableResult<>(page.getPageNum(), page.getTotal(), page.getList());
         return result;
