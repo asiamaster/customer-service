@@ -15,17 +15,24 @@
  */
 package com.dili.customer.controller;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import com.dili.commons.bstable.TableResult;
 import com.dili.customer.domain.Related;
 import com.dili.customer.domain.dto.RelatedList;
 import com.dili.customer.sdk.dto.RelatedDto;
-import com.dili.customer.service.RelatedService;
 import com.dili.customer.sdk.dto.RelatedQuery;
-import lombok.RequiredArgsConstructor;
+import com.dili.customer.service.RelatedService;
 import com.dili.ss.domain.BaseOutput;
-import org.springframework.web.bind.annotation.*;
 import com.github.pagehelper.PageInfo;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -66,6 +73,15 @@ public class RelatedController {
         related.setCustomerId(query.getCustomerId());
         related.setMarketId(query.getMarketId());
         List<Related> relateds = relatedService.listByExample(related);
+        if (CollUtil.isNotEmpty(relateds)) {
+            Related rd = relateds.get(0);
+            Date begin = Date.from(rd.getRelatedTimeStart().toLocalDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            Date end = Date.from(rd.getRelatedTimeEnd().toLocalDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            boolean in = DateUtil.isIn(new Date(), begin, end);
+            if (!in) {
+                return BaseOutput.success();
+            }
+        }
         return BaseOutput.successData(relateds);
     }
 
