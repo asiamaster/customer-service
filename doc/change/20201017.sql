@@ -1,0 +1,1 @@
+update customer set is_cellphone_valid = 0 where is_cellphone_valid is null;

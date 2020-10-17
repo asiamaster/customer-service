@@ -5,12 +5,10 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.commons.glossary.YesOrNoEnum;
+import com.dili.customer.config.CustomerConfig;
 import com.dili.customer.domain.*;
 import com.dili.customer.mapper.CustomerMapper;
-import com.dili.customer.sdk.domain.dto.CustomerCertificateInput;
-import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
-import com.dili.customer.sdk.domain.dto.CustomerUpdateInput;
-import com.dili.customer.sdk.domain.dto.EnterpriseCustomerInput;
+import com.dili.customer.sdk.domain.dto.*;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.*;
 import com.dili.ss.base.BaseServiceImpl;
@@ -53,6 +51,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final TallyingAreaService tallyingAreaService;
     private final AddressService addressService;
     private final BusinessCategoryService businessCategoryService;
+    private final CustomerConfig customerConfig;
 
     @Override
     public Customer getBaseInfoByCertificateNumber(String certificateNumber) {
@@ -82,10 +81,20 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             //根据证件号判断客户是否已存在
             customer = getBaseInfoByCertificateNumber(baseInfo.getCertificateNumber());
             if (null == customer) {
-                //身份证号对应的客户不存在，手机号对应的客户已存在，则认为手机号已被使用
-                List<Customer> phoneExist = getByContactsPhone(baseInfo.getContactsPhone());
-                if (CollectionUtil.isNotEmpty(phoneExist)) {
-                    return BaseOutput.failure("此手机号对应的客户已存在");
+                /**
+                 * 身份证号对应的客户不存在，手机号对应的客户已存在，则认为手机号已被使用
+                 * 个人客户中，手机号不允许重复，企业客户中，手机号允许重复
+                 */
+                List<Customer> phoneExist = getByContactsPhone(baseInfo.getContactsPhone(), baseInfo.getOrganizationType());
+                //如果为个人用户
+                if (CustomerEnum.OrganizationType.INDIVIDUAL.equals(CustomerEnum.OrganizationType.getInstance(baseInfo.getOrganizationType()))) {
+                    if (CollectionUtil.isNotEmpty(phoneExist)) {
+                        return BaseOutput.failure("此手机号对应的客户已存在");
+                    }
+                } else {
+                    if (CollectionUtil.isNotEmpty(phoneExist) && phoneExist.size() >= customerConfig.getPhoneLimit()) {
+                        return BaseOutput.failure("此手机号注册的客户数量已达上限");
+                    }
                 }
                 customer = new Customer();
                 BeanUtils.copyProperties(baseInfo, customer);
@@ -209,6 +218,29 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     }
 
     @Override
+    public PageOutput<List<Customer>> listBasePage(CustomerBaseQueryInput input) {
+        if (input.getRows() != null && input.getRows() >= 1) {
+            PageHelper.startPage(input.getPage(), input.getRows());
+        }
+        if (StringUtils.isNotBlank(input.getSort())) {
+            input.setSort(POJOUtils.humpToLineFast(input.getSort()));
+        } else {
+            input.setSort("id");
+            input.setOrder("desc");
+        }
+        List<Customer> list = getActualMapper().listBasePage(input);
+        //总记录
+        Long total = list instanceof Page ? ((Page) list).getTotal() : list.size();
+        //总页数
+        int totalPage = list instanceof Page ? ((Page) list).getPages() : 1;
+        //当前页数
+        int pageNum = list instanceof Page ? ((Page) list).getPageNum() : 1;
+        PageOutput output = PageOutput.success();
+        output.setData(list).setPageNum(pageNum).setTotal(total.intValue()).setPageSize(input.getPage()).setPages(totalPage);
+        return output;
+    }
+
+    @Override
     public BaseOutput<Customer> checkExistByNoAndMarket(String certificateNumber, Long marketId) {
         if (StrUtil.isBlank(certificateNumber) || Objects.isNull(marketId)) {
             return BaseOutput.failure("业务关键信息丢失").setCode(ResultCode.PARAMS_ERROR);
@@ -240,14 +272,15 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         }
         //如果更新了客户电话，则需要验证电话是否已存在
         if (!updateInput.getContactsPhone().equals(customer.getContactsPhone())) {
-            List<Customer> phoneExist = getByContactsPhone(updateInput.getContactsPhone());
-            if (CollectionUtil.isNotEmpty(phoneExist)) {
-                if (phoneExist.size() > 1) {
-                    return BaseOutput.failure("联系手机号已存在").setCode(ResultCode.DATA_ERROR);
+            List<Customer> phoneExist = getByContactsPhone(updateInput.getContactsPhone(), customer.getOrganizationType());
+            //如果为个人用户
+            if (CustomerEnum.OrganizationType.INDIVIDUAL.equals(CustomerEnum.OrganizationType.getInstance(updateInput.getOrganizationType()))) {
+                if (CollectionUtil.isNotEmpty(phoneExist)) {
+                    return BaseOutput.failure("此手机号对应的客户已存在");
                 }
-                Customer temp = phoneExist.get(0);
-                if (!temp.getId().equals(customer.getId())) {
-                    return BaseOutput.failure("联系手机号已存在").setCode(ResultCode.DATA_ERROR);
+            } else {
+                if (CollectionUtil.isNotEmpty(phoneExist) && phoneExist.size() >= customerConfig.getPhoneLimit()) {
+                    return BaseOutput.failure("此手机号注册的客户数量已达上限");
                 }
             }
         }
@@ -396,11 +429,12 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     /**
      * 根据手机号获取客户信息
      * @param contactsPhone 客户手机号
+     * @param organizationType 客户类型
      * @return
      */
-    private List<Customer> getByContactsPhone(String contactsPhone) {
+    private List<Customer> getByContactsPhone(String contactsPhone,String organizationType) {
         Customer queryPhone = new Customer();
-//            queryPhone.setOrganizationType(updateInput.getOrganizationType());
+        queryPhone.setOrganizationType(organizationType);
         queryPhone.setContactsPhone(contactsPhone);
         return list(queryPhone);
     }

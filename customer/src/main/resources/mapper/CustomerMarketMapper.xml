@@ -24,4 +24,15 @@
     <result column="modify_time"  property="modifyTime" />
   </resultMap>
 
+  <!-- list列表查询返回结果集 -->
+  <resultMap id="resultUnionCustomerMap"  type="com.dili.customer.domain.dto.CustomerMarketDto" extends="BaseResultMap">
+    <result column="customerName"  property="customerName" />
+    <result column="customerState" property="customerState" />
+    <result column="isCellphoneValid" property="isCellphoneValid" />
+  </resultMap>
+  
+  <select id="selectByContactsPhone" parameterType="string" resultMap="resultUnionCustomerMap">
+    SELECT c.`name`,c.state,c.is_cellphone_valid, cm.* from customer_market cm,customer c where cm.customer_id = c.id AND c.contacts_phone=#{value}
+  </select>
+
 </mapper>

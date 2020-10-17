@@ -1,6 +1,7 @@
 package com.dili.customer.api;
 
 import com.dili.customer.domain.CustomerMarket;
+import com.dili.customer.domain.dto.CustomerMarketDto;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.CustomerMarketService;
 import com.dili.ss.constant.ResultCode;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -60,4 +63,13 @@ public class CustomerMarketController {
         }
     }
 
+    /**
+     * 根据联系电话获取对应的客户所在的市场分组信息
+     * @param contactsPhone 联系电话
+     * @return
+     */
+    @PostMapping("/selectByContactsPhone")
+    public BaseOutput<Map<String, List<CustomerMarketDto>>> selectByContactsPhone(@RequestParam("contactsPhone") String contactsPhone) {
+        return BaseOutput.success().setData(customerMarketService.selectByContactsPhone(contactsPhone));
+    }
 }

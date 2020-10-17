@@ -25,7 +25,7 @@
     <parent>
         <artifactId>customer-parent</artifactId>
         <groupId>com.dili</groupId>
-        <version>1.2.6-SNAPSHOT</version>
+        <version>1.2.7-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -167,6 +167,27 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.dili</groupId>
+            <artifactId>uap-sdk</artifactId>
+            <version>2.9.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>ss-beetl</artifactId>
+                    <groupId>com.dili</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>ss-redis</artifactId>
+                    <groupId>com.dili</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.dili</groupId>
+            <artifactId>ss-redis</artifactId>
+            <version>${sharp-sword.version}</version>
         </dependency>
 
     </dependencies>

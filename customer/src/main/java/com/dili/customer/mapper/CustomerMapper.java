@@ -1,6 +1,7 @@
 package com.dili.customer.mapper;
 
 import com.dili.customer.domain.Customer;
+import com.dili.customer.sdk.domain.dto.CustomerBaseQueryInput;
 import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
 import com.dili.ss.base.MyMapper;
 
@@ -17,4 +18,11 @@ public interface CustomerMapper extends MyMapper<Customer> {
      * @return
      */
     List<Customer> listForPage(CustomerQueryInput customerQueryInput);
+
+    /**
+     * 客户基础信息查询
+     * @param customerBaseQueryInput 基础信息查询条件
+     * @return
+     */
+    List<Customer> listBasePage(CustomerBaseQueryInput customerBaseQueryInput);
 }

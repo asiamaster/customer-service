@@ -163,4 +163,11 @@ public class IndividualCustomerInput implements Serializable {
      */
     private List<BusinessCategory> businessCategoryList;
 
+    /**
+     * 手机号是否已认证  1-是 0-否
+     * 默认否
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
+     */
+    private Integer isCellphoneValid;
+
 }

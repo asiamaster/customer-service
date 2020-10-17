@@ -1,10 +1,7 @@
 package com.dili.customer.sdk.rpc;
 
 import com.dili.customer.sdk.domain.Customer;
-import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
-import com.dili.customer.sdk.domain.dto.CustomerUpdateInput;
-import com.dili.customer.sdk.domain.dto.EnterpriseCustomerInput;
-import com.dili.customer.sdk.domain.dto.IndividualCustomerInput;
+import com.dili.customer.sdk.domain.dto.*;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -30,7 +27,7 @@ public interface CustomerRpc {
      * @return
      */
     @PostMapping(value = "/api/customer/listPage")
-    PageOutput<List<Customer>> listPage(CustomerQueryInput customer);
+    PageOutput<List<CustomerExtendDto>> listPage(CustomerQueryInput customer);
 
     /**
      * 获取客户列表信息
@@ -38,7 +35,15 @@ public interface CustomerRpc {
      * @return
      */
     @PostMapping(value = "/api/customer/list")
-    BaseOutput<List<Customer>> list(CustomerQueryInput customer);
+    BaseOutput<List<CustomerExtendDto>> list(CustomerQueryInput customer);
+
+    /**
+     * 获取客户列表信息
+     * @param customer
+     * @return
+     */
+    @PostMapping(value = "/api/customer/listBase")
+    BaseOutput<List<Customer>> listBase(CustomerBaseQueryInput customer);
 
     /**
      * 企业用户注册
@@ -46,7 +51,7 @@ public interface CustomerRpc {
      * @return
      */
     @PostMapping(value = "/api/customer/registerEnterprise")
-    BaseOutput<Customer> registerEnterprise(EnterpriseCustomerInput baseInfo);
+    BaseOutput<CustomerExtendDto> registerEnterprise(EnterpriseCustomerInput baseInfo);
 
     /**
      * 个人用户注册
@@ -54,7 +59,7 @@ public interface CustomerRpc {
      * @return
      */
     @PostMapping(value = "/api/customer/registerIndividual")
-    BaseOutput<Customer> registerIndividual(IndividualCustomerInput baseInfo);
+    BaseOutput<CustomerExtendDto> registerIndividual(IndividualCustomerInput baseInfo);
 
 
     /**
@@ -63,7 +68,7 @@ public interface CustomerRpc {
      * @return
      */
     @PostMapping(value = "/api/customer/update")
-    BaseOutput<Customer> update(CustomerUpdateInput updateInput);
+    BaseOutput<CustomerExtendDto> update(CustomerUpdateInput updateInput);
 
     /**
      * 更新用户状态
@@ -90,7 +95,15 @@ public interface CustomerRpc {
      * @return
      */
     @PostMapping(value="/api/customer/get")
-    BaseOutput<Customer> get(@RequestParam("id") Long id, @RequestParam("marketId") Long marketId);
+    BaseOutput<CustomerExtendDto> get(@RequestParam("id") Long id, @RequestParam("marketId") Long marketId);
+
+    /**
+     * 根据id查询客户的基本信息，不带有任何的市场属性数据
+     * @param id 客户ID
+     * @return
+     */
+    @PostMapping(value = "/api/customer/getById")
+    BaseOutput<Customer> getById(@RequestParam("id") Long id);
 
     /**
      * 根据证件号及市场，查询客户的信息
@@ -99,6 +112,6 @@ public interface CustomerRpc {
      * @return
      */
     @PostMapping(value="/api/customer/getByCertificateNumber")
-    BaseOutput<Customer> getByCertificateNumber(@RequestParam("certificateNumber") String certificateNumber, @RequestParam("marketId") Long marketId);
+    BaseOutput<CustomerExtendDto> getByCertificateNumber(@RequestParam("certificateNumber") String certificateNumber, @RequestParam("marketId") Long marketId);
 
 }
