@@ -50,7 +50,7 @@
                 #{item}
             </foreach>
         </if>
-        <if test="modifyTime != null">
+        <if test="modifyTime != null and modifyTime.size()>0">
             and modify_time between
             <foreach collection="modifyTime" index="index" item="item">
                 <if test="index ==0">
