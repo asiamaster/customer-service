@@ -32,7 +32,7 @@
   </resultMap>
   
   <select id="selectByContactsPhone" parameterType="string" resultMap="resultUnionCustomerMap">
-    SELECT c.`name`,c.state,c.is_cellphone_valid, cm.* from customer_market cm,customer c where cm.customer_id = c.id AND c.contacts_phone=#{value}
+    SELECT c.`name` as customerName,c.state as customerState,c.is_cellphone_valid as isCellphoneValid, cm.* from customer_market cm,customer c where cm.customer_id = c.id AND c.contacts_phone=#{value}
   </select>
 
 </mapper>
