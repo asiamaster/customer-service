@@ -1,8 +1,12 @@
 package com.dili.customer.service;
 
 import com.dili.customer.domain.CustomerMarket;
+import com.dili.customer.domain.dto.CustomerMarketDto;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.ss.base.BaseService;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -26,4 +30,11 @@ public interface CustomerMarketService extends BaseService<CustomerMarket, Long>
      * @param nextGrade 想要更新成的等级
      */
     void changeGrade(Long customerId, Long marketId, CustomerEnum.Grade nextGrade);
+
+    /**
+     * 根据客户手机号查询客户市场归类信息
+     * @param phone 手机号
+     * @return map --> key:市场名称，value:市场客户
+     */
+    Map<String,List<CustomerMarketDto>> selectByContactsPhone(String phone);
 }

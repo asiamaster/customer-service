@@ -1,6 +1,7 @@
 package com.dili.customer.service;
 
 import com.dili.customer.domain.Customer;
+import com.dili.customer.sdk.domain.dto.CustomerBaseQueryInput;
 import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
 import com.dili.customer.sdk.domain.dto.CustomerUpdateInput;
 import com.dili.customer.sdk.domain.dto.EnterpriseCustomerInput;
@@ -38,6 +39,13 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @return
      */
     PageOutput<List<Customer>> listForPage(CustomerQueryInput input);
+
+    /**
+     * 分页查询客户基本信息，不带有任何市场属性数据
+     * @param input
+     * @return
+     */
+    PageOutput<List<Customer>> listBasePage(CustomerBaseQueryInput input);
 
     /**
      * 根据证件号检测某个客户在某市场是否已存在

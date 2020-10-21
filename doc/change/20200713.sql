@@ -97,8 +97,8 @@ create table business_category
    id                   bigint not null comment 'ID',
    customer_id          bigint comment '客户ID',
    market_id            bigint comment '所属市场ID',
-   category_path        varchar(100) comment '经营品类ID路径',
-   category_name_path   varchar(200) comment '经营品类名称全路径',
+   category_id          bigint comment '经营品类ID路径',
+   category_name        varchar(40) comment '经营品类名称全路径',
    create_time          datetime default CURRENT_TIMESTAMP comment '创建时间',
    modify_time          datetime default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '最后修改时间',
    primary key (id)

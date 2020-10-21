@@ -2,10 +2,7 @@ package com.dili.customer.api;
 
 import cn.hutool.core.util.StrUtil;
 import com.dili.customer.domain.Customer;
-import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
-import com.dili.customer.sdk.domain.dto.CustomerUpdateInput;
-import com.dili.customer.sdk.domain.dto.EnterpriseCustomerInput;
-import com.dili.customer.sdk.domain.dto.IndividualCustomerInput;
+import com.dili.customer.sdk.domain.dto.*;
 import com.dili.customer.sdk.validator.AddView;
 import com.dili.customer.sdk.validator.EnterpriseView;
 import com.dili.customer.service.CustomerService;
@@ -67,13 +64,25 @@ public class CustomerController {
     }
 
     /**
+     * 只查询并返回客户基础数据，不会带有客户市场属性数据
+     * 也不会查询 主表以外的数据
+     * @param customer 客户查询条件
+     * @return
+     */
+    @PostMapping(value = "/listBase")
+    public BaseOutput<List<Customer>> listBase(@RequestBody CustomerBaseQueryInput customer) {
+        PageOutput<List<Customer>> pageOutput = customerService.listBasePage(customer);
+        return BaseOutput.success().setData(pageOutput.getData());
+    }
+
+    /**
      * 根据id及市场，查询客户的信息
      * @param id 客户ID
      * @param marketId 市场ID
      * @return
      */
     @PostMapping(value="/get")
-    public BaseOutput<Customer> get(@RequestParam("id") Long id, @RequestParam("marketId") Long marketId){
+    public BaseOutput<CustomerExtendDto> get(@RequestParam("id") Long id, @RequestParam("marketId") Long marketId){
         if (Objects.isNull(id) || Objects.isNull(marketId)) {
             return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
         }
@@ -83,6 +92,19 @@ public class CustomerController {
         PageOutput<List<Customer>> pageOutput = customerService.listForPage(condition);
         Customer customer = pageOutput.getData().stream().findFirst().orElse(null);
         return BaseOutput.success().setData(customer);
+    }
+
+    /**
+     * 根据id查询客户基本信息，不带有任何市场属性数据
+     * @param id 客户ID
+     * @return
+     */
+    @PostMapping(value = "/getById")
+    public BaseOutput<Customer> getById(@RequestParam("id") Long id) {
+        if (Objects.isNull(id)) {
+            return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
+        }
+        return BaseOutput.success().setData(customerService.get(id));
     }
 
     /**
