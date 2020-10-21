@@ -76,7 +76,9 @@ public class RelatedController {
         if (CollUtil.isNotEmpty(relateds)) {
             Related rd = relateds.get(0);
             Date begin = Date.from(rd.getRelatedTimeStart().toLocalDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            begin = DateUtil.beginOfDay(begin);
             Date end = Date.from(rd.getRelatedTimeEnd().toLocalDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            end = DateUtil.endOfDay(end);
             boolean in = DateUtil.isIn(new Date(), begin, end);
             if (!in) {
                 return BaseOutput.success();
