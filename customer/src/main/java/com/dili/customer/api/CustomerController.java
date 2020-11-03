@@ -40,7 +40,7 @@ public class CustomerController {
      */
     @PostMapping(value="/listPage")
     public PageOutput<List<Customer>> listPage(@RequestBody CustomerQueryInput customer){
-        log.info(String.format("客户listPage查询:", JSONUtil.toJsonStr(customer)));
+        log.info(String.format("客户listPage查询:%s", JSONUtil.toJsonStr(customer)));
         if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
@@ -55,7 +55,7 @@ public class CustomerController {
      */
     @PostMapping(value="/listNormalPage")
     public PageOutput<List<Customer>> listNormalPage(@RequestBody CustomerQueryInput customer){
-        log.info(String.format("客户listNormalPage查询:", JSONUtil.toJsonStr(customer)));
+        log.info(String.format("客户listNormalPage查询:%s", JSONUtil.toJsonStr(customer)));
         if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
@@ -74,7 +74,7 @@ public class CustomerController {
      */
     @PostMapping(value = "/listBase")
     public BaseOutput<List<Customer>> listBase(@RequestBody CustomerBaseQueryInput customer) {
-        log.info(String.format("客户listBase查询:", JSONUtil.toJsonStr(customer)));
+        log.info(String.format("客户listBase查询:%s", JSONUtil.toJsonStr(customer)));
         PageOutput<List<Customer>> pageOutput = customerService.listBasePage(customer);
         return BaseOutput.success().setData(pageOutput.getData());
     }
@@ -179,7 +179,7 @@ public class CustomerController {
      */
     @PostMapping(value="/registerEnterprise")
     public BaseOutput<Customer> registerEnterprise(@Validated({AddView.class, EnterpriseView.class}) @RequestBody EnterpriseCustomerInput customer, BindingResult bindingResult) {
-        log.info(String.format("企业客户注册:", JSONUtil.toJsonStr(customer)));
+        log.info(String.format("企业客户注册:%s", JSONUtil.toJsonStr(customer)));
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
@@ -193,7 +193,7 @@ public class CustomerController {
      */
     @PostMapping(value="/registerIndividual")
     public BaseOutput<Customer> registerIndividual(@Validated({AddView.class}) @RequestBody IndividualCustomerInput customer, BindingResult bindingResult) {
-        log.info(String.format("个人客户注册:", JSONUtil.toJsonStr(customer)));
+        log.info(String.format("个人客户注册:%s", JSONUtil.toJsonStr(customer)));
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
