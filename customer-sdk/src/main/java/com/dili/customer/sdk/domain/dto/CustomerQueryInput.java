@@ -1,11 +1,9 @@
 package com.dili.customer.sdk.domain.dto;
 
-import com.dili.customer.sdk.domain.Customer;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -22,12 +20,12 @@ public class CustomerQueryInput extends CustomerBaseQueryInput {
     /**
      * 客户所在市场中的创建时间-开始
      */
-    private LocalDate marketCreateTimeStart;
+    private LocalDateTime marketCreateTimeStart;
 
     /**
      * 客户所在市场中的创建时间-介绍
      */
-    private LocalDate marketCreateTimeEnd;
+    private LocalDateTime marketCreateTimeEnd;
 
     /**
      * 客户所属组织
