@@ -96,6 +96,9 @@
       <if test="state != null">
         and c.state = #{state}
       </if>
+      <if test="certificateAddr !=null and certificateAddr !=''">
+        and c.certificate_addr LIKE CONCAT('%',#{certificateAddr},'%')
+      </if>
       <if test="currentCityId !=null">
         and FIND_IN_SET(#{currentCityId},c.current_city_path)
       </if>
