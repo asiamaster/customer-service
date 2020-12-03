@@ -55,9 +55,14 @@ public class CustomerMarket extends BaseDomain {
     private Integer grade;
 
     /**
-     * 客户行业##水果批发/蔬菜批发/超市
+     * 客户行业代码,多个以英文逗号隔开
      */
     private String profession;
+
+    /**
+     * 客户行业名称,多个以英文逗号隔开
+     */
+    private String professionName;
 
     /**
      * 经营地区##经营地区城市id
@@ -88,12 +93,6 @@ public class CustomerMarket extends BaseDomain {
      * 客户别名
      */
     private String alias;
-
-    /**
-     * 客户类型
-     */
-    @NotBlank(message = "客户身份不能为空", groups = {AddView.class})
-    private String type;
 
     /**
      * 备注信息

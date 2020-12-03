@@ -2,6 +2,7 @@ package com.dili.customer.sdk.domain.dto;
 
 
 import com.dili.customer.sdk.domain.BusinessCategory;
+import com.dili.customer.sdk.domain.CharacterType;
 import com.dili.customer.sdk.domain.CustomerMarket;
 import com.dili.customer.sdk.domain.TallyingArea;
 import com.dili.customer.sdk.validator.AddView;
@@ -165,9 +166,21 @@ public class IndividualCustomerInput implements Serializable {
 
     /**
      * 手机号是否已认证  1-是 0-否
-     * 默认否
      * {@link com.dili.commons.glossary.YesOrNoEnum}
      */
+    @NotNull(message = "【手机号是否已认证】不能为空")
     private Integer isCellphoneValid;
+
+    /**
+     * 客户身份类型
+     */
+    private List<CharacterType> characterTypeList;
+
+    /**
+     * 是否已实名认证  1-是 0-否
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
+     */
+    @NotNull(message = "【是否已实名】不能为空")
+    private Integer isCertification;
 
 }

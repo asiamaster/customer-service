@@ -240,4 +240,55 @@ public class CustomerEnum {
             return null;
         }
     }
+
+    /**
+     * 客户角色身份
+     */
+    public enum CharacterType{
+
+        /**
+         * 营业执照
+         */
+        经营户("business_user_character_type", "经营户"),
+        买家("buyer_character_type", "买家"),
+        其他类型("other_character_type", "其他类型"),
+        ;
+        @Getter
+        private String code;
+        @Getter
+        private String value;
+
+        CharacterType(String code, String value) {
+            this.code = code;
+            this.value = value;
+        }
+
+        /**
+         * 获取某个枚举值实例信息
+         * @param code
+         * @return
+         */
+        public static CharacterType getInstance(String code){
+            for (CharacterType at : CharacterType.values()) {
+                if (at.getCode().equals(code)){
+                    return at;
+                }
+            }
+            return null;
+        }
+
+        /**
+         * 获取某个枚举值实例信息
+         * @param code
+         * @return
+         */
+        public static String getValueByCode(String code){
+            for (CharacterType at : CharacterType.values()) {
+                if (at.getCode().equals(code)){
+                    return at.value;
+                }
+            }
+            return "";
+        }
+    }
 }

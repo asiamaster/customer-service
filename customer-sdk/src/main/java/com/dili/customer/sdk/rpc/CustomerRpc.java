@@ -114,4 +114,22 @@ public interface CustomerRpc {
     @PostMapping(value="/api/customer/getByCertificateNumber")
     BaseOutput<CustomerExtendDto> getByCertificateNumber(@RequestParam("certificateNumber") String certificateNumber, @RequestParam("marketId") Long marketId);
 
+    /**
+     * 更新用户手机验证结果
+     * @param customerId 客户ID
+     * @param cellphone  手机号
+     * @param valid 是否认证有效-true:是
+     * @return
+     */
+    @PostMapping(value = "/api/customer/updateCellphoneValid")
+    BaseOutput<Boolean> updateCellphoneValid(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone, @RequestParam("valid") Boolean valid);
+
+    /**
+     * 根据手机号已验证手机号的客户
+     * @param cellphone 手机号
+     * @return
+     */
+    @PostMapping(value = "/api/customer/getValidatedCellphoneCustomer")
+    BaseOutput<Customer> getValidatedCellphoneCustomer(@RequestParam("cellphone") String cellphone);
+
 }

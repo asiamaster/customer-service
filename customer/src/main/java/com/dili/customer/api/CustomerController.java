@@ -1,7 +1,9 @@
 package com.dili.customer.api;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.sdk.domain.dto.*;
 import com.dili.customer.sdk.validator.AddView;
@@ -212,5 +214,51 @@ public class CustomerController {
     @PostMapping(value="/checkExistByNoAndMarket")
     public BaseOutput<Customer> checkExistByNoAndMarket(@RequestParam(value = "certificateNumber") String certificateNumber,@RequestParam(value = "marketId") Long marketId) {
         return customerService.checkExistByNoAndMarket(certificateNumber,marketId);
+    }
+
+    /**
+     * 更新用户手机验证结果
+     * @param customerId 客户ID
+     * @param cellphone  手机号
+     * @param valid 是否认证有效-true:是
+     * @return
+     */
+    @PostMapping(value = "/updateCellphoneValid")
+    public BaseOutput<Boolean> updateCellphoneValid(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone, @RequestParam("valid") Boolean valid) {
+        log.info(String.format("客户【%s】手机号【%s】认证结果【%s】", customerId, cellphone, valid));
+        Customer condition = new Customer();
+        condition.setContactsPhone(cellphone);
+        condition.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
+        List<Customer> customerList = customerService.list(condition);
+        if (CollectionUtil.isNotEmpty(customerList)) {
+            return BaseOutput.failure("该手机号已被认证");
+        }
+        Customer data = customerService.get(customerId);
+        data.setId(customerId);
+        data.setContactsPhone(cellphone);
+        data.setIsCellphoneValid(valid ? YesOrNoEnum.YES.getCode() : YesOrNoEnum.NO.getCode());
+        customerService.updateSelective(data);
+        return BaseOutput.success().setData(true);
+    }
+
+    /**
+     * 根据手机号已验证手机号的客户
+     * @param cellphone 手机号
+     * @return
+     */
+    @PostMapping(value = "/getValidatedCellphoneCustomer")
+    public BaseOutput<Customer> getValidatedCellphoneCustomer(@RequestParam("cellphone") String cellphone) {
+        log.info(String.format("手机号【%s】获取手机验证客户", cellphone));
+        Customer condition = new Customer();
+        condition.setContactsPhone(cellphone);
+        condition.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
+        List<Customer> customerList = customerService.list(condition);
+        if (CollectionUtil.isNotEmpty(customerList)) {
+            if (customerList.size() > 1) {
+                return BaseOutput.failure("数据有误,手机号已被多个客户实名");
+            }
+            return BaseOutput.successData(customerList.get(0));
+        }
+        return BaseOutput.success();
     }
 }

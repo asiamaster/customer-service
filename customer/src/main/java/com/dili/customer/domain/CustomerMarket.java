@@ -60,10 +60,16 @@ public class CustomerMarket extends BaseDomain {
     private Integer grade;
 
     /**
-     * 客户行业##水果批发/蔬菜批发/超市
+     * 客户行业代码
      */
     @Column(name = "`profession`")
     private String profession;
+
+    /**
+     * 客户行业名称
+     */
+    @Column(name = "`profession_name`")
+    private String professionName;
 
     /**
      * 经营地区##经营地区城市id
@@ -100,12 +106,6 @@ public class CustomerMarket extends BaseDomain {
      */
     @Column(name = "`alias`")
     private String alias;
-
-    /**
-     * 客户类型##采购、销售、代买等##{provider:"dataDictionaryValueProvider",queryParams:{dd_id:4}}
-     */
-    @Column(name = "`type`")
-    private String type;
 
     /**
      * 备注信息

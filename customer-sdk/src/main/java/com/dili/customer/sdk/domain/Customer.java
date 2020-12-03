@@ -9,7 +9,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -56,6 +55,11 @@ public class Customer extends BaseDomain {
      * 证件地址
      */
     private String certificateAddr;
+
+    /**
+     * 是否已经实名认证
+     */
+    private Integer isCertification;
 
     /**
      * 客户名称

@@ -1,5 +1,6 @@
 package com.dili.customer.sdk.domain.dto;
 
+import com.dili.customer.sdk.domain.CharacterType;
 import com.dili.customer.sdk.domain.Customer;
 import com.dili.customer.sdk.domain.CustomerMarket;
 import com.dili.customer.sdk.domain.TallyingArea;
@@ -32,4 +33,9 @@ public class CustomerExtendDto extends Customer {
      * 客户理货区
      */
     private List<TallyingArea> tallyingAreaList;
+
+    /**
+     * 客户角色身份信息
+     */
+    private List<CharacterType> characterTypeList;
 }

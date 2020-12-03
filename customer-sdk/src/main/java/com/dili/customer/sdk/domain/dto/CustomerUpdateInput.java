@@ -91,4 +91,16 @@ public class CustomerUpdateInput implements Serializable {
      */
     private List<BusinessCategory> businessCategoryList;
 
+    /**
+     * 客户身份信息
+     */
+    @NotNull
+    private List<CharacterType> characterTypeList;
+
+    /**
+     * 客户车型信息
+     */
+    @Valid
+    private List<VehicleInfo> vehicleInfoList;
+
 }

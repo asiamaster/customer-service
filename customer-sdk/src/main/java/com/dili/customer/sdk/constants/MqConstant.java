@@ -9,8 +9,13 @@ package com.dili.customer.sdk.constants;
 public interface MqConstant {
 
     /**
-     * MQ 交换机配置
+     * 客户信息修改后 MQ 消息同步 交换机配置
      */
     String CUSTOMER_MQ_FANOUT_EXCHANGE = "dili.customer.fanoutExchange";
+
+    /**
+     * 客户新注册后 MQ 消息同步 交换机配置
+     */
+    String CUSTOMER_ADD_MQ_FANOUT_EXCHANGE = "dili.customer.add.fanoutExchange";
 
 }

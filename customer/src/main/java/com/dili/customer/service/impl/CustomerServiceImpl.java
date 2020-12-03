@@ -52,6 +52,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final AddressService addressService;
     private final BusinessCategoryService businessCategoryService;
     private final CustomerConfig customerConfig;
+    private final CharacterTypeService characterTypeService;
+    private final VehicleInfoService vehicleInfoService;
 
     @Override
     public Customer getBaseInfoByCertificateNumber(String certificateNumber) {
@@ -128,6 +130,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             if (Objects.nonNull(temp)) {
                 BeanUtils.copyProperties(temp, marketInfo);
             }
+            //如果数据库中已存在的客户未实名，而本次传入的数据为已实名，则需要更新实名认证标识
+            if (YesOrNoEnum.NO.getCode().equals(customer.getIsCertification()) && YesOrNoEnum.YES.getCode().equals(baseInfo.getIsCertification())){
+                customer.setIsCertification(baseInfo.getIsCertification());
+            }
             /**
              * 如果在此次创建中，增加了现地址信息
              */
@@ -135,8 +141,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customer.setCurrentCityPath(baseInfo.getCurrentCityPath());
                 customer.setCurrentCityName(baseInfo.getCurrentCityName());
                 customer.setCurrentAddress(baseInfo.getCurrentAddress());
-                this.update(customer);
             }
+            this.update(customer);
         }
         marketInfo.setCustomerId(customer.getId());
         marketInfo.setModifierId(baseInfo.getOperatorId());
@@ -171,9 +177,16 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             List<TallyingArea> tallyingAreaList = JSONArray.parseArray(JSONObject.toJSONString(baseInfo.getTallyingAreaList()), TallyingArea.class);
             tallyingAreaService.saveInfo(tallyingAreaList, customer.getId(), marketInfo.getMarketId());
         }
+        //处理客户经营品类信息
         if (CollectionUtil.isNotEmpty(baseInfo.getBusinessCategoryList())){
             List<BusinessCategory> businessCategoryList = JSONArray.parseArray(JSONObject.toJSONString(baseInfo.getBusinessCategoryList()), BusinessCategory.class);
             businessCategoryService.saveInfo(businessCategoryList, customer.getId(), marketInfo.getMarketId());
+        }
+        //组装保存客户角色身份信息
+        if (CollectionUtil.isNotEmpty(baseInfo.getCharacterTypeList())){
+            List<CharacterType> characterTypeList = JSONArray.parseArray(JSONObject.toJSONString(baseInfo.getCharacterTypeList()), CharacterType.class);
+            characterTypeService.saveInfo(characterTypeList,customer.getId(),marketInfo.getMarketId());
+            customer.setCharacterTypeList(characterTypeList);
         }
         customer.setCustomerMarket(marketInfo);
         return BaseOutput.success().setData(customer);
@@ -181,14 +194,14 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Override
     public PageOutput<List<Customer>> listForPage(CustomerQueryInput input) {
-        if (input.getRows() != null && input.getRows() >= 1) {
-            PageHelper.startPage(input.getPage(), input.getRows());
-        }
         if (StringUtils.isNotBlank(input.getSort())) {
             input.setSort(POJOUtils.humpToLineFast(input.getSort()));
         } else {
             input.setSort("id");
             input.setOrder("desc");
+        }
+        if (input.getRows() != null && input.getRows() >= 1) {
+            PageHelper.startPage(input.getPage(), input.getRows());
         }
         List<Customer> list = getActualMapper().listForPage(input);
         //总记录
@@ -199,16 +212,23 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         int pageNum = list instanceof Page ? ((Page) list).getPageNum() : 1;
         PageOutput output = PageOutput.success();
         if (CollectionUtil.isNotEmpty(list)) {
-            Set<Long> collect = list.stream().map(Customer::getId).collect(Collectors.toSet());
+            Set<Long> customerIdSet = list.stream().map(Customer::getId).collect(Collectors.toSet());
             TallyingArea tallyingArea = new TallyingArea();
             tallyingArea.setMarketId(input.getMarketId());
-            tallyingArea.setCustomerIdSet(collect);
+            tallyingArea.setCustomerIdSet(customerIdSet);
+            //获取客户理货区信息
             List<TallyingArea> tallyingAreaList = tallyingAreaService.listByExample(tallyingArea);
-            if (CollectionUtil.isNotEmpty(tallyingAreaList)) {
-                Map<Long, List<TallyingArea>> listMap = tallyingAreaList.stream().collect(Collectors.groupingBy(TallyingArea::getCustomerId));
+            //获取客户角色身份信息
+            List<CharacterType> characterTypeList = characterTypeService.listByCustomerAndMarket(customerIdSet, input.getMarketId());
+            if (CollectionUtil.isNotEmpty(tallyingAreaList) || CollectionUtil.isNotEmpty(characterTypeList)) {
+                Map<Long, List<TallyingArea>> tallyingAreaMap = tallyingAreaList.stream().collect(Collectors.groupingBy(TallyingArea::getCustomerId));
+                Map<Long, List<CharacterType>> characterTypeMap = characterTypeList.stream().collect(Collectors.groupingBy(CharacterType::getCustomerId));
                 list.forEach(t -> {
-                    if (listMap.containsKey(t.getId())) {
-                        t.setTallyingAreaList(listMap.get(t.getId()));
+                    if (tallyingAreaMap.containsKey(t.getId())) {
+                        t.setTallyingAreaList(tallyingAreaMap.get(t.getId()));
+                    }
+                    if (characterTypeMap.containsKey(t.getId())) {
+                        t.setCharacterTypeList(characterTypeMap.get(t.getId()));
                     }
                 });
             }
@@ -270,8 +290,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (Objects.isNull(customer)) {
             return BaseOutput.failure("客户信息已不存在").setCode(ResultCode.DATA_ERROR);
         }
-        //如果更新了客户电话，则需要验证电话是否已存在
-        if (!updateInput.getContactsPhone().equals(customer.getContactsPhone())) {
+        //如果更新了客户电话，且电话未实名，则需要验证电话是否已存在
+        if (!updateInput.getContactsPhone().equals(customer.getContactsPhone()) && YesOrNoEnum.NO.getCode().equals(customer.getIsCellphoneValid())) {
             List<Customer> phoneExist = getByContactsPhone(updateInput.getContactsPhone(), customer.getOrganizationType());
             //如果为个人用户
             if (CustomerEnum.OrganizationType.INDIVIDUAL.equals(CustomerEnum.OrganizationType.getInstance(updateInput.getOrganizationType()))) {
@@ -283,10 +303,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                     return BaseOutput.failure("此手机号注册的客户数量已达上限");
                 }
             }
+            customer.setContactsPhone(updateInput.getContactsPhone());
         }
         customer.setName(updateInput.getName());
         customer.setState(updateInput.getState());
-        customer.setContactsPhone(updateInput.getContactsPhone());
         if (Objects.nonNull(updateInput.getCustomerCertificate())){
             CustomerCertificateInput customerCertificate = updateInput.getCustomerCertificate();
             customer.setCertificateRange(customerCertificate.getCertificateRange());
@@ -378,10 +398,40 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         } else {
             addressService.deleteByCustomerAndMarket(customer.getId(), marketId);
         }
+        /**
+         * 更新客户车辆资源信息
+         */
+        if (CollectionUtil.isNotEmpty(updateInput.getVehicleInfoList())) {
+            List<VehicleInfo> vehicleInfoList = Lists.newArrayList();
+            updateInput.getVehicleInfoList().forEach(t -> {
+                if (Objects.nonNull(t)) {
+                    VehicleInfo temp = new VehicleInfo();
+                    BeanUtils.copyProperties(t, temp);
+                    temp.setCustomerId(customer.getId());
+                    temp.setMarketId(marketId);
+                    temp.setModifyTime(LocalDateTime.now());
+                    temp.setModifierId(updateInput.getOperatorId());
+                    if (Objects.isNull(temp.getId())) {
+                        temp.setCreatorId(updateInput.getOperatorId());
+                        temp.setCreateTime(temp.getModifyTime());
+                    }
+                    vehicleInfoList.add(temp);
+                }
+            });
+            vehicleInfoService.batchSaveOrUpdate(vehicleInfoList);
+        } else {
+            vehicleInfoService.deleteByCustomerAndMarket(customer.getId(), marketId);
+        }
         //更新客户经营品类信息
         if (CollectionUtil.isNotEmpty(updateInput.getBusinessCategoryList())) {
             List<BusinessCategory> businessCategoryList = JSONArray.parseArray(JSONObject.toJSONString(updateInput.getBusinessCategoryList()), BusinessCategory.class);
             businessCategoryService.saveInfo(businessCategoryList, customer.getId(), marketId);
+        }
+        //组装保存客户角色身份信息
+        if (CollectionUtil.isNotEmpty(updateInput.getCharacterTypeList())){
+            List<CharacterType> characterTypeList = JSONArray.parseArray(JSONObject.toJSONString(updateInput.getCharacterTypeList()), CharacterType.class);
+            characterTypeService.saveInfo(characterTypeList,customer.getId(),marketId);
+            customer.setCharacterTypeList(characterTypeList);
         }
         super.update(customer);
         customer.setCustomerMarket(customerMarket);

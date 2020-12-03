@@ -27,7 +27,7 @@ import java.util.List;
 企业客户没有性别和民族和certificate_time，但有certificate_rang
  * This file was generated on 2020-01-09 17:36:22.
  */
-@Table(name = "`customer`")
+@Table(name = "customer")
 @Getter
 @Setter
 @ToString(callSuper = true)
@@ -76,6 +76,12 @@ public class Customer extends BaseDomain {
      */
     @Column(name = "`certificate_addr`")
     private String certificateAddr;
+
+    /**
+     * 是否已经实名认证
+     */
+    @Column(name = "`is_certification`")
+    private Integer isCertification;
 
     /**
      * 客户名称
@@ -245,6 +251,12 @@ public class Customer extends BaseDomain {
      */
     @Transient
     private List<TallyingArea> tallyingAreaList;
+
+    /**
+     * 客户市场身份
+     */
+    @Transient
+    private List<CharacterType> characterTypeList;
 
     /**
      * 客户证件号打码加*显示

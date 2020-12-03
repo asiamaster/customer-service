@@ -1,5 +1,6 @@
 package com.dili.customer.sdk.domain.dto;
 
+import com.dili.customer.sdk.domain.CharacterType;
 import com.dili.customer.sdk.domain.Customer;
 import lombok.Data;
 
@@ -44,12 +45,6 @@ public class CustomerBaseQueryInput extends CustomerExtendDto {
     private String keyword;
 
     /**
-     * 当客户在多市场时，是否分组只返回一条客户主数据
-     * 如果设置为true，则根据客户id分组
-     */
-    private Boolean isGroup;
-
-    /**
      * 根据ID不存在的条件集过滤
      */
     private Set<Long> notInIdSet = new HashSet<>();
@@ -63,4 +58,9 @@ public class CustomerBaseQueryInput extends CustomerExtendDto {
      * 客户编号列表
      */
     private List<String> codeList;
+
+    /**
+     * 客户身份类型
+     */
+    private CharacterType characterType;
 }
