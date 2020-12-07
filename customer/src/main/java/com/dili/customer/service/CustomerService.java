@@ -1,10 +1,7 @@
 package com.dili.customer.service;
 
 import com.dili.customer.domain.Customer;
-import com.dili.customer.sdk.domain.dto.CustomerBaseQueryInput;
-import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
-import com.dili.customer.sdk.domain.dto.CustomerUpdateInput;
-import com.dili.customer.sdk.domain.dto.EnterpriseCustomerInput;
+import com.dili.customer.sdk.domain.dto.*;
 import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
@@ -61,4 +58,18 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @return
      */
     BaseOutput<Customer> update(CustomerUpdateInput updateInput);
+
+    /**
+     * 获取被某手机号验证的客户
+     * @param cellphone 手机号
+     * @return
+     */
+    List<Customer> getValidatedCellphoneCustomer(String cellphone);
+
+    /**
+     * 客户自动注册
+     * @param dto
+     * @return
+     */
+    BaseOutput<Customer> autoRegister(CustomerAutoRegisterDto dto);
 }

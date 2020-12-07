@@ -1,7 +1,9 @@
 package com.dili.customer.api;
 
+import cn.hutool.core.collection.CollStreamUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.validation.ValidationUtil;
 import cn.hutool.json.JSONUtil;
 import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.domain.Customer;
@@ -242,17 +244,14 @@ public class CustomerController {
     }
 
     /**
-     * 根据手机号已验证手机号的客户
+     * 获取被某手机号验证的客户
      * @param cellphone 手机号
      * @return
      */
     @PostMapping(value = "/getValidatedCellphoneCustomer")
     public BaseOutput<Customer> getValidatedCellphoneCustomer(@RequestParam("cellphone") String cellphone) {
-        log.info(String.format("手机号【%s】获取手机验证客户", cellphone));
-        Customer condition = new Customer();
-        condition.setContactsPhone(cellphone);
-        condition.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
-        List<Customer> customerList = customerService.list(condition);
+        log.info(String.format("获取被手机号【%s】验证的客户", cellphone));
+        List<Customer> customerList = customerService.getValidatedCellphoneCustomer(cellphone);
         if (CollectionUtil.isNotEmpty(customerList)) {
             if (customerList.size() > 1) {
                 return BaseOutput.failure("数据有误,手机号已被多个客户实名");
@@ -261,4 +260,19 @@ public class CustomerController {
         }
         return BaseOutput.success();
     }
+
+    /**
+     * 客户自行注册
+     * @param dto
+     * @return
+     */
+    @PostMapping(value = "/autoRegister")
+    public BaseOutput<Customer> autoRegister(@Validated @RequestBody CustomerAutoRegisterDto dto, BindingResult bindingResult) {
+        log.info(String.format("客户自行注册:%s", JSONUtil.toJsonStr(dto)));
+        if (bindingResult.hasErrors()) {
+            return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
+        }
+        return customerService.autoRegister(dto);
+    }
+
 }

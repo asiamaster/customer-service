@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -48,6 +49,7 @@ public class Customer extends BaseDomain {
 
     /**
      * 证件是否长期有效 1-是；0-否
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
      */
     private Integer certificateLongTerm;
 
@@ -58,6 +60,7 @@ public class Customer extends BaseDomain {
 
     /**
      * 是否已经实名认证
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
      */
     private Integer isCertification;
 
@@ -76,6 +79,7 @@ public class Customer extends BaseDomain {
 
     /**
      * 性别:男,女
+     * {@link com.dili.customer.sdk.enums.CustomerEnum.Gender}
      */
     private Integer gender;
 
@@ -96,6 +100,7 @@ public class Customer extends BaseDomain {
 
     /**
      * 组织类型,个人/企业
+     * {@link com.dili.customer.sdk.enums.CustomerEnum.OrganizationType}
      */
     private String organizationType;
 
@@ -136,6 +141,7 @@ public class Customer extends BaseDomain {
 
     /**
      * 手机号是否验证
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
      */
     private Integer isCellphoneValid;
 
@@ -177,13 +183,16 @@ public class Customer extends BaseDomain {
     private LocalDateTime modifyTime;
 
     /**
-     * 是否可用
+     * 是否删除
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
      */
     private Integer isDelete;
 
     /**
-     * 客户状态 0注销，1生效，2禁用，
+     * 客户状态 0注销，1生效，2禁用..
+     * {@link com.dili.customer.sdk.enums.CustomerEnum.State}
      */
+    @NotNull(message = "客户状态不能为空")
     private Integer state;
 
     /**

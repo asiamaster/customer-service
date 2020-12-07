@@ -1,5 +1,6 @@
 package com.dili.customer.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
@@ -436,6 +437,28 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         super.update(customer);
         customer.setCustomerMarket(customerMarket);
         return BaseOutput.success().setData(customer);
+    }
+
+    @Override
+    public List<Customer> getValidatedCellphoneCustomer(String cellphone) {
+        Customer condition = new Customer();
+        condition.setContactsPhone(cellphone);
+        condition.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
+        return list(condition);
+    }
+
+    @Override
+    public BaseOutput<Customer> autoRegister(CustomerAutoRegisterDto dto) {
+        List<Customer> validatedCellphoneCustomerList = getValidatedCellphoneCustomer(dto.getContactsPhone());
+        if (CollectionUtil.isNotEmpty(validatedCellphoneCustomerList)) {
+            return BaseOutput.failure("您的联系电话系统已存在，请更换其他号码，谢谢！");
+        }
+        Customer customer = BeanUtil.copyProperties(dto, Customer.class);
+        customer.setCreateTime(LocalDateTime.now());
+        customer.setModifyTime(customer.getCreateTime());
+        customer.setSourceChannel("auto_register");
+        this.insertSelective(customer);
+        return BaseOutput.successData(customer);
     }
 
 

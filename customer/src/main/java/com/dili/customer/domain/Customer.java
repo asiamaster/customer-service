@@ -67,6 +67,7 @@ public class Customer extends BaseDomain {
 
     /**
      * 证件是否长期有效 1-是；0-否
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
      */
     @Column(name = "`certificate_long_term`")
     private Integer certificateLongTerm;
@@ -79,6 +80,7 @@ public class Customer extends BaseDomain {
 
     /**
      * 是否已经实名认证
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
      */
     @Column(name = "`is_certification`")
     private Integer isCertification;
@@ -101,6 +103,7 @@ public class Customer extends BaseDomain {
 
     /**
      * 性别:男,女
+     * {@link com.dili.customer.sdk.enums.CustomerEnum.Gender}
      */
     @Column(name = "`gender`")
     private Integer gender;
@@ -129,6 +132,7 @@ public class Customer extends BaseDomain {
 
     /**
      * 组织类型,个人/企业
+     * {@link com.dili.customer.sdk.enums.CustomerEnum.OrganizationType}
      */
     @Column(name = "`organization_type`")
     private String organizationType;
@@ -179,6 +183,7 @@ public class Customer extends BaseDomain {
 
     /**
      * 手机号是否验证
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
      */
     @Column(name = "`is_cellphone_valid`")
     private Integer isCellphoneValid;
@@ -229,12 +234,14 @@ public class Customer extends BaseDomain {
 
     /**
      * 是否删除
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
      */
     @Column(name = "`is_delete`")
     private Integer isDelete;
 
     /**
      * 客户状态 0注销，1生效，2禁用，
+     * {@link com.dili.customer.sdk.enums.CustomerEnum.State}
      */
     @Column(name = "`state`")
     private Integer state;

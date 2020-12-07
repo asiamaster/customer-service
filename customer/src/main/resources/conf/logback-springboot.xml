@@ -4,14 +4,15 @@
     <property name="LOG_NAME" value="customer-service"/>
     <!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径-->
     <property name="LOG_HOME" value="logs"/>
-
     <!-- 日志文件存放的历史天数 -->
     <springProperty scope="context" name="maxHistory" source="log.maxHistory"/>
+    <!-- 日志环境 -->
+    <springProperty scope="context" name="profile.id" source="spring.profiles.active" />
 
     <!-- 日志控制台输出 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d %-5level [${LOG_NAME}-${build.profile.id}] [%t] [%c:%L] -| %msg%n</pattern>
+            <pattern>%d %-5level [${LOG_NAME}-${profile.id}] [%t] [%c:%L] -| %msg%n</pattern>
         </encoder>
     </appender>
     <!-- 日志文件输出 -->
@@ -26,7 +27,7 @@
             <maxFileSize>10MB</maxFileSize>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d %-5level [${LOG_NAME}-${build.profile.id}] [%t] [%c:%L] -| %msg%n</pattern>
+            <pattern>%d %-5level [${LOG_NAME}-${profile.id}] [%t] [%c:%L] -| %msg%n</pattern>
         </encoder>
     </appender>
 

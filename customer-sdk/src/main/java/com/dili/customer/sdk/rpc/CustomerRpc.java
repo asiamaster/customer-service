@@ -125,11 +125,19 @@ public interface CustomerRpc {
     BaseOutput<Boolean> updateCellphoneValid(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone, @RequestParam("valid") Boolean valid);
 
     /**
-     * 根据手机号已验证手机号的客户
+     * 获取被某手机号验证的客户
      * @param cellphone 手机号
-     * @return
+     * @return 已被验证的客户信息
      */
     @PostMapping(value = "/api/customer/getValidatedCellphoneCustomer")
     BaseOutput<Customer> getValidatedCellphoneCustomer(@RequestParam("cellphone") String cellphone);
+
+    /**
+     * 客户自行注册
+     * @param autoRegisterDto 自行注册dto参数
+     * @return 注册后的客户信息
+     */
+    @PostMapping(value = "/api/customer/autoRegister")
+    BaseOutput<Customer> autoRegister(CustomerAutoRegisterDto autoRegisterDto);
 
 }

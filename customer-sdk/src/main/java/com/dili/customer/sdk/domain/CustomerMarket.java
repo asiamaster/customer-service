@@ -2,13 +2,11 @@ package com.dili.customer.sdk.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.customer.sdk.enums.CustomerEnum;
-import com.dili.customer.sdk.validator.AddView;
 import com.dili.ss.domain.BaseDomain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -93,6 +91,22 @@ public class CustomerMarket extends BaseDomain {
      * 客户别名
      */
     private String alias;
+
+    /**
+     * 客户资料审核状态
+     * {@link com.dili.customer.sdk.enums.CustomerEnum.ApprovalStatus}
+     */
+    private Integer approvalStatus;
+
+    /**
+     * 客户资料审核人
+     */
+    private Long approvalUserId;
+
+    /**
+     * 客户资料审核时间
+     */
+    private LocalDateTime approvalTime;
 
     /**
      * 备注信息

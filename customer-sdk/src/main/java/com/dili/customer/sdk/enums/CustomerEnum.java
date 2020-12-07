@@ -18,10 +18,11 @@ public class CustomerEnum {
     /**
      * 客户状态枚举定义
      */
-    public enum State{
+    public enum State {
 
-        NORMAL(1, "生效"),
+        NORMAL(1, "正常"),
         DISABLED(2, "禁用"),
+        USELESS(3, "未生效"),
         ;
         private Integer code;
         private String value;
@@ -29,6 +30,7 @@ public class CustomerEnum {
         public Integer getCode() {
             return code;
         }
+
         public String getValue() {
             return value;
         }
@@ -41,12 +43,13 @@ public class CustomerEnum {
 
         /**
          * 获取某个枚举值实例信息
+         *
          * @param code
          * @return
          */
-        public static State getInstance(Integer code){
+        public static State getInstance(Integer code) {
             for (State state : State.values()) {
-                if (state.getCode().equals(code)){
+                if (state.getCode().equals(code)) {
                     return state;
                 }
             }
@@ -58,30 +61,18 @@ public class CustomerEnum {
      * 客户组织类型
      */
     public enum OrganizationType {
-        INDIVIDUAL("individual", "个人", "PC", "individualCustomer"),
-        ENTERPRISE("enterprise", "企业", "BC", "enterpriseCustomer"),
+        INDIVIDUAL("individual", "个人"),
+        ENTERPRISE("enterprise", "企业"),
         ;
 
         @Getter
         private String code;
         @Getter
         private String value;
-        /**
-         * 客户编码规则前缀
-         */
-        @Getter
-        private String prefix;
-        /**
-         * uid编码生成时的业务类型
-         */
-        @Getter
-        private String uidType;
 
-        OrganizationType(String code, String value, String prefix, String uidType) {
+        OrganizationType(String code, String value) {
             this.code = code;
             this.value = value;
-            this.prefix = prefix;
-            this.uidType = uidType;
         }
 
         /**
@@ -149,6 +140,7 @@ public class CustomerEnum {
 
         /**
          * 获取某个枚举值实例信息
+         *
          * @param code
          * @return
          */
@@ -165,7 +157,7 @@ public class CustomerEnum {
     /**
      * 客户性别枚举定义
      */
-    public enum Gender{
+    public enum Gender {
 
         MALE(1, "男"),
         FEMALE(2, "女"),
@@ -176,6 +168,7 @@ public class CustomerEnum {
         public Integer getCode() {
             return code;
         }
+
         public String getValue() {
             return value;
         }
@@ -188,12 +181,13 @@ public class CustomerEnum {
 
         /**
          * 获取某个枚举值实例信息
+         *
          * @param code
          * @return
          */
-        public static Gender getInstance(Integer code){
+        public static Gender getInstance(Integer code) {
             for (Gender gender : Gender.values()) {
-                if (gender.getCode().equals(code)){
+                if (gender.getCode().equals(code)) {
                     return gender;
                 }
             }
@@ -204,7 +198,7 @@ public class CustomerEnum {
     /**
      * 客户附件类别
      */
-    public enum AttachmentType{
+    public enum AttachmentType {
 
         /**
          * 营业执照
@@ -217,6 +211,7 @@ public class CustomerEnum {
         public Integer getCode() {
             return code;
         }
+
         public String getValue() {
             return value;
         }
@@ -228,12 +223,13 @@ public class CustomerEnum {
 
         /**
          * 获取某个枚举值实例信息
+         *
          * @param code
          * @return
          */
-        public static AttachmentType getInstance(Integer code){
+        public static AttachmentType getInstance(Integer code) {
             for (AttachmentType at : AttachmentType.values()) {
-                if (at.getCode().equals(code)){
+                if (at.getCode().equals(code)) {
                     return at;
                 }
             }
@@ -244,11 +240,8 @@ public class CustomerEnum {
     /**
      * 客户角色身份
      */
-    public enum CharacterType{
+    public enum CharacterType {
 
-        /**
-         * 营业执照
-         */
         经营户("business_user_character_type", "经营户"),
         买家("buyer_character_type", "买家"),
         其他类型("other_character_type", "其他类型"),
@@ -265,12 +258,13 @@ public class CustomerEnum {
 
         /**
          * 获取某个枚举值实例信息
+         *
          * @param code
          * @return
          */
-        public static CharacterType getInstance(String code){
+        public static CharacterType getInstance(String code) {
             for (CharacterType at : CharacterType.values()) {
-                if (at.getCode().equals(code)){
+                if (at.getCode().equals(code)) {
                     return at;
                 }
             }
@@ -279,16 +273,78 @@ public class CustomerEnum {
 
         /**
          * 获取某个枚举值实例信息
+         *
          * @param code
          * @return
          */
-        public static String getValueByCode(String code){
+        public static String getValueByCode(String code) {
             for (CharacterType at : CharacterType.values()) {
-                if (at.getCode().equals(code)){
+                if (at.getCode().equals(code)) {
                     return at.value;
                 }
             }
             return "";
         }
     }
+
+
+    /**
+     * 客户资料审核状态
+     */
+    public enum ApprovalStatus {
+
+        /**
+         * 待审核
+         */
+        WAIT_CONFIRM(1, "待审核"),
+        /**
+         * 已通过
+         */
+        PASSED(2, "已通过"),
+        /**
+         * 未通过
+         */
+        UN_PASS(3, "未通过"),
+        ;
+        @Getter
+        private Integer code;
+        @Getter
+        private String value;
+
+        ApprovalStatus(Integer code, String value) {
+            this.code = code;
+            this.value = value;
+        }
+
+        /**
+         * 获取某个枚举值实例信息
+         *
+         * @param code
+         * @return
+         */
+        public static ApprovalStatus getInstance(String code) {
+            for (ApprovalStatus as : ApprovalStatus.values()) {
+                if (as.getCode().equals(code)) {
+                    return as;
+                }
+            }
+            return null;
+        }
+
+        /**
+         * 获取某个枚举值实例信息
+         *
+         * @param code
+         * @return
+         */
+        public static String getValueByCode(Integer code) {
+            for (ApprovalStatus as : ApprovalStatus.values()) {
+                if (as.getCode().equals(code)) {
+                    return as.value;
+                }
+            }
+            return "";
+        }
+    }
+
 }

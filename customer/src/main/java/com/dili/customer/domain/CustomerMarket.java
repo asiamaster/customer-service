@@ -108,6 +108,25 @@ public class CustomerMarket extends BaseDomain {
     private String alias;
 
     /**
+     * 客户资料审核状态
+     * {@link com.dili.customer.sdk.enums.CustomerEnum.ApprovalStatus}
+     */
+    @Column(name = "`approval_status`")
+    private Integer approvalStatus;
+
+    /**
+     * 客户资料审核人
+     */
+    @Column(name = "`approval_user_id`")
+    private Long approvalUserId;
+
+    /**
+     * 客户资料审核时间
+     */
+    @Column(name = "`approval_time`")
+    private LocalDateTime approvalTime;
+
+    /**
      * 备注信息
      */
     @Column(name = "`notes`")
