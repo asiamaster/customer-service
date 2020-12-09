@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dili.customer.mapper.UserAccountMapper">
+    <resultMap id="BaseResultMap" type="com.dili.customer.domain.UserAccount">
+        <id column="id" property="id"/>
+        <result column="customer_id" property="customerCode"/>
+        <result column="customer_code" property="customerCode"/>
+        <result column="certificate_number" property="certificateNumber"/>
+        <result column="cellphone" property="cellphone" />
+        <result column="cellphone_valid" property="cellphoneValid" />
+        <result column="account_name" property="accountName"/>
+        <result column="account_code" property="accountCode"/>
+        <result column="password" property="password"/>
+        <result column="is_enable" property="isEnable"/>
+        <result column="wechat_terminal_code" property="wechatTerminalCode" />
+        <result column="avatar_url"  property="avatarUrl"/>
+        <result column="notes" property="notes"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modify_time" property="modifyTime"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <if test="cellphone != null and '' != cellphone">
+                and cellphone = #{cellphone}
+            </if>
+            <if test="accountCode != null and '' != accountCode">
+                and account_code = #{accountCode}
+            </if>
+            <if test="isEnable != null">
+                and is_enable = #{isEnable}
+            </if>
+            <if test="customerIdSet != null and customerIdSet.size() > 0">
+                and id in ( select account_id from customer_account_user where customer_id in
+                <foreach collection="customerIdSet" item="temp" open="(" close=")" separator=",">
+                    #{temp}
+                </foreach>
+                )
+            </if>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id,cellphone,account_name,account_code,password, is_enable,wechat_terminal_code,wechat_avatar_url,notes,operator_id,create_time,modify_time
+    </sql>
+    <select id="selectByQuery" parameterType="com.dili.customer.sdk.domain.dto.UserAccountQuery" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user_account
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        order by ${sortName} ${sortOrder}
+    </select>
+
+    <!-- 更改账号状态 -->
+    <update id="updateState">
+        update user_account set is_enable = #{isEnable} where id in
+        <foreach  collection="ids" item = "id" open="(" separator="," close=")" index="index">
+            #{id}
+        </foreach>
+    </update>
+
+</mapper>

@@ -11,4 +11,9 @@ public interface CustomerConstant {
      * redis key 前缀
      */
     String REDIS_KEY_PREFIX = "customer_service:";
+
+    /**
+     * 客户账号的默认密码
+     */
+    String DEFAULT_PASSWORD = "123456";
 }

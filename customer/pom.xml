@@ -142,6 +142,11 @@
             <artifactId>streamex</artifactId>
             <version>0.7.3</version>
         </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.11.0</version>
+        </dependency>
         <!-- 内部包  -->
         <dependency>
             <groupId>com.dili</groupId>

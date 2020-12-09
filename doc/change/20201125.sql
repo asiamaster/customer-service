@@ -104,3 +104,36 @@ INSERT INTO `uap`.`data_dictionary_value`(`dd_code`,`order_number`, `name`, `cod
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`,`order_number`, `name`, `code`, `description`, `state`) VALUES ('customer_business',18, '文化、体育和娱乐业', 'R', '',1);
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`,`order_number`, `name`, `code`, `description`, `state`) VALUES ('customer_business',19, '综合', 'S', '',1);
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`,`order_number`, `name`, `code`, `description`, `state`) VALUES ('customer_business',20, '其它', 'T', '',1);
+
+/*==============================================================*/
+/* Table: user_account         客户账号                                 */
+/*==============================================================*/
+drop table if exists user_account;
+create table user_account
+(
+    id                   bigint not null auto_increment comment '主键ID',
+    customer_id          bigint comment '所属客户',
+    certificate_number   varchar(40) comment '客户证件号',
+    customer_code        varchar(20) comment '客户编码',
+    cellphone            varchar(11) comment '手机号码',
+    account_name         varchar(50) comment '账号名称',
+    account_code         varchar(40) comment '用户账号',
+    password             varchar(100) comment '用户密码',
+    cellphone_valid      tinyint comment '手机号是否已验证',
+    is_enable            tinyint comment '是否启用',
+    wechat_terminal_code varchar(30) comment '微信终端号',
+    avatar_url           varchar(255) comment '头像地址',
+    notes                varchar(255) comment '备注',
+    operator_id          bigint comment '创建人',
+    create_time          datetime default CURRENT_TIMESTAMP comment '创建时间',
+    modify_time          datetime default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '修改时间',
+    primary key (id)
+);
+alter table user_account comment '用户账号信息';
+/*==============================================================*/
+/* Index: idx_user_account_code                                 */
+/*==============================================================*/
+create unique index idx_user_account_code on user_account
+(
+   account_code
+);

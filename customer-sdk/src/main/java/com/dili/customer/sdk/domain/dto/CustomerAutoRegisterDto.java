@@ -17,17 +17,17 @@ import javax.validation.constraints.Pattern;
 public class CustomerAutoRegisterDto {
 
     /**
-     * 客户编码
-     */
-    @NotBlank(message = "客户编码不能为空")
-    private String code;
-
-    /**
      * 联系电话
      */
     @NotBlank(message = "注册手机号不能为空")
     @Pattern(regexp = "^(1[3456789]\\d{9})$", message = "请输入正确的联系方式")
     private String contactsPhone;
+
+    /**
+     * 注册密码
+     */
+    @NotBlank(message = "注册密码不能为空")
+    private String password;
 
     /**
      * 来源系统
@@ -37,15 +37,10 @@ public class CustomerAutoRegisterDto {
     private String sourceSystem;
 
     /**
-     * 是否已实名认证  1-是 0-否
+     * 手机号是否已认证  1-是 0-否
      * {@link com.dili.commons.glossary.YesOrNoEnum}
      */
     @NotNull(message = "【是否已实名】不能为空")
-    private Integer isCertification;
+    private Integer isCellphoneValid;
 
-    /**
-     * 客户状态 0注销，1生效，2禁用....
-     * {@link com.dili.customer.sdk.enums.CustomerEnum.State}
-     */
-    private Integer state;
 }

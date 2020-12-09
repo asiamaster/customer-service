@@ -12,6 +12,7 @@ import com.dili.customer.mapper.CustomerMapper;
 import com.dili.customer.sdk.domain.dto.*;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.*;
+import com.dili.customer.service.remote.UidRpcService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
@@ -27,10 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,10 +41,14 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> implements CustomerService {
 
+    /**
+     * 客户编号生成策略类型
+     */
+    private static final String UID_TYPE = "customerCode";
+
     private CustomerMapper getActualMapper() {
         return (CustomerMapper) getDao();
     }
-
     private final CustomerMarketService customerMarketService;
     private final ContactsService contactsService;
     private final TallyingAreaService tallyingAreaService;
@@ -55,6 +57,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final CustomerConfig customerConfig;
     private final CharacterTypeService characterTypeService;
     private final VehicleInfoService vehicleInfoService;
+    private final UserAccountService userAccountService;
+    private final UidRpcService uidRpcService;
 
     @Override
     public Customer getBaseInfoByCertificateNumber(String certificateNumber) {
@@ -101,6 +105,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 }
                 customer = new Customer();
                 BeanUtils.copyProperties(baseInfo, customer);
+                customer.setCode(getCustomerCode());
                 customer.setCreatorId(baseInfo.getOperatorId());
                 customer.setCreateTime(LocalDateTime.now());
                 customer.setModifyTime(customer.getCreateTime());
@@ -448,16 +453,28 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public BaseOutput<Customer> autoRegister(CustomerAutoRegisterDto dto) {
         List<Customer> validatedCellphoneCustomerList = getValidatedCellphoneCustomer(dto.getContactsPhone());
         if (CollectionUtil.isNotEmpty(validatedCellphoneCustomerList)) {
             return BaseOutput.failure("您的联系电话系统已存在，请更换其他号码，谢谢！");
         }
+        Optional<UserAccount> byCellphone = userAccountService.getByCellphone(dto.getContactsPhone());
+        if (byCellphone.isPresent()) {
+            return BaseOutput.failure("您的联系电话系统已存在对应账号，请更换其他号码，谢谢！");
+        }
         Customer customer = BeanUtil.copyProperties(dto, Customer.class);
+        customer.setCode(getCustomerCode());
+        customer.setState(CustomerEnum.State.USELESS.getCode());
         customer.setCreateTime(LocalDateTime.now());
         customer.setModifyTime(customer.getCreateTime());
         customer.setSourceChannel("auto_register");
         this.insertSelective(customer);
+        UserAccount userAccount = new UserAccount();
+        userAccount.setCellphone(customer.getContactsPhone()).setCustomerId(customer.getId())
+                .setCustomerCode(customer.getCode()).setCellphoneValid(customer.getIsCellphoneValid())
+                .setAccountName(customer.getContactsPhone()).setAccountCode(customer.getContactsPhone()).setPassword(dto.getPassword());
+        userAccountService.add(userAccount);
         return BaseOutput.successData(customer);
     }
 
@@ -510,6 +527,14 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         queryPhone.setOrganizationType(organizationType);
         queryPhone.setContactsPhone(contactsPhone);
         return list(queryPhone);
+    }
+
+    /**
+     * 获取客户编码
+     * @return 客户编码
+     */
+    private String getCustomerCode() {
+        return uidRpcService.getBizNumber(UID_TYPE);
     }
 
 }
