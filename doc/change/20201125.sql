@@ -137,3 +137,5 @@ create unique index idx_user_account_code on user_account
 (
    account_code
 );
+## 更改附件类型为营业执照
+update attachment set file_type=1;

@@ -10,7 +10,7 @@ import cn.hutool.json.JSONUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.dili.commons.glossary.YesOrNoEnum;
-import com.dili.customer.constants.CustomerConstant;
+import com.dili.customer.constants.CustomerServiceConstant;
 import com.dili.customer.domain.UserAccount;
 import com.dili.customer.mapper.UserAccountMapper;
 import com.dili.customer.sdk.constants.SecurityConstant;
@@ -194,7 +194,7 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
      * @param saveData
      */
     private void setPassword(UserAccount saveData) {
-        saveData.setPassword(new BCryptPasswordEncoder().encode(CustomerConstant.DEFAULT_PASSWORD));
+        saveData.setPassword(new BCryptPasswordEncoder().encode(CustomerServiceConstant.DEFAULT_PASSWORD));
     }
 
     /**

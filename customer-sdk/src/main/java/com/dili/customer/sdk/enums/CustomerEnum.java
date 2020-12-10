@@ -1,8 +1,10 @@
 package com.dili.customer.sdk.enums;
 
+import com.google.common.collect.Lists;
 import lombok.Getter;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -203,10 +205,54 @@ public class CustomerEnum {
         /**
          * 营业执照
          */
-        营业执照(1, "营业执照"),
+        营业执照(1, "营业执照") {
+            @Override
+            public Set<OrganizationType> useFor() {
+                return Set.of(OrganizationType.INDIVIDUAL, OrganizationType.ENTERPRISE);
+            }
+        },
+        /**
+         * 食品经营许可证
+         */
+        食品经营许可证(2, "食品经营许可证") {
+            @Override
+            public Set<OrganizationType> useFor() {
+                return Set.of(OrganizationType.INDIVIDUAL, OrganizationType.ENTERPRISE);
+            }
+        },
+        /**
+         * 生产许可证
+         */
+        生产许可证(3, "生产许可证") {
+            @Override
+            public Set<OrganizationType> useFor() {
+                return Set.of(OrganizationType.INDIVIDUAL, OrganizationType.ENTERPRISE);
+            }
+        },
+        /**
+         * 法人证件
+         */
+        法人证件(4, "法人证件") {
+            @Override
+            public Set<OrganizationType> useFor() {
+                return Set.of(OrganizationType.ENTERPRISE);
+            }
+        },
+        /**
+         * 个人证件
+         */
+        个人证件(5, "个人证件") {
+            @Override
+            public Set<OrganizationType> useFor() {
+                return Set.of(OrganizationType.INDIVIDUAL);
+            }
+        },
         ;
         private Integer code;
         private String value;
+
+        //当前状态可流转到的下一状态定义
+        public abstract Set<OrganizationType> useFor();
 
         public Integer getCode() {
             return code;
@@ -235,6 +281,30 @@ public class CustomerEnum {
             }
             return null;
         }
+
+        /**
+         * 对比枚举值是否相等
+         * @param code
+         * @return
+         */
+        public Boolean equalsToCode(Integer code) {
+            return this.getCode().equals(code);
+        }
+
+        /**
+         * 根据组织类型获取该类型对应的附件类型
+         * @param organizationType
+         * @return
+         */
+        public static List<AttachmentType> getByOrganizationType(OrganizationType organizationType) {
+            List<AttachmentType> attachmentTypeList = Lists.newArrayList();
+            for (AttachmentType at : AttachmentType.values()) {
+                if (at.useFor().contains(organizationType)) {
+                    attachmentTypeList.add(at);
+                }
+            }
+            return attachmentTypeList;
+        }
     }
 
     /**
@@ -242,23 +312,28 @@ public class CustomerEnum {
      */
     public enum CharacterType {
 
-        经营户("business_user_character_type", "经营户"),
-        买家("buyer_character_type", "买家"),
-        其他类型("other_character_type", "其他类型"),
+        经营户("business_user_character_type", "经营户", Boolean.FALSE),
+        买家("buyer_character_type", "买家", Boolean.FALSE),
+        其他类型("other_character_type", "其他类型", Boolean.TRUE),
         ;
         @Getter
         private String code;
         @Getter
         private String value;
+        /**
+         * 子类是否多选
+         */
+        @Getter
+        private Boolean multiple;
 
-        CharacterType(String code, String value) {
+        CharacterType(String code, String value, Boolean multiple) {
             this.code = code;
             this.value = value;
+            this.multiple = multiple;
         }
 
         /**
          * 获取某个枚举值实例信息
-         *
          * @param code
          * @return
          */
@@ -273,7 +348,6 @@ public class CustomerEnum {
 
         /**
          * 获取某个枚举值实例信息
-         *
          * @param code
          * @return
          */
@@ -284,6 +358,15 @@ public class CustomerEnum {
                 }
             }
             return "";
+        }
+
+        /**
+         * 对比枚举值是否相等
+         * @param code
+         * @return
+         */
+        public Boolean equalsToCode(Integer code) {
+            return this.getCode().equals(code);
         }
     }
 

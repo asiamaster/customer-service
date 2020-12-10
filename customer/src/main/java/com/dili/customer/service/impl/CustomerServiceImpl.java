@@ -9,6 +9,7 @@ import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.config.CustomerConfig;
 import com.dili.customer.domain.*;
 import com.dili.customer.mapper.CustomerMapper;
+import com.dili.customer.sdk.constants.CustomerConstant;
 import com.dili.customer.sdk.domain.dto.*;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.*;
@@ -17,6 +18,7 @@ import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
+import com.dili.ss.redis.service.RedisUtil;
 import com.dili.ss.util.POJOUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -59,6 +61,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final VehicleInfoService vehicleInfoService;
     private final UserAccountService userAccountService;
     private final UidRpcService uidRpcService;
+    private final RedisUtil redisUtil;
 
     @Override
     public Customer getBaseInfoByCertificateNumber(String certificateNumber) {
@@ -455,6 +458,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public BaseOutput<Customer> autoRegister(CustomerAutoRegisterDto dto) {
+        String s = this.checkVerificationCode(dto.getContactsPhone(), CustomerConstant.REGISTER_SCENE_CODE, dto.getVerificationCode());
+        if (StrUtil.isNotBlank(s)){
+            return BaseOutput.failure(s);
+        }
         List<Customer> validatedCellphoneCustomerList = getValidatedCellphoneCustomer(dto.getContactsPhone());
         if (CollectionUtil.isNotEmpty(validatedCellphoneCustomerList)) {
             return BaseOutput.failure("您的联系电话系统已存在，请更换其他号码，谢谢！");
@@ -464,6 +471,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             return BaseOutput.failure("您的联系电话系统已存在对应账号，请更换其他号码，谢谢！");
         }
         Customer customer = BeanUtil.copyProperties(dto, Customer.class);
+        customer.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
         customer.setCode(getCustomerCode());
         customer.setState(CustomerEnum.State.USELESS.getCode());
         customer.setCreateTime(LocalDateTime.now());
@@ -537,4 +545,25 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         return uidRpcService.getBizNumber(UID_TYPE);
     }
 
+
+    /**
+     * 检查手机验证码是否有效
+     * @param cellphone 手机号
+     * @param sceneCode 验证码场景
+     * @param verificationCode 验证码
+     * @return 通过返回null，未通过，返回错误信息
+     */
+    private String checkVerificationCode(String cellphone, String sceneCode, String verificationCode) {
+        String redisKey = CustomerConstant.REDIS_KEY_PREFIX + "verificationCode:" + sceneCode + ":" + cellphone;
+        Object o = redisUtil.get(redisKey);
+        if (Objects.isNull(o)) {
+            return "验证码已失效";
+        }
+        String number = String.valueOf(o);
+        if (verificationCode.equalsIgnoreCase(number)) {
+            redisUtil.remove(redisKey);
+            return null;
+        }
+        return "验证码不正确";
+    }
 }

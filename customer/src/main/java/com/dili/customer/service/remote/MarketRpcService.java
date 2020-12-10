@@ -1,10 +1,8 @@
 package com.dili.customer.service.remote;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.dili.customer.constants.CustomerConstant;
+import com.dili.customer.constants.CustomerServiceConstant;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.redis.service.RedisUtil;
@@ -38,7 +36,7 @@ public class MarketRpcService {
      * @return
      */
     public Map<String, String> listForMap() {
-        String redisKey = CustomerConstant.REDIS_KEY_PREFIX + "firmMap";
+        String redisKey = CustomerServiceConstant.REDIS_KEY_PREFIX + "firmMap";
         Object o = redisUtil.get(redisKey);
         if (Objects.nonNull(o)) {
             return (Map<String, String>) JSONUtil.parse(o);

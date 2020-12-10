@@ -37,10 +37,9 @@ public class CustomerAutoRegisterDto {
     private String sourceSystem;
 
     /**
-     * 手机号是否已认证  1-是 0-否
-     * {@link com.dili.commons.glossary.YesOrNoEnum}
+     * 手机验证码
      */
-    @NotNull(message = "【是否已实名】不能为空")
-    private Integer isCellphoneValid;
+    @NotNull(message = "【手机验证码】不能为空")
+    private String verificationCode;
 
 }

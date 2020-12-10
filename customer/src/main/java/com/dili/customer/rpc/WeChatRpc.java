@@ -3,7 +3,7 @@ package com.dili.customer.rpc;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.dili.customer.constants.CustomerConstant;
+import com.dili.customer.constants.CustomerServiceConstant;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.redis.service.RedisUtil;
 import com.google.common.collect.Maps;
@@ -58,7 +58,7 @@ public class WeChatRpc {
             return BaseOutput.failure("code不能为空");
         }
         try {
-            String redisKey = CustomerConstant.REDIS_KEY_PREFIX + "wechat:applet:" + code;
+            String redisKey = CustomerServiceConstant.REDIS_KEY_PREFIX + "wechat:applet:" + code;
             Object o = redisUtil.get(redisKey);
             if (Objects.nonNull(o)) {
                 return BaseOutput.successData(String.valueOf(o));
