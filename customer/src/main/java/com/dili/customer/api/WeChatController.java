@@ -2,6 +2,7 @@ package com.dili.customer.api;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
+import com.dili.customer.domain.wechat.JsCode2Session;
 import com.dili.customer.rpc.WeChatRpc;
 import com.dili.customer.service.UserAccountService;
 import com.dili.ss.constant.ResultCode;
@@ -28,7 +29,7 @@ public class WeChatController {
     private final UserAccountService userAccountService;
 
     /**
-     * 小程序通过微信号登录凭证校验
+     * 通过微信号登录凭证校验
      * @param code 微信小程序获取的code
      */
     @PostMapping(value = "/appletLogin")
@@ -36,9 +37,9 @@ public class WeChatController {
         if (StrUtil.isBlank(code)) {
             return BaseOutput.failure("参数丢失").setCode(ResultCode.INVALID_REQUEST);
         }
-        BaseOutput<String> baseOutput = weChatRpc.code2session(code);
+        BaseOutput<JsCode2Session> baseOutput = weChatRpc.code2session(code);
         if (baseOutput.isSuccess()) {
-            return userAccountService.loginByWechat(baseOutput.getData());
+            return userAccountService.loginByWechat(baseOutput.getData().getOpenId());
         }
         return baseOutput;
     }
@@ -59,9 +60,9 @@ public class WeChatController {
         if (StrUtil.isBlank(code) || StrUtil.isBlank(cellphone) || StrUtil.isBlank(wechatAvatarUrl)) {
             return BaseOutput.failure("必要参数丢失");
         }
-        BaseOutput<String> baseOutput = weChatRpc.code2session(code);
+        BaseOutput<JsCode2Session> baseOutput = weChatRpc.code2session(code);
         if (baseOutput.isSuccess()) {
-            return userAccountService.bindingWechat(baseOutput.getData(), cellphone, wechatAvatarUrl);
+            return userAccountService.bindingWechat(baseOutput.getData().getOpenId(), cellphone, wechatAvatarUrl);
         }
         return baseOutput;
     }
@@ -77,5 +78,14 @@ public class WeChatController {
         String encryptedData = wxInfo.get("encryptedData");
         String iv = wxInfo.get("iv");
         return weChatRpc.decodePhone(sessionKey, encryptedData, iv);
+    }
+
+    /**
+     * 登录凭证校验
+     * @param code 微信小程序获取的code
+     */
+    @PostMapping(value = "/code2session")
+    public BaseOutput<JsCode2Session> code2session(@RequestParam("code") String code) {
+        return weChatRpc.code2session(code);
     }
 }

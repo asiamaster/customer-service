@@ -3,13 +3,12 @@ package com.dili.customer.rpc;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson.JSONObject;
-import com.dili.customer.constants.CustomerServiceConstant;
+import com.dili.customer.domain.wechat.AppletPhone;
+import com.dili.customer.domain.wechat.JsCode2Session;
 import com.dili.customer.utils.WeChatAppletAesUtil;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.redis.service.RedisUtil;
 import com.google.common.collect.Maps;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Component;
 import java.net.URLDecoder;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author yuehongbo
@@ -57,16 +55,11 @@ public class WeChatRpc {
      * @param code 临时登录凭证 code
      * @return BaseOutput
      */
-    public BaseOutput<String> code2session(String code) {
+    public BaseOutput<JsCode2Session> code2session(String code) {
         if (StringUtils.isBlank(code)) {
             return BaseOutput.failure("code不能为空");
         }
         try {
-            String redisKey = CustomerServiceConstant.REDIS_KEY_PREFIX + "wechat:applet:" + code;
-            Object o = redisUtil.get(redisKey);
-            if (Objects.nonNull(o)) {
-                return BaseOutput.successData(String.valueOf(o));
-            }
             Map params = Maps.newHashMap();
             params.put("appid", appletAppId);
             params.put("secret", appletSecret);
@@ -77,14 +70,11 @@ public class WeChatRpc {
             if (response.isOk()) {
                 String responseBody = response.body();
                 log.info("code2session responseBody << " + responseBody);
-                JSONObject jsonObject = JSONObject.parseObject(responseBody);
-                Integer errCode = jsonObject.getInteger("errcode");
-                if (null == errCode || errCode == 0) {
-                    String openId = jsonObject.getString("openid");
-                    redisUtil.set(redisKey, openId, 5L, TimeUnit.MINUTES);
-                    return BaseOutput.successData(openId);
+                JsCode2Session jsCode2Session = JsCode2Session.fromJson(responseBody);
+                if (Objects.isNull(jsCode2Session.getErrCode()) || jsCode2Session.getErrCode() == 0) {
+                    return BaseOutput.successData(jsCode2Session);
                 }
-                return BaseOutput.failure(jsonObject.getString("errmsg")).setCode(String.valueOf(errCode));
+                return BaseOutput.failure(jsCode2Session.getErrMsg()).setCode(String.valueOf(jsCode2Session.getErrCode()));
             } else {
                 response.close();
                 log.error(String.format("根据code[%s]调用微信小程序失败，response状态码[%d]", code, response.getStatus()));
@@ -116,31 +106,11 @@ public class WeChatRpc {
             log.info(String.format("解密手机号,decode值 == sessionKey:%s,encryptedData:%s,iv:%s", sessionKey, encryptedData, iv));
             String decryStr = WeChatAppletAesUtil.decrypt(encryptedData, sessionKey, iv);
             log.info(String.format("解密后手机号信息:%s", decryStr));
-            AppletPhone phone = JSONObject.parseObject(decryStr, AppletPhone.class);
+            AppletPhone phone = AppletPhone.fromJson(decryStr);
             return BaseOutput.successData(phone);
         } catch (Exception e) {
             log.error("解密手机号码错误", e);
             return BaseOutput.failure("解密手机号码错误");
         }
     }
-}
-
-/**
- * 解密后的手机号信息对象
- */
-@Data
-class AppletPhone{
-    /**
-     * 用户绑定的手机号（国外手机号会有区号）
-     */
-    private String phoneNumber;
-    /**
-     * 没有区号的手机号
-     */
-    private String purePhoneNumber;
-    /**
-     * 区号
-     */
-    private String countryCode;
-
 }
