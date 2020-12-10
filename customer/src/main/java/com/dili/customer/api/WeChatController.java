@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 /**
  * 微信端服务接口
  * @author yuehongbo
@@ -62,5 +64,18 @@ public class WeChatController {
             return userAccountService.bindingWechat(baseOutput.getData(), cellphone, wechatAvatarUrl);
         }
         return baseOutput;
+    }
+
+    /**
+     * 解密手机号
+     * @param wxInfo
+     * @return
+     */
+    @PostMapping(value = "/decodePhone")
+    public BaseOutput decodePhone(@RequestBody Map<String, String> wxInfo) {
+        String sessionKey = wxInfo.get("sessionKey");
+        String encryptedData = wxInfo.get("encryptedData");
+        String iv = wxInfo.get("iv");
+        return weChatRpc.decodePhone(sessionKey, encryptedData, iv);
     }
 }
