@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -53,8 +50,10 @@ public class AppletRequestAspect {
                 Object retValue = point.proceed();
                 return retValue;
             }
-            return BaseOutput.failure("小程序appId未配置");
+            log.warn(String.format("系统:%s,小程序:%s 无法识别", systemCode, appletCode));
+            return BaseOutput.failure("无法识别的请求程序");
         } else {
+            log.warn(String.format("未知的请求程序,系统:%s,小程序:%s ", systemCode, appletCode));
             return BaseOutput.failure("来源系统或程序识别码为空");
         }
     }

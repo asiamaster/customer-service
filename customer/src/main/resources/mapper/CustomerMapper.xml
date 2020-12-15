@@ -146,6 +146,10 @@
             /* 直接可用的，或者有租赁状态且已生效的 */
             and (ta.is_usable = 1 or (ta.is_lease=1 and ta.state=5)))
         </if>
+        <if test="null != vehicleNumber and vehicleNumber !=''">
+            and c.id in
+            (select customer_id from vehicle_info vi where vi.market_id=#{marketId} and vi.registration_number = #{vehicleNumber})
+        </if>
         <if test="null != hasLicense">
             <if test="hasLicense == 1">
                 and c.id in

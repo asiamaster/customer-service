@@ -2,6 +2,7 @@ package com.dili.customer.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.BadPaddingException;
@@ -15,6 +16,7 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.Security;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * 微信小程序解密工具类
@@ -34,14 +36,12 @@ public class WeChatAppletAesUtil {
      * 加解密算法/模式/填充方式
      */
     private static final String ALGORITHM = "AES/CBC/PKCS7Padding";
-    /**
-     * key
-     */
-    private static Key key;
-    private static Cipher cipher;
 
-    public static void init(byte[] keyBytes) {
+
+    public static Pair<Key, Cipher> init(byte[] keyBytes) {
         try {
+            Key key;
+            Cipher cipher;
             int base = 16;
             if (keyBytes.length % base != 0) {
                 int groups = keyBytes.length / base + (keyBytes.length % base != 0 ? 1 : 0);
@@ -54,24 +54,32 @@ public class WeChatAppletAesUtil {
             key = new SecretKeySpec(keyBytes, KEY_ALGORITHM);
             // 初始化cipher
             cipher = Cipher.getInstance(ALGORITHM);
+            return Pair.of(key, cipher);
         } catch (Exception e) {
             log.error("init AppletRequest Key error", e);
+            return null;
         }
     }
+
 
     /**
      * 解密方法
      *
      * @param encryptedDataStr 要解密的字符串
-     * @param keyBytesStr      解密密钥
+     * @param sessionKeyStr      解密密钥
      * @return
      */
-    public static String decrypt(String encryptedDataStr, String keyBytesStr, String ivStr) throws BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException, InvalidAlgorithmParameterException, InvalidKeyException {
+    public static String decrypt(String encryptedDataStr, String sessionKeyStr, String ivStr) throws BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException, InvalidAlgorithmParameterException, InvalidKeyException {
         String decryStr = "";
-        byte[] sessionKey = Base64.decodeBase64(keyBytesStr);
+        byte[] sessionKey = Base64.decodeBase64(sessionKeyStr);
         byte[] encryptedData = Base64.decodeBase64(encryptedDataStr);
         byte[] iv = Base64.decodeBase64(ivStr);
-        init(sessionKey);
+        Pair<Key, Cipher> pair = init(sessionKey);
+        if (Objects.isNull(pair)) {
+            return null;
+        }
+        Key key = pair.getLeft();
+        Cipher cipher = pair.getRight();
         cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
         byte[] encryptedText = cipher.doFinal(encryptedData);
         if (encryptedText != null) {

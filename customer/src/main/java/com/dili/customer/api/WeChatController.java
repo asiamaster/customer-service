@@ -5,6 +5,7 @@ import cn.hutool.json.JSONObject;
 import com.dili.customer.annotation.AppletRequest;
 import com.dili.customer.domain.wechat.AppletSystemInfo;
 import com.dili.customer.domain.wechat.JsCode2Session;
+import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.domain.wechat.WeChatRegisterDto;
 import com.dili.customer.rpc.WeChatRpc;
 import com.dili.customer.service.UserAccountService;
@@ -38,7 +39,7 @@ public class WeChatController {
      */
     @AppletRequest
     @PostMapping(value = "/appletLogin")
-    public BaseOutput login(@RequestParam("code") String code) {
+    public BaseOutput<LoginSuccessData> login(@RequestParam("code") String code) {
         if (StrUtil.isBlank(code)) {
             return BaseOutput.failure("参数丢失").setCode(ResultCode.INVALID_REQUEST);
         }
@@ -46,7 +47,7 @@ public class WeChatController {
         if (baseOutput.isSuccess()) {
             return userAccountService.loginByWechat(baseOutput.getData().getOpenId());
         }
-        return baseOutput;
+        return BaseOutput.failure(baseOutput.getMessage()).setCode(baseOutput.getCode());
     }
 
     /**

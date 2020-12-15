@@ -91,6 +91,15 @@ public class CustomerEnum {
             }
             return null;
         }
+
+        /**
+         * 对比枚举值是否相等
+         * @param code
+         * @return
+         */
+        public Boolean equalsToCode(String code) {
+            return this.getCode().equals(code);
+        }
     }
 
     /**

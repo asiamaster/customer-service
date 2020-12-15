@@ -5,6 +5,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.validation.BeanValidationResult;
+import cn.hutool.extra.validation.ValidationUtil;
 import cn.hutool.json.JSONUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -22,7 +24,6 @@ import com.dili.customer.service.UserAccountService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
-import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author yuehongbo
@@ -61,6 +65,7 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
             return BaseOutput.failure("原始密码不正确").setCode(ResultCode.DATA_ERROR).setData(false);
         }
         userAccount.setPassword(encoder.encode(newPassword));
+        userAccount.setChangedPwdTime(LocalDateTime.now());
         this.update(userAccount);
         return BaseOutput.successData(true);
     }
@@ -110,7 +115,7 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
     }
 
     @Override
-    public BaseOutput loginByWechat(String terminalCode) {
+    public BaseOutput<LoginSuccessData> loginByWechat(String terminalCode) {
         Optional<UserAccount> byWechat = this.getByWechat(terminalCode);
         UserAccount userAccount = null;
         if (byWechat.isPresent()){
@@ -162,6 +167,7 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
         UserAccount queryCondition = new UserAccount();
         queryCondition.setCellphone(cellphone);
         queryCondition.setCellphoneValid(YesOrNoEnum.YES.getCode());
+        queryCondition.setDeleted(YesOrNoEnum.NO.getCode());
         List<UserAccount> accountList = this.list(queryCondition);
         return accountList.stream().findFirst();
     }
@@ -187,6 +193,10 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
     public BaseOutput weChatRegister(WeChatRegisterDto dto, String system, Boolean login) {
         if (Objects.isNull(dto)) {
             return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
+        }
+        BeanValidationResult beanValidationResult = ValidationUtil.warpValidate(dto);
+        if (!beanValidationResult.isSuccess()) {
+            return BaseOutput.failure(beanValidationResult.getErrorMessages().get(0).getMessage()).setCode(ResultCode.PARAMS_ERROR);
         }
         /**
          * 根据微信openId获取微信绑定账号
@@ -261,6 +271,7 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
         }
         UserAccount condition = new UserAccount();
         condition.setCertificateNumber(certificateNumber);
+        condition.setDeleted(YesOrNoEnum.NO.getCode());
         Optional<UserAccount> optional = this.list(condition).stream().findFirst();
         if (optional.isEmpty()) {
             return BaseOutput.failure("账号或密码不正确").setCode(ResultCode.UNAUTHORIZED);
@@ -280,15 +291,12 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
     public Optional<UserAccount> getByCustomerId(Long customerId) {
         UserAccount condition = new UserAccount();
         condition.setCustomerId(customerId);
+        condition.setDeleted(YesOrNoEnum.NO.getCode());
         return list(condition).stream().findFirst();
     }
 
-    /**
-     * 组装返回登录成功后的数据
-     * @param userAccount 登录成功的账号信息
-     * @return
-     */
-    private LoginSuccessData getLoginSuccessData(UserAccount userAccount) {
+    @Override
+    public LoginSuccessData getLoginSuccessData(UserAccount userAccount) {
         String token = getToken(userAccount);
         userAccount.setPassword("");
         LoginSuccessData loginSuccessData = new LoginSuccessData();
@@ -308,6 +316,7 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
         }
         UserAccount queryCondition = new UserAccount();
         queryCondition.setWechatTerminalCode(terminalCode);
+        queryCondition.setDeleted(YesOrNoEnum.NO.getCode());
         List<UserAccount> accountList = this.list(queryCondition);
         return accountList.stream().findFirst();
     }
@@ -323,6 +332,8 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
             saveData.setIsEnable(YesOrNoEnum.YES.getCode());
             saveData.setCreateTime(saveData.getModifyTime());
             saveData.setAccountCode("c_" + IdUtil.getSnowflake(1, 1).nextIdStr());
+            saveData.setDeleted(YesOrNoEnum.NO.getCode());
+            saveData.setChangedPwdTime(saveData.getModifyTime());
         }
     }
 

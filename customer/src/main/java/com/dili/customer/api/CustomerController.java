@@ -3,19 +3,19 @@ package com.dili.customer.api;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.domain.Customer;
+import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.sdk.domain.dto.*;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.sdk.validator.*;
 import com.dili.customer.service.CustomerService;
+import com.dili.customer.service.UserAccountService;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +36,7 @@ import java.util.Objects;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final UserAccountService userAccountService;
 
     /**
      * 分页查询客户数据集
@@ -273,11 +274,12 @@ public class CustomerController {
 
     /**
      * 完善企业客户信息
+     * 由于可能会有账号合并的情况，所以会自动重新登录并返回登录信息
      * @param input 待完善的信息
      * @return
      */
     @PostMapping(value = "/completeEnterprise")
-    public BaseOutput<Boolean> completeEnterprise(@Validated({CompleteView.class, Default.class, EnterpriseCompleteView.class}) @RequestBody CustomerUpdateInput input, BindingResult bindingResult) {
+    public BaseOutput<LoginSuccessData> completeEnterprise(@Validated({CompleteView.class, Default.class, EnterpriseCompleteView.class}) @RequestBody CustomerUpdateInput input, BindingResult bindingResult) {
         log.info(String.format("企业客户信息完善:%s", JSONUtil.toJsonStr(input)));
         if (bindingResult.hasErrors()) {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
@@ -288,11 +290,12 @@ public class CustomerController {
 
     /**
      * 完善企业客户信息
+     * 由于可能会有账号合并的情况，所以会自动重新登录并返回登录信息
      * @param input 待完善的信息
      * @return
      */
     @PostMapping(value = "/completeIndividual")
-    public BaseOutput<Boolean> completeIndividual(@Validated({CompleteView.class, Default.class}) @RequestBody CustomerUpdateInput input, BindingResult bindingResult) {
+    public BaseOutput<LoginSuccessData> completeIndividual(@Validated({CompleteView.class, Default.class}) @RequestBody CustomerUpdateInput input, BindingResult bindingResult) {
         log.info(String.format("个人客户信息完善:%s", JSONUtil.toJsonStr(input)));
         if (bindingResult.hasErrors()) {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
@@ -306,10 +309,13 @@ public class CustomerController {
      * @param input
      * @return
      */
-    private BaseOutput<Boolean> completeInfo(CustomerUpdateInput input) {
+    private BaseOutput<LoginSuccessData> completeInfo(CustomerUpdateInput input) {
         try {
-            customerService.completeInfo(input);
-            return BaseOutput.successData(true);
+            BaseOutput<Customer> customerBaseOutput = customerService.completeInfo(input);
+            if (customerBaseOutput.isSuccess()) {
+                return BaseOutput.successData(userAccountService.getLoginSuccessData(userAccountService.getByCellphone(input.getContactsPhone()).get()));
+            }
+            return BaseOutput.failure(customerBaseOutput.getMessage());
         } catch (Exception e) {
             log.error(String.format("完善信息数据：%s 异常:%s", JSONUtil.toJsonStr(input), e.getMessage()), e);
             return BaseOutput.failure("系统异常").setData(false);

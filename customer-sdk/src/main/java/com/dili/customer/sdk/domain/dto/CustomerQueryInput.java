@@ -42,4 +42,9 @@ public class CustomerQueryInput extends CustomerBaseQueryInput {
      */
     private Integer hasLicense;
 
+    /**
+     * 客户车牌号
+     */
+    private String vehicleNumber;
+
 }

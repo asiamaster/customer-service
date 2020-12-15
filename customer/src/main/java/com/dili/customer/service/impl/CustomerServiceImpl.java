@@ -2,6 +2,7 @@ package com.dili.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -497,14 +498,61 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (Objects.isNull(customer)) {
             return BaseOutput.failure("客户信息不存在");
         }
+        //获取当前登录可以对应的账号信息
+        Optional<UserAccount> accountCustomer = userAccountService.getByCustomerId(input.getId());
+        UserAccount accountData = null;
+        if (accountCustomer.isPresent()) {
+            accountData = accountCustomer.get();
+        }
+        /**
+         * 检查是否已存在对应证件号的客户，如果已存在，则需要合并客户信息
+         */
         Customer baseInfoByCertificateNumber = getBaseInfoByCertificateNumber(input.getCertificateNumber());
         if (Objects.nonNull(baseInfoByCertificateNumber)) {
-            return BaseOutput.failure("对应证件号的客户已存在");
+            if (!StrUtil.equalsIgnoreCase(baseInfoByCertificateNumber.getOrganizationType(),input.getOrganizationType())){
+                return BaseOutput.failure("已存在证件号相同，组织类型不同的客户信息");
+            }
+            //复制数据库已有值到客户对象中
+            BeanUtil.copyProperties(baseInfoByCertificateNumber, customer);
+            /**
+             * 获取数据库已有证件号对应的账号信息
+             * 如果已经存在，则需要把当前账号信息合并到已有账号中
+             * 如果不存在，则可直接用当前账号信息
+             */
+            Optional<UserAccount> byCustomerId = userAccountService.getByCustomerId(baseInfoByCertificateNumber.getId());
+            if (byCustomerId.isPresent()){
+                customer.setContactsPhone(input.getContactsPhone());
+                customer.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
+                UserAccount userAccount = byCustomerId.get();
+                if (Objects.nonNull(accountData)){
+                    userAccount.setChangedPwdTime(accountData.getChangedPwdTime()).setWechatTerminalCode(accountData.getWechatTerminalCode()).setAvatarUrl(accountData.getAvatarUrl());
+                    accountData.setNewAccountId(userAccount.getId());
+                    accountData.setDeleted(YesOrNoEnum.YES.getCode());
+                    userAccountService.update(accountData);
+                }
+                userAccount.setPassword(accountData.getPassword());
+                userAccount.setCellphone(input.getContactsPhone()).setCellphoneValid(YesOrNoEnum.YES.getCode());
+                userAccountService.update(userAccount);
+            }
+        } else {
+            if (CustomerEnum.OrganizationType.INDIVIDUAL.equalsToCode(input.getOrganizationType())) {
+                if (!IdcardUtil.isValidCard(input.getCertificateNumber())) {
+                    return BaseOutput.failure("个人证件号码错误");
+                }
+            }
+            customer.setName(input.getName());
+            customer.setOrganizationType(input.getOrganizationType());
+            customer.setCertificateNumber(input.getCertificateNumber());
+            customer.setCertificateType(input.getCertificateType());
         }
-        customer.setName(input.getName());
-        customer.setOrganizationType(input.getOrganizationType());
-        customer.setCertificateNumber(input.getCertificateNumber());
-        customer.setCertificateType(input.getCertificateType());
+        if (Objects.isNull(accountData)){
+            accountData = new UserAccount();
+        }
+        accountData.setCustomerId(customer.getId()).setCustomerCode(customer.getCode()).setCertificateNumber(customer.getCertificateNumber());
+        if (StrUtil.isBlank(accountData.getAccountName())){
+            accountData.setAccountName(customer.getName());
+        }
+        userAccountService.insertOrUpdate(accountData);
         CustomerCertificateInput customerCertificate = input.getCustomerCertificate();
         if (Objects.nonNull(customerCertificate)) {
             customer.setCorporationName(customerCertificate.getCorporationName());

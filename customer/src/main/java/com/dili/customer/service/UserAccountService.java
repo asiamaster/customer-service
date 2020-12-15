@@ -6,7 +6,6 @@ import com.dili.customer.domain.wechat.WeChatRegisterDto;
 import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
 
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -56,7 +55,7 @@ public interface UserAccountService extends BaseService<UserAccount, Long> {
      * @param terminalCode 微信终端号
      * @return
      */
-    BaseOutput loginByWechat(String terminalCode);
+    BaseOutput<LoginSuccessData> loginByWechat(String terminalCode);
 
     /**
      * 客户微信绑定
@@ -111,4 +110,11 @@ public interface UserAccountService extends BaseService<UserAccount, Long> {
      * @return
      */
     Optional<UserAccount> getByCustomerId(Long customerId);
+
+    /**
+     * 组装返回登录成功后的数据
+     * @param userAccount 登录成功的账号信息
+     * @return
+     */
+    LoginSuccessData getLoginSuccessData(UserAccount userAccount);
 }

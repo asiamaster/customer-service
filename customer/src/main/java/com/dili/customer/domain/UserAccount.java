@@ -118,6 +118,28 @@ public class UserAccount extends BaseDomain implements Serializable {
     private String notes;
 
     /**
+     * 密码修改时间
+     */
+    @Column(name = "changed_pwd_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime changedPwdTime;
+
+    /**
+     * 是否已删除
+     * {@link com.dili.commons.glossary.YesOrNoEnum}
+     */
+    @Column(name = "deleted")
+    private Integer deleted;
+
+    /**
+     * 账号合并后的ID
+     */
+    @Column(name = "new_account_id")
+    @JsonIgnore
+    private Long newAccountId;
+
+    /**
      * 创建人ID
      */
     @Column(name = "operator_id", updatable = false)

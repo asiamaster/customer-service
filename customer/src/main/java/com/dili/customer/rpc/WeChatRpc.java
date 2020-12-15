@@ -10,7 +10,6 @@ import com.dili.customer.domain.wechat.AppletSystemInfo;
 import com.dili.customer.domain.wechat.JsCode2Session;
 import com.dili.customer.utils.WeChatAppletAesUtil;
 import com.dili.ss.domain.BaseOutput;
-import com.dili.ss.redis.service.RedisUtil;
 import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -95,6 +94,9 @@ public class WeChatRpc {
         try {
             String decryStr = WeChatAppletAesUtil.decrypt(encryptedData, sessionKey, iv);
             log.info(String.format("解密后手机号信息:%s", decryStr));
+            if (StrUtil.isBlank(decryStr)) {
+                return BaseOutput.failure("解密手机号码为空");
+            }
             AppletPhone phone = AppletPhone.fromJson(decryStr);
             return BaseOutput.successData(phone);
         } catch (Exception e) {

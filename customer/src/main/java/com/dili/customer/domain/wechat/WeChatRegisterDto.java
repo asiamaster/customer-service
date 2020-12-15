@@ -2,6 +2,8 @@ package com.dili.customer.domain.wechat;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * 微信注册实体类型
  * @author yuehongbo
@@ -16,16 +18,17 @@ public class WeChatRegisterDto {
      */
     private String nickName;
 
-   /**
+    /**
      * 手机号
      */
+    @NotBlank(message = "手机号不能为空")
     private String cellphone;
 
     /**
      * 开放ID
      */
+    @NotBlank(message = "微信openId不能为空")
     private String openId;
-
     /**
      * 头像
      */
