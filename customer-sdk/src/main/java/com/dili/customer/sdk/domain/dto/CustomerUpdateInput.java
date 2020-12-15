@@ -1,12 +1,16 @@
 package com.dili.customer.sdk.domain.dto;
 
 import com.dili.customer.sdk.domain.*;
+import com.dili.customer.sdk.validator.CompleteView;
+import com.dili.customer.sdk.validator.UpdateView;
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 
@@ -36,15 +40,28 @@ public class CustomerUpdateInput implements Serializable {
     private String name;
 
     /**
+     * 证件类型
+     */
+    @NotBlank(message = "客户证件类型不能为空", groups = {CompleteView.class})
+    private String certificateType;
+
+    /**
+     * 证件号
+     */
+    @NotBlank(message = "客户证件号不能为空", groups = {CompleteView.class})
+    @Size(min = 1, max = 40, message = "证件号码请保持在40个字以内")
+    private String certificateNumber;
+
+    /**
      * 客户状态 0注销，1生效，2禁用，
      */
-    @NotNull(message = "客户状态不能为空")
+    @NotNull(message = "客户状态不能为空",groups = {UpdateView.class})
     private Integer state;
 
     /**
      * 联系电话
      */
-    @NotBlank(message = "联系电话不能为空")
+    @NotBlank(message = "联系电话不能为空",groups = {UpdateView.class})
     @Pattern(regexp = "^(1[3456789]\\d{9})$", message = "请输入正确的联系方式")
     private String contactsPhone;
 
@@ -69,6 +86,7 @@ public class CustomerUpdateInput implements Serializable {
     /**
      * 联系人信息
      */
+    @Valid
     private List<Contacts> contactsList;
 
     /**
@@ -102,5 +120,11 @@ public class CustomerUpdateInput implements Serializable {
      */
     @Valid
     private List<VehicleInfo> vehicleInfoList;
+
+    /**
+     * 客户附件信息
+     */
+    @Valid
+    private List<Attachment> attachmentList;
 
 }

@@ -26,6 +26,7 @@ import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,9 +60,12 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final CustomerConfig customerConfig;
     private final CharacterTypeService characterTypeService;
     private final VehicleInfoService vehicleInfoService;
-    private final UserAccountService userAccountService;
     private final UidRpcService uidRpcService;
     private final RedisUtil redisUtil;
+    private final AttachmentService attachmentService;
+
+    @Autowired
+    private UserAccountService userAccountService;
 
     @Override
     public Customer getBaseInfoByCertificateNumber(String certificateNumber) {
@@ -91,6 +95,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             //根据证件号判断客户是否已存在
             customer = getBaseInfoByCertificateNumber(baseInfo.getCertificateNumber());
             if (null == customer) {
+                Integer countByContactsPhone = this.countByContactsPhone(baseInfo.getContactsPhone());
+                if (countByContactsPhone > 0) {
+                    return BaseOutput.failure("该手机号已被其他客户验证");
+                }
                 /**
                  * 身份证号对应的客户不存在，手机号对应的客户已存在，则认为手机号已被使用
                  * 个人客户中，手机号不允许重复，企业客户中，手机号允许重复
@@ -115,6 +123,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customer.setState(CustomerEnum.State.NORMAL.getCode());
                 customer.setIsDelete(0);
                 super.insertSelective(customer);
+
             } else {
                 if (!customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())) {
                     return BaseOutput.failure("已存在相同证件号的客户").setCode(ResultCode.DATA_ERROR);
@@ -458,32 +467,165 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public BaseOutput<Customer> autoRegister(CustomerAutoRegisterDto dto) {
+        //验证短信验证码是否正确
         String s = this.checkVerificationCode(dto.getContactsPhone(), CustomerConstant.REGISTER_SCENE_CODE, dto.getVerificationCode());
-        if (StrUtil.isNotBlank(s)){
+        if (StrUtil.isNotBlank(s)) {
             return BaseOutput.failure(s);
-        }
-        List<Customer> validatedCellphoneCustomerList = getValidatedCellphoneCustomer(dto.getContactsPhone());
-        if (CollectionUtil.isNotEmpty(validatedCellphoneCustomerList)) {
-            return BaseOutput.failure("您的联系电话系统已存在，请更换其他号码，谢谢！");
         }
         Optional<UserAccount> byCellphone = userAccountService.getByCellphone(dto.getContactsPhone());
         if (byCellphone.isPresent()) {
             return BaseOutput.failure("您的联系电话系统已存在对应账号，请更换其他号码，谢谢！");
         }
-        Customer customer = BeanUtil.copyProperties(dto, Customer.class);
+        BaseOutput<Customer> customerBaseOutput = this.insertByContactsPhone(dto.getContactsPhone(), dto.getSourceSystem());
+        if (customerBaseOutput.isSuccess()) {
+            Customer customer = customerBaseOutput.getData();
+            UserAccount userAccount = new UserAccount();
+            userAccount.setCellphone(customer.getContactsPhone()).setCustomerId(customer.getId())
+                    .setCustomerCode(customer.getCode()).setCellphoneValid(customer.getIsCellphoneValid())
+                    .setAccountName(customer.getContactsPhone()).setAccountCode(customer.getContactsPhone()).setPassword(dto.getPassword());
+            userAccountService.add(userAccount);
+            return BaseOutput.successData(customer);
+        } else {
+            return BaseOutput.failure(customerBaseOutput.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public BaseOutput<Customer> completeInfo(CustomerUpdateInput input) {
+        Customer customer = this.get(input.getId());
+        if (Objects.isNull(customer)) {
+            return BaseOutput.failure("客户信息不存在");
+        }
+        Customer baseInfoByCertificateNumber = getBaseInfoByCertificateNumber(input.getCertificateNumber());
+        if (Objects.nonNull(baseInfoByCertificateNumber)) {
+            return BaseOutput.failure("对应证件号的客户已存在");
+        }
+        customer.setName(input.getName());
+        customer.setOrganizationType(input.getOrganizationType());
+        customer.setCertificateNumber(input.getCertificateNumber());
+        customer.setCertificateType(input.getCertificateType());
+        CustomerCertificateInput customerCertificate = input.getCustomerCertificate();
+        if (Objects.nonNull(customerCertificate)) {
+            customer.setCorporationName(customerCertificate.getCorporationName());
+            if (StrUtil.isNotBlank(customerCertificate.getCorporationCertificateNumber())) {
+                customer.setCorporationCertificateNumber(customerCertificate.getCorporationCertificateNumber());
+                if (StrUtil.isBlank(customerCertificate.getCorporationCertificateType())) {
+                    customer.setCorporationCertificateType("ID");
+                } else {
+                    customer.setCorporationCertificateType(customerCertificate.getCorporationCertificateType());
+                }
+            }
+        }
+        this.update(customer);
+        CustomerMarket customerMarket = BeanUtil.copyProperties(input.getCustomerMarket(), CustomerMarket.class, "id");
+        CustomerMarket old = customerMarketService.queryByMarketAndCustomerId(customer.getId(), customerMarket.getCustomerId());
+        if (Objects.nonNull(old)) {
+            old.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
+            old.setBusinessNature(customerMarket.getBusinessNature());
+            customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
+            customerMarket.setApprovalUserId(null);
+            customerMarket.setApprovalTime(null);
+            customerMarketService.update(old);
+        } else {
+            customerMarket.setCustomerId(customer.getId());
+            customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
+            customerMarket.setCreateTime(LocalDateTime.now());
+            customerMarket.setModifyTime(customerMarket.getCreateTime());
+            customerMarketService.insert(customerMarket);
+        }
+        //更新客户经营品类信息
+        if (CollectionUtil.isNotEmpty(input.getBusinessCategoryList())) {
+            List<BusinessCategory> businessCategoryList = JSONArray.parseArray(JSONObject.toJSONString(input.getBusinessCategoryList()), BusinessCategory.class);
+            businessCategoryService.saveInfo(businessCategoryList, customer.getId(), customerMarket.getMarketId());
+        }
+        /**
+         * 如果客户理货区不为空，则保存对应的理货区信息
+         */
+        if (CollectionUtil.isNotEmpty(input.getTallyingAreaList())) {
+            List<TallyingArea> tallyingAreaList = JSONArray.parseArray(JSONObject.toJSONString(input.getTallyingAreaList()), TallyingArea.class);
+            tallyingAreaService.saveInfo(tallyingAreaList, customer.getId(), customerMarket.getMarketId());
+        } else {
+            //如果传入的客户理货区为空，则表示该客户在该市场没有租赁理货区(手动关联的，可编辑)，所有可以直接删除
+            tallyingAreaService.deleteByCustomerId(customer.getId(), customerMarket.getMarketId());
+        }
+        //更新客户经营品类信息
+        if (CollectionUtil.isNotEmpty(input.getBusinessCategoryList())) {
+            List<BusinessCategory> businessCategoryList = JSONArray.parseArray(JSONObject.toJSONString(input.getBusinessCategoryList()), BusinessCategory.class);
+            businessCategoryService.saveInfo(businessCategoryList, customer.getId(), customerMarket.getMarketId());
+        }
+        //组装保存客户角色身份信息
+        if (CollectionUtil.isNotEmpty(input.getCharacterTypeList())){
+            List<CharacterType> characterTypeList = JSONArray.parseArray(JSONObject.toJSONString(input.getCharacterTypeList()), CharacterType.class);
+            characterTypeService.saveInfo(characterTypeList,customer.getId(),customerMarket.getMarketId());
+            customer.setCharacterTypeList(characterTypeList);
+        }
+        //组装保存客户附件信息
+        if (CollectionUtil.isNotEmpty(input.getAttachmentList())) {
+            List<Attachment> attachmentList = JSONArray.parseArray(JSONObject.toJSONString(input.getAttachmentList()), Attachment.class);
+            attachmentService.batchSave(attachmentList, customer.getId(), customerMarket.getMarketId());
+        }
+        return BaseOutput.successData(customer);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public BaseOutput<Customer> insertByContactsPhone(String contactsPhone, String sourceSystem) {
+        List<Customer> validatedCellphoneCustomerList = getValidatedCellphoneCustomer(contactsPhone);
+        if (CollectionUtil.isNotEmpty(validatedCellphoneCustomerList)) {
+            return BaseOutput.failure("您的联系电话系统已存在，请更换其他号码，谢谢！");
+        }
+        Customer customer = new Customer();
         customer.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
         customer.setCode(getCustomerCode());
         customer.setState(CustomerEnum.State.USELESS.getCode());
         customer.setCreateTime(LocalDateTime.now());
         customer.setModifyTime(customer.getCreateTime());
+        customer.setSourceSystem(sourceSystem);
         customer.setSourceChannel("auto_register");
         this.insertSelective(customer);
-        UserAccount userAccount = new UserAccount();
-        userAccount.setCellphone(customer.getContactsPhone()).setCustomerId(customer.getId())
-                .setCustomerCode(customer.getCode()).setCellphoneValid(customer.getIsCellphoneValid())
-                .setAccountName(customer.getContactsPhone()).setAccountCode(customer.getContactsPhone()).setPassword(dto.getPassword());
-        userAccountService.add(userAccount);
         return BaseOutput.successData(customer);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String updateCellphoneValid(Long customerId, String cellphone) {
+        if (Objects.isNull(customerId) || StrUtil.isBlank(cellphone)) {
+            return "必要参数丢失";
+        }
+        //先检查此手机号是否已被其它客户认证
+        Integer countByContactsPhone = this.countByContactsPhone(cellphone);
+        if (countByContactsPhone > 0) {
+            return "该手机号已被认证";
+        }
+        Customer data = get(customerId);
+        //查询此验证手机号对应的验证客户
+        Optional<UserAccount> byCellphone = userAccountService.getByCellphone(cellphone);
+        Optional<UserAccount> byCustomerId = userAccountService.getByCustomerId(data.getId());
+        UserAccount userAccount = null;
+        /**
+         * 如果已存在验证的手机号对应的账号
+         * 则需要判断此账号有无对应的客户证件信息(微信一键注册等可能会还没有对应的客户账号信息)
+         */
+        if (byCellphone.isPresent()) {
+            UserAccount byCellphoneData = byCellphone.get();
+            if (StrUtil.isNotBlank(byCellphoneData.getCertificateNumber())) {
+                return "该手机号已认证";
+            }
+        }
+        if (byCustomerId.isPresent()) {
+            userAccount = byCustomerId.get();
+        }
+        if (Objects.isNull(userAccount)) {
+            userAccount = new UserAccount();
+
+        }
+        userAccount.setCertificateNumber(data.getCertificateNumber()).setCustomerId(data.getId()).setCustomerCode(data.getCode())
+                .setAccountName(data.getName()).setCellphone(cellphone).setCellphoneValid(YesOrNoEnum.YES.getCode());
+        userAccountService.insertOrUpdate(userAccount);
+        data.setContactsPhone(cellphone);
+        data.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
+        return null;
     }
 
 
@@ -538,13 +680,24 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     }
 
     /**
+     * 根据手机号，获取此手机号已认证的数量
+     * @param contactsPhone
+     * @return
+     */
+    private Integer countByContactsPhone(String contactsPhone) {
+        Customer queryPhone = new Customer();
+        queryPhone.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
+        queryPhone.setContactsPhone(contactsPhone);
+        return getActualMapper().selectCount(queryPhone);
+    }
+
+    /**
      * 获取客户编码
      * @return 客户编码
      */
     private String getCustomerCode() {
         return uidRpcService.getBizNumber(UID_TYPE);
     }
-
 
     /**
      * 检查手机验证码是否有效

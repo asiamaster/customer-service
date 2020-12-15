@@ -105,7 +105,7 @@ public class UserAccount extends BaseDomain implements Serializable {
     private String wechatTerminalCode;
 
     /**
-     * 微信头像地址
+     * 头像地址
      */
     @Column(name = "avatar_url")
     private String avatarUrl;

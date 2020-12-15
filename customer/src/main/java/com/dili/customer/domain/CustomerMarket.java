@@ -1,10 +1,12 @@
 package com.dili.customer.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.dili.ss.dao.sql.DateNextVersion;
 import com.dili.ss.domain.BaseDomain;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
+import tk.mybatis.mapper.annotation.Version;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -70,6 +72,12 @@ public class CustomerMarket extends BaseDomain {
      */
     @Column(name = "`profession_name`")
     private String professionName;
+
+    /**
+     * 客户经营性质
+     */
+    @Column(name = "`business_nature`")
+    private String businessNature;
 
     /**
      * 经营地区##经营地区城市id
@@ -158,6 +166,7 @@ public class CustomerMarket extends BaseDomain {
     @Column(name = "`modify_time`")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Version(nextVersion = DateNextVersion.class)
     private LocalDateTime modifyTime;
 
 }

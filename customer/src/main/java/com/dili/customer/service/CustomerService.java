@@ -5,6 +5,7 @@ import com.dili.customer.sdk.domain.dto.*;
 import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -72,4 +73,27 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @return
      */
     BaseOutput<Customer> autoRegister(CustomerAutoRegisterDto dto);
+
+    /**
+     * 完善客户信息
+     * @param input
+     * @return
+     */
+    BaseOutput<Customer> completeInfo(CustomerUpdateInput input);
+
+    /**
+     * 根据联系电话自动注册，此方法只会创建客户，不会创建对应的账号
+     * @param contactsPhone 联系电话
+     * @param sourceSystem 来源系统
+     * @return
+     */
+    BaseOutput<Customer> insertByContactsPhone(String contactsPhone, String sourceSystem);
+
+    /**
+     * 更改客户-手机号验证
+     * @param customerId 客户ID
+     * @param cellphone 手机号
+     * @return
+     */
+    String updateCellphoneValid(Long customerId, String cellphone);
 }

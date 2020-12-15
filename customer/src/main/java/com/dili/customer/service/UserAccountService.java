@@ -1,10 +1,12 @@
 package com.dili.customer.service;
 
-import cn.hutool.json.JSONObject;
 import com.dili.customer.domain.UserAccount;
+import com.dili.customer.domain.wechat.LoginSuccessData;
+import com.dili.customer.domain.wechat.WeChatRegisterDto;
 import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -29,7 +31,7 @@ public interface UserAccountService extends BaseService<UserAccount, Long> {
      * @param password 登录密码
      * @return
      */
-    BaseOutput<JSONObject> loginByCellphone(String cellphone, String password);
+    BaseOutput<LoginSuccessData> loginByCellphone(String cellphone, String password);
 
     /**
      * 多选启用
@@ -67,6 +69,7 @@ public interface UserAccountService extends BaseService<UserAccount, Long> {
 
     /**
      * 根据手机号查询用户账户信息
+     * 只会查询此手机号被验证过的对应账号
      * @param cellphone 手机号
      * @return
      */
@@ -77,4 +80,35 @@ public interface UserAccountService extends BaseService<UserAccount, Long> {
      * @param userAccount
      */
     void add(UserAccount userAccount);
+
+    /**
+     * 新增或修改用户账号
+     * @param userAccount
+     * @return
+     */
+    Integer insertOrUpdate(UserAccount userAccount);
+
+    /**
+     * 微信一键注册
+     * @param dto 微信注册信息
+     * @param system 来源系统
+     * @param login 注册后是否登录
+     * @return
+     */
+    BaseOutput weChatRegister(WeChatRegisterDto dto, String system, Boolean login);
+
+    /**
+     * 根据证件号加密码登录
+     * @param certificateNumber 客户证件号
+     * @param password 用户密码
+     * @return
+     */
+    BaseOutput<LoginSuccessData> loginByCertificateNumber(String certificateNumber, String password);
+
+    /**
+     * 根据客户获取客户的账号信息
+     * @param customerId 客户
+     * @return
+     */
+    Optional<UserAccount> getByCustomerId(Long customerId);
 }

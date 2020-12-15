@@ -33,10 +33,4 @@
     <result column="organization_type" property="organizationType" />
   </resultMap>
 
-  <!-- 根据客户手机号查询客户市场归类信息 -->
-  <select id="selectByContactsPhone" parameterType="string" resultMap="resultUnionCustomerMap">
-    SELECT c.`name` as customerName,c.state as customerState,c.is_cellphone_valid as isCellphoneValid, c.certificate_number, c.organization_type,
-    cm.* from customer_market cm,customer c where cm.customer_id = c.id AND c.contacts_phone=#{value}
-  </select>
-
 </mapper>

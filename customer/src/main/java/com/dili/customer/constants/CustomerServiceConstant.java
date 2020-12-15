@@ -13,4 +13,14 @@ public interface CustomerServiceConstant extends CustomerConstant {
      * 客户账号的默认密码
      */
     String DEFAULT_PASSWORD = "123456";
+
+    /**
+     * 溯源-司机端小程序
+     */
+    String TRACE_DRIVER_APPLET = "TRACE#DRIVER";
+
+    /**
+     * 溯源-买卖家小程序
+     */
+    String TRACE_BUYER_SELLER_APPLET = "TRACE#BUYER_SELLER";
 }

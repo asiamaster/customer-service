@@ -1,5 +1,6 @@
 package com.dili.customer.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.dili.customer.domain.CustomerMarket;
 import com.dili.customer.domain.dto.CustomerMarketDto;
@@ -8,11 +9,15 @@ import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.CustomerMarketService;
 import com.dili.customer.service.remote.MarketRpcService;
 import com.dili.ss.base.BaseServiceImpl;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
+import one.util.streamex.StreamEx;
+import org.aspectj.weaver.ast.Var;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -57,16 +62,23 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
     }
 
     @Override
-    public Map<String,List<CustomerMarketDto>> selectByContactsPhone(String phone) {
-        List<CustomerMarketDto> customerMarketDtoList = getActualMapper().selectByContactsPhone(phone);
-        Map<String,List<CustomerMarketDto>> resultMap = Maps.newHashMap();
-        if (CollectionUtil.isNotEmpty(customerMarketDtoList)){
-            Map<String, String> marketMap = marketRpcService.listForMap();
-            Map<Long, List<CustomerMarketDto>> collect = customerMarketDtoList.stream().collect(Collectors.groupingBy(CustomerMarketDto::getMarketId));
-            collect.forEach((k, v) -> {
-                resultMap.put(marketMap.get(String.valueOf(k)),v);
-            });
+    public List<CustomerMarketDto> selectByCustomerId(Long customerId) {
+        if (Objects.isNull(customerId)) {
+            return Collections.EMPTY_LIST;
         }
-        return resultMap;
+        CustomerMarket condition = new CustomerMarket();
+        condition.setCustomerId(customerId);
+        List<CustomerMarket> customerMarketList = this.list(condition);
+        if (CollectionUtil.isNotEmpty(customerMarketList)) {
+            Map<String, String> marketMap = marketRpcService.listForMap();
+            List<CustomerMarketDto> resultData = Lists.newArrayList();
+            StreamEx.of(customerMarketList).forEach(t -> {
+                CustomerMarketDto customerMarketDto = BeanUtil.copyProperties(t, CustomerMarketDto.class);
+                customerMarketDto.setMarketName(marketMap.get(String.valueOf(t.getMarketId())));
+                resultData.add(customerMarketDto);
+            });
+            return resultData;
+        }
+        return Collections.EMPTY_LIST;
     }
 }

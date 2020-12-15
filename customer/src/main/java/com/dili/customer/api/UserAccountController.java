@@ -1,14 +1,15 @@
 package com.dili.customer.api;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.service.UserAccountService;
-import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 客户账号服务接口
@@ -31,7 +32,7 @@ public class UserAccountController {
      * @return 登录结果
      */
     @PostMapping("/loginByCellphone")
-    public BaseOutput<JSONObject> loginByCellphone(@RequestParam("cellphone") String cellphone, @RequestParam("password") String password) {
+    public BaseOutput<LoginSuccessData> loginByCellphone(@RequestParam("cellphone") String cellphone, @RequestParam("password") String password) {
         try {
             return userAccountService.loginByCellphone(cellphone, password);
         } catch (Exception e) {
@@ -42,26 +43,39 @@ public class UserAccountController {
 
     /**
      * 账号更新登录密码
-     * @param jsonString
+     * @param params 接口参数
      *  id 登录账号ID
      *  oldPassword 旧密码
      *  newPassword 新密码
      * @return 是否更新成功
      */
     @PostMapping("/changePassword")
-    public BaseOutput<Boolean> changePassword(@RequestBody String jsonString) {
-        if (StrUtil.isBlank(jsonString)) {
-            return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR).setData(false);
-        }
+    public BaseOutput<Boolean> changePassword(@RequestBody Map<String, Object> params) {
+        log.info(String.format("更改账号密码参数为:%s", JSONUtil.toJsonStr(params)));
         try {
-            JSONObject jsonObject = JSONUtil.parseObj(jsonString);
-            Long id = jsonObject.getLong("id");
-            String oldPassword = jsonObject.getStr("oldPassword");
-            String newPassword = jsonObject.getStr("newPassword");
+            Long id = (Long) params.getOrDefault("id", null);
+            String oldPassword = Objects.toString(params.get("oldPassword"), null);
+            String newPassword = Objects.toString(params.get("newPassword"), null);
             return userAccountService.changePassword(id, oldPassword, newPassword);
         } catch (Exception e) {
-            log.error(String.format("根据【%s】修改账户密码异常:", jsonString, e.getMessage()), e);
+            log.error(String.format("根据【%s】修改账户密码异常:", JSONUtil.toJsonStr(params), e.getMessage()), e);
             return BaseOutput.failure("密码修改异常");
+        }
+    }
+
+    /**
+     * 根据证件号
+     * @param certificateNumber 用户证件号
+     * @param password 用户密码
+     * @return 登录结果
+     */
+    @PostMapping("/loginByCertificateNumber")
+    public BaseOutput<LoginSuccessData> loginByCertificateNumber(@RequestParam("certificateNumber") String certificateNumber, @RequestParam("password") String password) {
+        try {
+            return userAccountService.loginByCertificateNumber(certificateNumber, password);
+        } catch (Exception e) {
+            log.error(String.format("用户登录异常,证件号[%s],密码[%s],异常:%s", certificateNumber, password, e.getMessage()), e);
+            return BaseOutput.failure("用户登录异常");
         }
     }
 }

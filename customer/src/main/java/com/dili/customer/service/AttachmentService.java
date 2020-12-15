@@ -18,4 +18,13 @@ public interface AttachmentService extends BaseService<Attachment, Long> {
      * @return
      */
     Integer batchSave(List<Attachment> attachmentList);
+
+    /**
+     * 批量保存数据
+     * @param attachmentList 附件信息
+     * @param customerId 客户ID
+     * @param marketId 市场ID
+     * @return
+     */
+    Integer batchSave(List<Attachment> attachmentList, Long customerId, Long marketId);
 }

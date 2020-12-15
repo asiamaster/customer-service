@@ -16,28 +16,7 @@ import javax.persistence.Column;
 public class CustomerMarketDto extends CustomerMarket {
 
     /**
-     * 客户名称
+     * 市场名称
      */
-    private String customerName;
-
-    /**
-     * 客户状态
-     */
-    private Integer customerState;
-
-    /**
-     * 手机号是否认证 1-是 0-否
-     * {@link com.dili.commons.glossary.YesOrNoEnum}
-     */
-    private Integer isCellphoneValid;
-
-    /**
-     * 证件号
-     */
-    private String certificateNumber;
-
-    /**
-     * 组织类型,个人/企业
-     */
-    private String organizationType;
+    private String marketName;
 }

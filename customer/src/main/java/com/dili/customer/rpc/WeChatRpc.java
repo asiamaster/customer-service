@@ -3,7 +3,10 @@ package com.dili.customer.rpc;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
+import com.dili.customer.config.AppletSecretConfig;
 import com.dili.customer.domain.wechat.AppletPhone;
+import com.dili.customer.domain.wechat.AppletSecret;
+import com.dili.customer.domain.wechat.AppletSystemInfo;
 import com.dili.customer.domain.wechat.JsCode2Session;
 import com.dili.customer.utils.WeChatAppletAesUtil;
 import com.dili.ss.domain.BaseOutput;
@@ -15,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.net.URLDecoder;
 import java.util.Map;
 import java.util.Objects;
 
@@ -29,7 +31,8 @@ import java.util.Objects;
 @Component
 public class WeChatRpc {
 
-    private final RedisUtil redisUtil;
+    private final AppletSecretConfig appletSecretConfig;
+    private final AppletSystemInfo appletSystemInfo;
 
     /**
      * 微信接口主地址
@@ -37,17 +40,6 @@ public class WeChatRpc {
     @Value("${dili.wechat.base.url:https://api.weixin.qq.com}")
     private String wechatBaseUrl;
 
-    /**
-     * 小程序 AppId
-     */
-    @Value("${dili.wechat.applet.appId:}")
-    private String appletAppId;
-
-    /**
-     * 小程序 secret
-     */
-    @Value("${dili.wechat.applet.secret:}")
-    private String appletSecret;
 
     /**
      * 登录凭证校验
@@ -60,9 +52,10 @@ public class WeChatRpc {
             return BaseOutput.failure("code不能为空");
         }
         try {
+            AppletSecret appletSecret = appletSecretConfig.getInitAppIdSecretMaps().get(appletSystemInfo.getJoint());
             Map params = Maps.newHashMap();
-            params.put("appid", appletAppId);
-            params.put("secret", appletSecret);
+            params.put("appid", appletSecret.getAppId());
+            params.put("secret", appletSecret.getSecret());
             params.put("js_code", code);
             params.put("grant_type", "authorization_code");
             HttpResponse response = HttpUtil.createPost(wechatBaseUrl + "/sns/jscode2session").form(params).execute();
@@ -100,10 +93,6 @@ public class WeChatRpc {
         }
         log.info(String.format("解密手机号,原始值 == sessionKey:%s,encryptedData:%s,iv:%s", sessionKey, encryptedData, iv));
         try {
-            sessionKey = URLDecoder.decode(sessionKey, "UTF-8");
-            encryptedData = URLDecoder.decode(encryptedData, "UTF-8");
-            iv = URLDecoder.decode(iv, "UTF-8");
-            log.info(String.format("解密手机号,decode值 == sessionKey:%s,encryptedData:%s,iv:%s", sessionKey, encryptedData, iv));
             String decryStr = WeChatAppletAesUtil.decrypt(encryptedData, sessionKey, iv);
             log.info(String.format("解密后手机号信息:%s", decryStr));
             AppletPhone phone = AppletPhone.fromJson(decryStr);

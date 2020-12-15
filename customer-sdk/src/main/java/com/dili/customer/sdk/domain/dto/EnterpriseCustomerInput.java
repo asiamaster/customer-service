@@ -1,6 +1,7 @@
 package com.dili.customer.sdk.domain.dto;
 
 import com.dili.customer.sdk.validator.EnterpriseAddView;
+import com.dili.customer.sdk.validator.EnterpriseView;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -33,5 +34,11 @@ public class EnterpriseCustomerInput extends IndividualCustomerInput implements 
     @NotBlank(message = "企业法人不能为空", groups = {EnterpriseAddView.class})
     @Size(max = 40, message = "法人请保持在40个字以内", groups = {EnterpriseAddView.class})
     private String corporationName;
+
+    /**
+     * 法人证件号
+     */
+    @Size(max = 40, message = "法人证件号码请保持在40个字符以内", groups = {EnterpriseView.class})
+    private String corporationCertificateNumber;
 
 }

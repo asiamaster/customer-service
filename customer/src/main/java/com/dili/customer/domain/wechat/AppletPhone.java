@@ -24,7 +24,7 @@ public class AppletPhone {
     private String countryCode;
 
     /**
-     *
+     * 水印标记
      */
     private Watermark watermark;
 

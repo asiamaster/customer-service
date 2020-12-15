@@ -1,15 +1,13 @@
 package com.dili.customer.api;
 
-import cn.hutool.core.collection.CollStreamUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.validation.ValidationUtil;
 import cn.hutool.json.JSONUtil;
 import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.sdk.domain.dto.*;
-import com.dili.customer.sdk.validator.AddView;
-import com.dili.customer.sdk.validator.EnterpriseView;
+import com.dili.customer.sdk.enums.CustomerEnum;
+import com.dili.customer.sdk.validator.*;
 import com.dili.customer.service.CustomerService;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
@@ -17,10 +15,12 @@ import com.dili.ss.domain.PageOutput;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.groups.Default;
 import java.util.List;
 import java.util.Objects;
 
@@ -169,8 +169,8 @@ public class CustomerController {
      * @return BaseOutput
      */
     @PostMapping(value="/update")
-    public BaseOutput<Customer> update(@Validated @RequestBody CustomerUpdateInput updateInput, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()){
+    public BaseOutput<Customer> update(@Validated({UpdateView.class, Default.class}) @RequestBody CustomerUpdateInput updateInput, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
         return customerService.update(updateInput);
@@ -222,25 +222,21 @@ public class CustomerController {
      * 更新用户手机验证结果
      * @param customerId 客户ID
      * @param cellphone  手机号
-     * @param valid 是否认证有效-true:是
      * @return
      */
     @PostMapping(value = "/updateCellphoneValid")
-    public BaseOutput<Boolean> updateCellphoneValid(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone, @RequestParam("valid") Boolean valid) {
-        log.info(String.format("客户【%s】手机号【%s】认证结果【%s】", customerId, cellphone, valid));
-        Customer condition = new Customer();
-        condition.setContactsPhone(cellphone);
-        condition.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
-        List<Customer> customerList = customerService.list(condition);
-        if (CollectionUtil.isNotEmpty(customerList)) {
-            return BaseOutput.failure("该手机号已被认证");
+    public BaseOutput<Boolean> updateCellphoneValid(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone) {
+        log.info(String.format("客户【%s】手机号【%s】认证", customerId, cellphone));
+        try {
+            String result = customerService.updateCellphoneValid(customerId, cellphone);
+            if (StrUtil.isNotBlank(result)) {
+                return BaseOutput.failure(result).setData(false);
+            }
+            return BaseOutput.successData(true);
+        } catch (Exception e) {
+            log.error(String.format("客户【%s】手机号【%s】认证异常:%s", customerId, cellphone, e.getMessage()), e);
+            return BaseOutput.failure("系统异常");
         }
-        Customer data = customerService.get(customerId);
-        data.setId(customerId);
-        data.setContactsPhone(cellphone);
-        data.setIsCellphoneValid(valid ? YesOrNoEnum.YES.getCode() : YesOrNoEnum.NO.getCode());
-        customerService.updateSelective(data);
-        return BaseOutput.success().setData(true);
     }
 
     /**
@@ -273,6 +269,51 @@ public class CustomerController {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
         return customerService.autoRegister(dto);
+    }
+
+    /**
+     * 完善企业客户信息
+     * @param input 待完善的信息
+     * @return
+     */
+    @PostMapping(value = "/completeEnterprise")
+    public BaseOutput<Boolean> completeEnterprise(@Validated({CompleteView.class, Default.class, EnterpriseCompleteView.class}) @RequestBody CustomerUpdateInput input, BindingResult bindingResult) {
+        log.info(String.format("企业客户信息完善:%s", JSONUtil.toJsonStr(input)));
+        if (bindingResult.hasErrors()) {
+            return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
+        }
+        input.setOrganizationType(CustomerEnum.OrganizationType.ENTERPRISE.getCode());
+        return completeInfo(input);
+    }
+
+    /**
+     * 完善企业客户信息
+     * @param input 待完善的信息
+     * @return
+     */
+    @PostMapping(value = "/completeIndividual")
+    public BaseOutput<Boolean> completeIndividual(@Validated({CompleteView.class, Default.class}) @RequestBody CustomerUpdateInput input, BindingResult bindingResult) {
+        log.info(String.format("个人客户信息完善:%s", JSONUtil.toJsonStr(input)));
+        if (bindingResult.hasErrors()) {
+            return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
+        }
+        input.setOrganizationType(CustomerEnum.OrganizationType.INDIVIDUAL.getCode());
+        return completeInfo(input);
+    }
+
+    /**
+     * 完善客户信息
+     * @param input
+     * @return
+     */
+    private BaseOutput<Boolean> completeInfo(CustomerUpdateInput input) {
+        try {
+            customerService.completeInfo(input);
+            return BaseOutput.successData(true);
+        } catch (Exception e) {
+            log.error(String.format("完善信息数据：%s 异常:%s", JSONUtil.toJsonStr(input), e.getMessage()), e);
+            return BaseOutput.failure("系统异常").setData(false);
+        }
     }
 
 }

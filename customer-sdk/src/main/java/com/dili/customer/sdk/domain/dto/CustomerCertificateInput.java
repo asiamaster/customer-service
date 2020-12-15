@@ -1,9 +1,12 @@
 package com.dili.customer.sdk.domain.dto;
 
 
+import com.dili.customer.sdk.validator.CompleteView;
+import com.dili.customer.sdk.validator.EnterpriseCompleteView;
 import com.dili.customer.sdk.validator.EnterpriseView;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -44,19 +47,20 @@ public class CustomerCertificateInput implements Serializable {
     /**
      * 法人证件类型
      */
-    @Size(max = 20, message = "法人证件类型请保持在20个字符以内", groups = {EnterpriseView.class})
+    @Size(max = 20, message = "法人证件类型请保持在20个字符以内", groups = {EnterpriseView.class,EnterpriseCompleteView.class})
     private String corporationCertificateType;
 
     /**
      * 法人证件号
      */
-    @Size(max = 40, message = "法人证件号码请保持在40个字符以内", groups = {EnterpriseView.class})
+    @Size(max = 40, message = "法人证件号码请保持在40个字符以内", groups = {EnterpriseView.class,EnterpriseCompleteView.class})
     private String corporationCertificateNumber;
 
     /**
      * 法人真实姓名
      */
-    @Size(max = 40, message = "法人姓名请保持在40个字符以内", groups = {EnterpriseView.class})
+    @NotBlank(message = "法人姓名不能为空",groups = {EnterpriseCompleteView.class})
+    @Size(max = 40, message = "法人姓名请保持在40个字符以内", groups = {EnterpriseView.class,EnterpriseCompleteView.class})
     private String corporationName;
 
 }

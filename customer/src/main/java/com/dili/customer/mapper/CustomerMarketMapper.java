@@ -10,11 +10,4 @@ import java.util.List;
  * @author yuehongbo
  */
 public interface CustomerMarketMapper extends MyMapper<CustomerMarket> {
-
-    /**
-     * 根据客户手机号查询客户市场归类信息
-     * @param phone 手机号
-     * @return
-     */
-    List<CustomerMarketDto> selectByContactsPhone(String phone);
 }

@@ -32,9 +32,9 @@ public interface CustomerMarketService extends BaseService<CustomerMarket, Long>
     void changeGrade(Long customerId, Long marketId, CustomerEnum.Grade nextGrade);
 
     /**
-     * 根据客户手机号查询客户市场归类信息
-     * @param phone 手机号
-     * @return map --> key:市场名称，value:市场客户
+     * 根据客户ID查询客户市场归类信息
+     * @param customerId 客户ID
+     * @return
      */
-    Map<String,List<CustomerMarketDto>> selectByContactsPhone(String phone);
+    List<CustomerMarketDto> selectByCustomerId(Long customerId);
 }

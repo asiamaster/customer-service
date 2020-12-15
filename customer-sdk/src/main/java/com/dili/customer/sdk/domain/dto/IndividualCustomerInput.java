@@ -6,6 +6,7 @@ import com.dili.customer.sdk.domain.CharacterType;
 import com.dili.customer.sdk.domain.CustomerMarket;
 import com.dili.customer.sdk.domain.TallyingArea;
 import com.dili.customer.sdk.validator.AddView;
+import com.dili.customer.sdk.validator.CompleteView;
 import com.dili.customer.sdk.validator.UpdateView;
 import lombok.Data;
 
@@ -33,20 +34,20 @@ public class IndividualCustomerInput implements Serializable {
     /**
      * 客户ID
      */
-    @NotNull(message = "业务关键ID不能为空",groups = {UpdateView.class})
+    @NotNull(message = "业务关键ID不能为空", groups = {UpdateView.class, CompleteView.class})
     private Long id;
 
     /**
      * 证件号
      */
-    @NotBlank(message = "证件号码不能为空", groups = {AddView.class})
-    @Size(min = 1, max = 40, message = "证件号码请保持在40个字以内", groups = {AddView.class})
+    @NotBlank(message = "证件号码不能为空", groups = {AddView.class, CompleteView.class})
+    @Size(min = 1, max = 40, message = "证件号码请保持在40个字以内", groups = {AddView.class, CompleteView.class})
     private String certificateNumber;
 
     /**
      * 证件类型
      */
-    @NotBlank(message = "证件类型不能为空", groups = {AddView.class})
+    @NotBlank(message = "证件类型不能为空", groups = {AddView.class, CompleteView.class})
     private String certificateType;
 
     /**
@@ -124,12 +125,13 @@ public class IndividualCustomerInput implements Serializable {
 
     /**
      * 现住址城市ID路径
-     * 格式为 100000,110000,111100
+     * 格式为 省(编码),市(编码),区(编码) 如: 100000,110000,111100
      */
     private String currentCityPath;
 
     /**
      * 现住址城市名称
+     * 格式为 省(中文),市(中文),区(中文) 如：四川省,成都市,青羊区
      */
     private String currentCityName;
 
@@ -174,6 +176,7 @@ public class IndividualCustomerInput implements Serializable {
     /**
      * 客户身份类型
      */
+    @NotNull(message = "客户身份类型不能为空")
     private List<CharacterType> characterTypeList;
 
     /**

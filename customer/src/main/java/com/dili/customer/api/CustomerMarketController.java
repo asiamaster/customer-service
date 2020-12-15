@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -64,12 +63,12 @@ public class CustomerMarketController {
     }
 
     /**
-     * 根据联系电话获取对应的客户所在的市场分组信息
-     * @param contactsPhone 联系电话
+     * 根据客户ID获取所在的市场信息
+     * @param customerId 客户ID
      * @return
      */
-    @PostMapping("/selectByContactsPhone")
-    public BaseOutput<Map<String, List<CustomerMarketDto>>> selectByContactsPhone(@RequestParam("contactsPhone") String contactsPhone) {
-        return BaseOutput.success().setData(customerMarketService.selectByContactsPhone(contactsPhone));
+    @PostMapping("/selectByCustomerId")
+    public BaseOutput<List<CustomerMarketDto>> selectByCustomerId(@RequestParam("customerId") Long customerId) {
+        return BaseOutput.success().setData(customerMarketService.selectByCustomerId(customerId));
     }
 }

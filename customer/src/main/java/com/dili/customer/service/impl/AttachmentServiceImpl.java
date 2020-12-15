@@ -32,14 +32,24 @@ public class AttachmentServiceImpl extends BaseServiceImpl<Attachment, Long> imp
         if (CollectionUtil.isEmpty(attachmentList)) {
             return 0;
         }
+        return batchSave(attachmentList,attachmentList.get(0).getCustomerId(),attachmentList.get(0).getMarketId());
+    }
+
+    @Override
+    public Integer batchSave(List<Attachment> attachmentList, Long customerId, Long marketId) {
+        if (CollectionUtil.isEmpty(attachmentList)) {
+            return 0;
+        }
         Set<Long> idSet = attachmentList.stream().map(t -> t.getId()).filter(Objects::nonNull).collect(Collectors.toSet());
         AttachmentDto dto = new AttachmentDto();
         dto.setIdNotSet(idSet);
-        dto.setCustomerId(attachmentList.get(0).getCustomerId());
-        dto.setMarketId(attachmentList.get(0).getMarketId());
+        dto.setCustomerId(customerId);
+        dto.setMarketId(marketId);
         //先删除数据库中已存在，但是不在本次传入的数据中的图片信息
         this.deleteByExample(dto);
         attachmentList.forEach(t -> {
+            t.setCustomerId(customerId);
+            t.setMarketId(marketId);
             if (Objects.isNull(t.getId())) {
                 this.insert(t);
             } else {

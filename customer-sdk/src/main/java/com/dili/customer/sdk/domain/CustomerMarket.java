@@ -2,11 +2,15 @@ package com.dili.customer.sdk.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.customer.sdk.enums.CustomerEnum;
+import com.dili.customer.sdk.validator.CompleteView;
 import com.dili.ss.domain.BaseDomain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -29,6 +33,7 @@ public class CustomerMarket extends BaseDomain {
     /**
      * 归属组织
      */
+    @NotNull(message = "归属市场不能为空")
     private Long marketId;
 
     /**
@@ -61,6 +66,13 @@ public class CustomerMarket extends BaseDomain {
      * 客户行业名称,多个以英文逗号隔开
      */
     private String professionName;
+
+    /**
+     * 客户经营性质
+     */
+    @NotBlank(message = "客户经营性质不能为空", groups = {CompleteView.class})
+    @Size(max = 120, message = "客户经营性质 请保持在120个字符以内")
+    private String businessNature;
 
     /**
      * 经营地区##经营地区城市id
