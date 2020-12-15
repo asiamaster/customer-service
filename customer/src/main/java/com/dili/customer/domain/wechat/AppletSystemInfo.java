@@ -28,7 +28,7 @@ public class AppletSystemInfo {
      * @return
      */
     public String getJoint() {
-        return (appletSystem + "_" + appletCode).toUpperCase();
+        return (appletSystem + "#" + appletCode).toUpperCase();
     }
 
 }
