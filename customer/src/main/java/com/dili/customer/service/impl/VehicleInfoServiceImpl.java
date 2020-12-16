@@ -8,6 +8,7 @@ import com.dili.customer.service.VehicleInfoService;
 import com.dili.ss.base.BaseServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -64,5 +65,20 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
         condition.setCustomerIdSet(customerIdSet);
         condition.setMarketId(marketId);
         return listByExample(condition);
+    }
+
+    @Override
+    public String bindingVehicle(VehicleInfo vehicleInfo) {
+        VehicleInfo condition = new VehicleInfo();
+        condition.setMarketId(vehicleInfo.getMarketId());
+        condition.setCustomerId(vehicleInfo.getCustomerId());
+        condition.setRegistrationNumber(vehicleInfo.getRegistrationNumber());
+        if (CollectionUtil.isNotEmpty(list(condition))) {
+            return "此车辆信息已被绑定,无需重复绑定";
+        }
+        vehicleInfo.setCreateTime(LocalDateTime.now());
+        vehicleInfo.setModifyTime(vehicleInfo.getCreateTime());
+        this.insert(vehicleInfo);
+        return null;
     }
 }

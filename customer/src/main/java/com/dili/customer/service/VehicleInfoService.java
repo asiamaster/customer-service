@@ -35,4 +35,11 @@ public interface VehicleInfoService extends BaseService<VehicleInfo, Long> {
      * @return
      */
     List<VehicleInfo> listByCustomerAndMarket(Set<Long> customerIdSet, Long marketId);
+
+    /**
+     * 客户车辆绑定
+     * @param vehicleInfo 绑定信息
+     * @return
+     */
+    String bindingVehicle(VehicleInfo vehicleInfo);
 }

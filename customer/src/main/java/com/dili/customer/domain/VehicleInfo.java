@@ -8,6 +8,8 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -33,18 +35,21 @@ public class VehicleInfo extends BaseDomain {
      * 客户ID
      */
     @Column(name = "`customer_id`",updatable = false)
+    @NotNull(message = "所属客户不能为空")
     private Long customerId;
 
     /**
      * 所属市场ID
      */
     @Column(name = "`market_id`",updatable = false)
+    @NotNull(message = "所属市场不能为空")
     private Long marketId;
 
     /**
      * 注册车牌号
      */
     @Column(name = "`registration_number`")
+    @NotBlank(message = "注册车牌号不能为空")
     private String registrationNumber;
 
     /**
