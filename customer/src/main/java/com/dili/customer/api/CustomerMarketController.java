@@ -71,4 +71,14 @@ public class CustomerMarketController {
     public BaseOutput<List<CustomerMarketDto>> selectByCustomerId(@RequestParam("customerId") Long customerId) {
         return BaseOutput.success().setData(customerMarketService.selectByCustomerId(customerId));
     }
+
+    /**
+     * 根据市场ID统计市场客户的审核情况
+     * @param marketId 市场ID
+     * @return
+     */
+    @PostMapping("/statisticsApproval")
+    public BaseOutput statisticsApproval(@RequestParam("marketId") Long marketId) {
+        return BaseOutput.success().setData(customerMarketService.statisticsApproval(marketId));
+    }
 }

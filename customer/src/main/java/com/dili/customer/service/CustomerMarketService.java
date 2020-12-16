@@ -37,4 +37,11 @@ public interface CustomerMarketService extends BaseService<CustomerMarket, Long>
      * @return
      */
     List<CustomerMarketDto> selectByCustomerId(Long customerId);
+
+    /**
+     * 根据市场ID统计市场客户的审核情况
+     * @param marketId 市场ID
+     * @return
+     */
+    List<Map<String, Object>> statisticsApproval(Long marketId);
 }

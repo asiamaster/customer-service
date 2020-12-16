@@ -81,6 +81,8 @@ ALTER TABLE customer_market ADD COLUMN `approval_status` tinyint DEFAULT NULL CO
 ALTER TABLE customer_market ADD COLUMN `approval_user_id` bigint DEFAULT NULL COMMENT '客户资料审核人ID' AFTER approval_status;
 ALTER TABLE customer_market ADD COLUMN `approval_time` datetime DEFAULT NULL COMMENT '客户资料审核时间' AFTER approval_user_id;
 
+update customer_market set approval_status = 2;
+
 INSERT INTO character_type(id,customer_id,market_id,sub_type) SELECT cm.id,cm.customer_id,cm.market_id,type FROM customer_market cm;
 update `dili-customer`.character_type ct,uap.data_dictionary_value ddv set ct.character_type=ddv.dd_code where ct.sub_type=ddv.`code` and ct.market_id = ddv.firm_id and ddv.dd_code IN ('business_user_character_type','buyer_character_type','other_character_type');
 

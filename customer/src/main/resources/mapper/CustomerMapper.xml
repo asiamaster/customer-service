@@ -182,6 +182,9 @@
             <if test="customerMarket.creatorId != null">
                 and cm.creator_id = #{customerMarket.creatorId}
             </if>
+            <if test="customerMarket.approvalStatus != null">
+                and cm.approval_status = #{customerMarket.approvalStatus}
+            </if>
         </if>
         <!-- 如果客户身份类型参数不为空 -->
         <if test="null != characterType">

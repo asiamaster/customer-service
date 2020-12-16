@@ -24,13 +24,16 @@
     <result column="modify_time"  property="modifyTime" />
   </resultMap>
 
-  <!-- list列表查询返回结果集 -->
-  <resultMap id="resultUnionCustomerMap"  type="com.dili.customer.domain.dto.CustomerMarketDto" extends="BaseResultMap">
-    <result column="customerName"  property="customerName" />
-    <result column="customerState" property="customerState" />
-    <result column="isCellphoneValid" property="isCellphoneValid" />
-    <result column="certificate_number" property="certificateNumber" />
-    <result column="organization_type" property="organizationType" />
-  </resultMap>
+  <!-- 根据市场ID统计在该市场的客户审核情况 -->
+  <select id="statisticsApproval" parameterType="long" resultType="map">
+    SELECT
+      cm.approval_status AS approvalStatus,
+      COUNT(id) AS quantity
+    FROM
+      customer_market cm
+    where cm.market_id = #{marketId}
+    GROUP BY
+      cm.approval_status
+  </select>
 
 </mapper>

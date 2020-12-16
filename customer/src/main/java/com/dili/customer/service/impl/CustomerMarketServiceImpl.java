@@ -10,10 +10,8 @@ import com.dili.customer.service.CustomerMarketService;
 import com.dili.customer.service.remote.MarketRpcService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import one.util.streamex.StreamEx;
-import org.aspectj.weaver.ast.Var;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -80,5 +77,14 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
             return resultData;
         }
         return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    public List<Map<String, Object>> statisticsApproval(Long marketId) {
+        List<Map<String, Object>> mapList = getActualMapper().statisticsApproval(marketId);
+        mapList.forEach(t -> {
+            t.put("statusName", CustomerEnum.ApprovalStatus.getValueByCode(Integer.valueOf(Objects.toString(t.get("approvalStatus"), "0"))));
+        });
+        return mapList;
     }
 }

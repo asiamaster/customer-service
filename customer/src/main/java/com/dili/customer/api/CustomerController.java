@@ -289,7 +289,7 @@ public class CustomerController {
     }
 
     /**
-     * 完善企业客户信息
+     * 完善个人客户信息
      * 由于可能会有账号合并的情况，所以会自动重新登录并返回登录信息
      * @param input 待完善的信息
      * @return
