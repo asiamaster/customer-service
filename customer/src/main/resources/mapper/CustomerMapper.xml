@@ -137,12 +137,18 @@
         <if test="marketCreateTimeEnd != null">
             and cm.create_time <![CDATA[ <= ]]> #{marketCreateTimeEnd}
         </if>
-        <if test="null != assetsIdSet and  assetsIdSet.size() > 0">
+        <if test="(null != assetsIdSet and  assetsIdSet.size() > 0) or (assetsName !=null and assetsName !='')">
             and c.id in
-            (select customer_id from tallying_area ta where ta.market_id=#{marketId} and ta.assets_id in
-            <foreach collection="assetsIdSet" index="index" item="item" open="(" separator="," close=")">
-                #{item}
-            </foreach>
+            (select customer_id from tallying_area ta where ta.market_id=#{marketId}
+                <if test="null != assetsIdSet and  assetsIdSet.size() > 0">
+                    and ta.assets_id in
+                    <foreach collection="assetsIdSet" index="index" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="assetsName !=null and assetsName !=''">
+                    and ta.assets_name = #{assetsName}
+                </if>
             /* 直接可用的，或者有租赁状态且已生效的 */
             and (ta.is_usable = 1 or (ta.is_lease=1 and ta.state=5)))
         </if>

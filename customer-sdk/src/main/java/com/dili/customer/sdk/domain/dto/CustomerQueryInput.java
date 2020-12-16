@@ -47,4 +47,9 @@ public class CustomerQueryInput extends CustomerBaseQueryInput {
      */
     private String vehicleNumber;
 
+    /**
+     * 资产名称(摊位、公寓等名称)
+     */
+    private String assetsName;
+
 }

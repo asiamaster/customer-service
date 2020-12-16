@@ -18,4 +18,8 @@ public class VehicleInfoDto extends VehicleInfo {
     @Column(name = "`id`")
     @Operator(Operator.NOT_IN)
     private Set<Long> idNotSet;
+
+    @Column(name = "`customer_id`")
+    @Operator(Operator.IN)
+    private Set<Long> customerIdSet;
 }

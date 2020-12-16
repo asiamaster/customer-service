@@ -4,6 +4,7 @@ import com.dili.customer.domain.VehicleInfo;
 import com.dili.ss.base.BaseService;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author yuehongbo
@@ -26,4 +27,12 @@ public interface VehicleInfoService extends BaseService<VehicleInfo, Long> {
      * @return 记录数
      */
     Integer batchSaveOrUpdate(List<VehicleInfo> vehicleInfoList);
+
+    /**
+     * 根据客户及市场获取车辆信息
+     * @param customerIdSet 客户ID集合
+     * @param marketId 市场ID
+     * @return
+     */
+    List<VehicleInfo> listByCustomerAndMarket(Set<Long> customerIdSet, Long marketId);
 }

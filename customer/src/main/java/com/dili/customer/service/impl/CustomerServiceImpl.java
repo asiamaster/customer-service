@@ -239,15 +239,22 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             List<TallyingArea> tallyingAreaList = tallyingAreaService.listByExample(tallyingArea);
             //获取客户角色身份信息
             List<CharacterType> characterTypeList = characterTypeService.listByCustomerAndMarket(customerIdSet, input.getMarketId());
-            if (CollectionUtil.isNotEmpty(tallyingAreaList) || CollectionUtil.isNotEmpty(characterTypeList)) {
+            //获取客户车辆信息
+            List<VehicleInfo> vehicleInfoList = vehicleInfoService.listByCustomerAndMarket(customerIdSet, input.getMarketId());
+            if (CollectionUtil.isNotEmpty(tallyingAreaList) || CollectionUtil.isNotEmpty(characterTypeList) || CollectionUtil.isNotEmpty(vehicleInfoList)) {
+
                 Map<Long, List<TallyingArea>> tallyingAreaMap = tallyingAreaList.stream().collect(Collectors.groupingBy(TallyingArea::getCustomerId));
                 Map<Long, List<CharacterType>> characterTypeMap = characterTypeList.stream().collect(Collectors.groupingBy(CharacterType::getCustomerId));
+                Map<Long, List<VehicleInfo>> vehicleInfoMap = vehicleInfoList.stream().collect(Collectors.groupingBy(VehicleInfo::getCustomerId));
                 list.forEach(t -> {
                     if (tallyingAreaMap.containsKey(t.getId())) {
                         t.setTallyingAreaList(tallyingAreaMap.get(t.getId()));
                     }
                     if (characterTypeMap.containsKey(t.getId())) {
                         t.setCharacterTypeList(characterTypeMap.get(t.getId()));
+                    }
+                    if (vehicleInfoMap.containsKey(t.getId())) {
+                        t.setVehicleInfoList(vehicleInfoMap.get(t.getId()));
                     }
                 });
             }
@@ -567,13 +574,13 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         }
         this.update(customer);
         CustomerMarket customerMarket = BeanUtil.copyProperties(input.getCustomerMarket(), CustomerMarket.class, "id");
-        CustomerMarket old = customerMarketService.queryByMarketAndCustomerId(customer.getId(), customerMarket.getCustomerId());
+        CustomerMarket old = customerMarketService.queryByMarketAndCustomerId(customerMarket.getMarketId(), customer.getId());
         if (Objects.nonNull(old)) {
             old.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
             old.setBusinessNature(customerMarket.getBusinessNature());
-            customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
-            customerMarket.setApprovalUserId(null);
-            customerMarket.setApprovalTime(null);
+            old.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
+            old.setApprovalUserId(null);
+            old.setApprovalTime(null);
             customerMarketService.update(old);
         } else {
             customerMarket.setCustomerId(customer.getId());

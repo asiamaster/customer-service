@@ -57,4 +57,12 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
         });
         return vehicleInfoList.size();
     }
+
+    @Override
+    public List<VehicleInfo> listByCustomerAndMarket(Set<Long> customerIdSet, Long marketId) {
+        VehicleInfoDto condition = new VehicleInfoDto();
+        condition.setCustomerIdSet(customerIdSet);
+        condition.setMarketId(marketId);
+        return listByExample(condition);
+    }
 }

@@ -266,6 +266,12 @@ public class Customer extends BaseDomain {
     private List<CharacterType> characterTypeList;
 
     /**
+     * 客户车辆信息
+     */
+    @Transient
+    private List<VehicleInfo> vehicleInfoList;
+
+    /**
      * 客户证件号打码加*显示
      */
     @Transient
