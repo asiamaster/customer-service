@@ -259,7 +259,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 });
             }
         }
-        output.setData(list).setPageNum(pageNum).setTotal(total).setPageSize(input.getPage()).setPages(totalPage);
+        output.setData(list).setPageNum(pageNum).setTotal(total).setPageSize(input.getRows()).setPages(totalPage);
         return output;
     }
 
@@ -282,7 +282,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         //当前页数
         int pageNum = list instanceof Page ? ((Page) list).getPageNum() : 1;
         PageOutput output = PageOutput.success();
-        output.setData(list).setPageNum(pageNum).setTotal(total).setPageSize(input.getPage()).setPages(totalPage);
+        output.setData(list).setPageNum(pageNum).setTotal(total).setPageSize(input.getRows()).setPages(totalPage);
         return output;
     }
 
