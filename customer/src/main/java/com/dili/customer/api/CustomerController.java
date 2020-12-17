@@ -44,7 +44,7 @@ public class CustomerController {
      * @return
      */
     @PostMapping(value="/listPage")
-    public PageOutput<List<Customer>> listPage(@RequestBody CustomerQueryInput customer){
+    public PageOutput<List<Customer>> listPage(@RequestBody CustomerQueryInput customer) {
         log.info(String.format("客户listPage查询:%s", JSONUtil.toJsonStr(customer)));
         if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
@@ -69,6 +69,20 @@ public class CustomerController {
         }
         customer.setIsDelete(0);
         return customerService.listForPage(customer);
+    }
+
+    /**
+     * 获取客户导出数据
+     * @param customer
+     * @return
+     */
+    @PostMapping(value="/export")
+    public PageOutput<List<Customer>> export(@RequestBody CustomerQueryInput customer) {
+        log.info(String.format("客户export查询:%s", JSONUtil.toJsonStr(customer)));
+        if (Objects.isNull(customer.getMarketId())) {
+            return PageOutput.failure("客户所属市场不能为空");
+        }
+        return customerService.listForPage(customer, true);
     }
 
     /**

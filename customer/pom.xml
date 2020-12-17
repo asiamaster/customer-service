@@ -131,11 +131,6 @@
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>5.5.2</version>
-        </dependency>
         <!-- 对jdk8中的stream 操作的扩展-->
         <dependency>
             <groupId>one.util</groupId>
@@ -163,7 +158,7 @@
         <!-- 内部包  -->
         <dependency>
             <groupId>com.dili</groupId>
-            <artifactId>customer-sdk</artifactId>
+            <artifactId>customer-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

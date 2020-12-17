@@ -2,12 +2,12 @@ package com.dili.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.dili.customer.commons.service.MarketRpcService;
 import com.dili.customer.domain.CustomerMarket;
 import com.dili.customer.domain.dto.CustomerMarketDto;
 import com.dili.customer.mapper.CustomerMarketMapper;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.CustomerMarketService;
-import com.dili.customer.service.remote.MarketRpcService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;

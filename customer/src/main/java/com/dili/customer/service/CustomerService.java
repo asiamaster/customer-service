@@ -39,6 +39,14 @@ public interface CustomerService extends BaseService<Customer, Long> {
     PageOutput<List<Customer>> listForPage(CustomerQueryInput input);
 
     /**
+     * 分页查询客户信息
+     * @param input
+     * @param export 是否导出
+     * @return
+     */
+    PageOutput<List<Customer>> listForPage(CustomerQueryInput input, Boolean export);
+
+    /**
      * 分页查询客户基本信息，不带有任何市场属性数据
      * @param input
      * @return

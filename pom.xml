@@ -17,8 +17,9 @@
     </parent>
 
     <modules>
-        <module>customer</module>
+        <!--<module>customer</module>-->
         <module>customer-sdk</module>
+        <module>commons</module>
     </modules>
 
     <properties>

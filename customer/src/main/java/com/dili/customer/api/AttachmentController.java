@@ -3,6 +3,7 @@ package com.dili.customer.api;
 import cn.hutool.core.collection.CollectionUtil;
 import com.dili.customer.domain.Attachment;
 import com.dili.customer.domain.dto.AttachmentDto;
+import com.dili.customer.sdk.domain.dto.AttachmentGroupInfo;
 import com.dili.customer.service.AttachmentService;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class AttachmentController {
      * @return
      */
     @PostMapping(value = "/listAttachment")
-    public BaseOutput<List<Attachment>> listAttachment(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId) {
+    public BaseOutput<List<AttachmentGroupInfo>> listAttachment(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam("organizationType") String organizationType) {
         Attachment condition = new Attachment();
         condition.setCustomerId(customerId);
         condition.setMarketId(marketId);

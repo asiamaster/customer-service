@@ -1,8 +1,8 @@
-package com.dili.customer.service.remote;
+package com.dili.customer.commons.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONUtil;
-import com.dili.customer.constants.CustomerServiceConstant;
+import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.redis.service.RedisUtil;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * @author yuehongbo
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
- * @date 2020/10/16 15:11
+ * @date 2020/12/17 16:44
  */
 @RequiredArgsConstructor
 @Service
@@ -36,7 +36,7 @@ public class MarketRpcService {
      * @return
      */
     public Map<String, String> listForMap() {
-        String redisKey = CustomerServiceConstant.REDIS_KEY_PREFIX + "firmMap";
+        String redisKey = CustomerConstant.REDIS_KEY_PREFIX + "firmMap";
         Object o = redisUtil.get(redisKey);
         if (Objects.nonNull(o)) {
             return (Map<String, String>) JSONUtil.parse(o);

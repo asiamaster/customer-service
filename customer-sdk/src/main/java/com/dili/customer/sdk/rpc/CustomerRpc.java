@@ -30,6 +30,14 @@ public interface CustomerRpc {
     PageOutput<List<CustomerExtendDto>> listPage(CustomerQueryInput customer);
 
     /**
+     * 获取客户导出数据
+     * @param customer
+     * @return
+     */
+    @PostMapping(value = "/api/customer/export")
+    PageOutput<List<CustomerExtendDto>> export(CustomerQueryInput customer);
+
+    /**
      * 获取客户列表信息
      * @param customer
      * @return

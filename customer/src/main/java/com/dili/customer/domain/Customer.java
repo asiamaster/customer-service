@@ -2,6 +2,7 @@ package com.dili.customer.domain;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.dili.customer.sdk.domain.dto.AttachmentGroupInfo;
 import com.dili.customer.utils.CustomerInfoUtil;
 import com.dili.ss.dao.sql.DateNextVersion;
 import com.dili.ss.domain.BaseDomain;
@@ -270,6 +271,12 @@ public class Customer extends BaseDomain {
      */
     @Transient
     private List<VehicleInfo> vehicleInfoList;
+
+    /**
+     * 客户附件分组显示信息
+     */
+    @Transient
+    private List<AttachmentGroupInfo> attachmentGroupInfoList;
 
     /**
      * 客户证件号打码加*显示

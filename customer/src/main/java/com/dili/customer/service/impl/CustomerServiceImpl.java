@@ -213,6 +213,11 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Override
     public PageOutput<List<Customer>> listForPage(CustomerQueryInput input) {
+        return listForPage(input, false);
+    }
+
+    @Override
+    public PageOutput<List<Customer>> listForPage(CustomerQueryInput input, Boolean export) {
         if (StringUtils.isNotBlank(input.getSort())) {
             input.setSort(POJOUtils.humpToLineFast(input.getSort()));
         } else {
@@ -232,32 +237,40 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         PageOutput output = PageOutput.success();
         if (CollectionUtil.isNotEmpty(list)) {
             Set<Long> customerIdSet = list.stream().map(Customer::getId).collect(Collectors.toSet());
-            TallyingArea tallyingArea = new TallyingArea();
-            tallyingArea.setMarketId(input.getMarketId());
-            tallyingArea.setCustomerIdSet(customerIdSet);
             //获取客户理货区信息
-            List<TallyingArea> tallyingAreaList = tallyingAreaService.listByExample(tallyingArea);
+            List<TallyingArea> tallyingAreaList = Lists.newArrayList();
             //获取客户角色身份信息
             List<CharacterType> characterTypeList = characterTypeService.listByCustomerAndMarket(customerIdSet, input.getMarketId());
             //获取客户车辆信息
-            List<VehicleInfo> vehicleInfoList = vehicleInfoService.listByCustomerAndMarket(customerIdSet, input.getMarketId());
-            if (CollectionUtil.isNotEmpty(tallyingAreaList) || CollectionUtil.isNotEmpty(characterTypeList) || CollectionUtil.isNotEmpty(vehicleInfoList)) {
+            List<VehicleInfo> vehicleInfoList = Lists.newArrayList();
 
-                Map<Long, List<TallyingArea>> tallyingAreaMap = tallyingAreaList.stream().collect(Collectors.groupingBy(TallyingArea::getCustomerId));
-                Map<Long, List<CharacterType>> characterTypeMap = characterTypeList.stream().collect(Collectors.groupingBy(CharacterType::getCustomerId));
-                Map<Long, List<VehicleInfo>> vehicleInfoMap = vehicleInfoList.stream().collect(Collectors.groupingBy(VehicleInfo::getCustomerId));
-                list.forEach(t -> {
-                    if (tallyingAreaMap.containsKey(t.getId())) {
-                        t.setTallyingAreaList(tallyingAreaMap.get(t.getId()));
-                    }
-                    if (characterTypeMap.containsKey(t.getId())) {
-                        t.setCharacterTypeList(characterTypeMap.get(t.getId()));
-                    }
-                    if (vehicleInfoMap.containsKey(t.getId())) {
-                        t.setVehicleInfoList(vehicleInfoMap.get(t.getId()));
-                    }
-                });
+            //如果是不是导出，才查询一些必要的数据值
+            if (!export){
+                TallyingArea tallyingArea = new TallyingArea();
+                tallyingArea.setMarketId(input.getMarketId());
+                tallyingArea.setCustomerIdSet(customerIdSet);
+                tallyingAreaList.addAll(tallyingAreaService.listByExample(tallyingArea));
+                vehicleInfoList.addAll(vehicleInfoService.listByCustomerAndMarket(customerIdSet, input.getMarketId()));
             }
+            Map<Long, List<TallyingArea>> tallyingAreaMap = tallyingAreaList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(TallyingArea::getCustomerId));
+            Map<Long, List<CharacterType>> characterTypeMap = characterTypeList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(CharacterType::getCustomerId));
+            Map<Long, List<VehicleInfo>> vehicleInfoMap = vehicleInfoList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(VehicleInfo::getCustomerId));
+            list.forEach(t -> {
+                if (tallyingAreaMap.containsKey(t.getId())) {
+                    t.setTallyingAreaList(tallyingAreaMap.get(t.getId()));
+                }
+                if (characterTypeMap.containsKey(t.getId())) {
+                    t.setCharacterTypeList(characterTypeMap.get(t.getId()));
+                }
+                if (vehicleInfoMap.containsKey(t.getId())) {
+                    t.setVehicleInfoList(vehicleInfoMap.get(t.getId()));
+                }
+                //如果不是导出，才查询客户附件信息
+                if (!export) {
+                    t.setAttachmentGroupInfoList(attachmentService.listAttachment(t.getId(), input.getMarketId(), t.getOrganizationType()));
+                }
+            });
+
         }
         output.setData(list).setPageNum(pageNum).setTotal(total).setPageSize(input.getRows()).setPages(totalPage);
         return output;
