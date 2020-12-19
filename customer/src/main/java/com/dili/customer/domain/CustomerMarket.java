@@ -3,6 +3,7 @@ package com.dili.customer.domain;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.ss.dao.sql.DateNextVersion;
 import com.dili.ss.domain.BaseDomain;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -131,6 +132,9 @@ public class CustomerMarket extends BaseDomain {
     /**
      * 客户资料审核时间
      */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "`approval_time`")
     private LocalDateTime approvalTime;
 
