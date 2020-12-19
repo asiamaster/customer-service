@@ -5,7 +5,6 @@ import com.dili.customer.sdk.validator.CompleteView;
 import com.dili.customer.sdk.validator.UpdateView;
 import lombok.Data;
 
-import javax.persistence.Column;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -112,7 +111,7 @@ public class CustomerUpdateInput implements Serializable {
     /**
      * 客户身份信息
      */
-    @NotNull
+    @NotNull(message = "客户角色身份信息不能为空")
     private List<CharacterType> characterTypeList;
 
     /**

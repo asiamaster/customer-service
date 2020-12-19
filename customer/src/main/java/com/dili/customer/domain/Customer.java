@@ -3,6 +3,7 @@ package com.dili.customer.domain;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.customer.sdk.domain.dto.AttachmentGroupInfo;
+import com.dili.customer.sdk.domain.dto.CharacterTypeGroupDto;
 import com.dili.customer.utils.CustomerInfoUtil;
 import com.dili.ss.dao.sql.DateNextVersion;
 import com.dili.ss.domain.BaseDomain;
@@ -262,9 +263,17 @@ public class Customer extends BaseDomain {
 
     /**
      * 客户市场身份
+     * 数据库原始一对一数据
      */
     @Transient
     private List<CharacterType> characterTypeList;
+
+    /**
+     * 客户市场身份
+     * 分组转换一对多关系
+     */
+    @Transient
+    private List<CharacterTypeGroupDto> characterTypeGroupList;
 
     /**
      * 客户车辆信息

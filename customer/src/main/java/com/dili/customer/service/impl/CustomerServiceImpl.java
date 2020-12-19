@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.commons.glossary.YesOrNoEnum;
+import com.dili.customer.commons.service.CommonDataService;
 import com.dili.customer.config.CustomerConfig;
 import com.dili.customer.domain.*;
 import com.dili.customer.mapper.CustomerMapper;
@@ -64,6 +65,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final UidRpcService uidRpcService;
     private final RedisUtil redisUtil;
     private final AttachmentService attachmentService;
+    private final CommonDataService commonDataService;
 
     @Autowired
     private UserAccountService userAccountService;
@@ -261,6 +263,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 }
                 if (characterTypeMap.containsKey(t.getId())) {
                     t.setCharacterTypeList(characterTypeMap.get(t.getId()));
+                    t.setCharacterTypeGroupList(commonDataService.produceCharacterTypeGroup(JSONArray.parseArray(JSONObject.toJSONString(t.getCharacterTypeList()), com.dili.customer.sdk.domain.CharacterType.class), input.getMarketId()));
                 }
                 if (vehicleInfoMap.containsKey(t.getId())) {
                     t.setVehicleInfoList(vehicleInfoMap.get(t.getId()));
@@ -591,7 +594,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (Objects.nonNull(old)) {
             old.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
             old.setBusinessNature(customerMarket.getBusinessNature());
-            old.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
             old.setApprovalUserId(null);
             old.setApprovalTime(null);
             customerMarketService.update(old);
@@ -645,13 +647,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         }
         Customer customer = new Customer();
         customer.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
-        customer.setCode(getCustomerCode());
-        customer.setState(CustomerEnum.State.USELESS.getCode());
-        customer.setCreateTime(LocalDateTime.now());
-        customer.setModifyTime(customer.getCreateTime());
+        customer.setContactsPhone(contactsPhone);
         customer.setSourceSystem(sourceSystem);
-        customer.setSourceChannel("auto_register");
-        this.insertSelective(customer);
+        defaultRegister(customer);
         return BaseOutput.successData(customer);
     }
 
@@ -694,6 +692,20 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         data.setContactsPhone(cellphone);
         data.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
         return null;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void defaultRegister(Customer customer) {
+        if (Objects.nonNull(customer)) {
+            customer.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
+            customer.setCode(getCustomerCode());
+            customer.setState(CustomerEnum.State.USELESS.getCode());
+            customer.setCreateTime(LocalDateTime.now());
+            customer.setModifyTime(customer.getCreateTime());
+            customer.setSourceChannel("auto_register");
+            this.insertSelective(customer);
+        }
     }
 
 

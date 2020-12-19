@@ -5,7 +5,6 @@ import com.dili.customer.sdk.domain.dto.*;
 import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -104,4 +103,10 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @return
      */
     String updateCellphoneValid(Long customerId, String cellphone);
+
+    /**
+     * 默认注册实现
+     * @param customer
+     */
+    void defaultRegister(Customer customer);
 }

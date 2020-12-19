@@ -37,6 +37,12 @@ public class CustomerExtendDto extends Customer {
     private List<CharacterType> characterTypeList;
 
     /**
+     * 客户市场身份
+     * 分组转换一对多关系
+     */
+    private List<CharacterTypeGroupDto> characterTypeGroupList;
+
+    /**
      * 客户车辆信息
      */
     private List<VehicleInfo> vehicleInfoList;

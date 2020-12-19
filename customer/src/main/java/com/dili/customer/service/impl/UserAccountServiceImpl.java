@@ -235,16 +235,17 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
          * 终端号绑定为空，且用户账号也为空，则认为是新用户，未注册过
          */
         if (Objects.isNull(userAccount)) {
-            BaseOutput<Customer> customerBaseOutput = customerService.insertByContactsPhone(dto.getCellphone(), system);
-            if (customerBaseOutput.isSuccess()) {
-                Customer customer = customerBaseOutput.getData();
-                userAccount = new UserAccount();
-                userAccount.setAccountCode(dto.getCellphone()).setCellphone(dto.getCellphone()).setCustomerId(customer.getId()).setCustomerCode(customer.getCode())
-                        .setCertificateNumber(customer.getCertificateNumber()).setCellphoneValid(YesOrNoEnum.YES.getCode());
-                produceSaveData(userAccount);
-            } else {
-                return BaseOutput.failure(customerBaseOutput.getMessage()).setData(false);
-            }
+            Customer customer = new Customer();
+            customer.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
+            customer.setContactsPhone(dto.getCellphone());
+            customer.setSourceSystem(system);
+            customer.setName(dto.getNickName());
+            customerService.defaultRegister(customer);
+            userAccount = new UserAccount();
+            userAccount.setCellphone(dto.getCellphone()).setCustomerId(customer.getId()).setCustomerCode(customer.getCode())
+                    .setCertificateNumber(customer.getCertificateNumber()).setCellphoneValid(YesOrNoEnum.YES.getCode());
+            produceSaveData(userAccount);
+
         }
         if (StrUtil.isBlank(userAccount.getAvatarUrl())) {
             userAccount.setAvatarUrl(dto.getAvatarUrl());

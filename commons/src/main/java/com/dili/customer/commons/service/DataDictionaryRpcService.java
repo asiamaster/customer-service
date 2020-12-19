@@ -5,7 +5,6 @@ import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.uap.sdk.domain.DataDictionaryValue;
 import com.dili.uap.sdk.rpc.DataDictionaryRpc;
-import com.dili.uap.sdk.session.SessionContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -54,7 +53,9 @@ public class DataDictionaryRpcService {
         try {
             DataDictionaryValue dataDictionaryValue = DTOUtils.newInstance(DataDictionaryValue.class);
             dataDictionaryValue.setDdCode(ddCode);
-            dataDictionaryValue.setState(state);
+            if (Objects.nonNull(state)) {
+                dataDictionaryValue.setState(state);
+            }
             if (Objects.nonNull(marketId)) {
                 dataDictionaryValue.setFirmId(marketId);
             }
