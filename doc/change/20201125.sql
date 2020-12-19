@@ -80,7 +80,7 @@ ALTER TABLE customer_market ADD COLUMN `business_nature` VARCHAR(120) DEFAULT NU
 ALTER TABLE customer_market ADD COLUMN `approval_status` tinyint DEFAULT NULL COMMENT '客户资料审核状态' AFTER alias;
 ALTER TABLE customer_market ADD COLUMN `approval_user_id` bigint DEFAULT NULL COMMENT '客户资料审核人ID' AFTER approval_status;
 ALTER TABLE customer_market ADD COLUMN `approval_time` datetime DEFAULT NULL COMMENT '客户资料审核时间' AFTER approval_user_id;
-ALTER TABLE customer_market ADD COLUMN `approval_notes` datetime DEFAULT NULL COMMENT '客户资料审核备注' AFTER approval_time;
+ALTER TABLE customer_market ADD COLUMN `approval_notes` VARCHAR(255) DEFAULT NULL COMMENT '客户资料审核备注' AFTER approval_time;
 
 update customer_market set approval_status = 2;
 

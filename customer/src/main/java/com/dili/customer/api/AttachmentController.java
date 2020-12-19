@@ -35,7 +35,7 @@ public class AttachmentController {
      * @return
      */
     @PostMapping(value = "/listAttachment")
-    public BaseOutput<List<AttachmentGroupInfo>> listAttachment(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam("organizationType") String organizationType) {
+    public BaseOutput<List<AttachmentGroupInfo>> listAttachment(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId) {
         Attachment condition = new Attachment();
         condition.setCustomerId(customerId);
         condition.setMarketId(marketId);
