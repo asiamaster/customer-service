@@ -6,6 +6,7 @@ import com.dili.customer.commons.service.MarketRpcService;
 import com.dili.customer.domain.CustomerMarket;
 import com.dili.customer.domain.dto.CustomerMarketDto;
 import com.dili.customer.mapper.CustomerMarketMapper;
+import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.CustomerMarketService;
 import com.dili.ss.base.BaseServiceImpl;
@@ -15,10 +16,8 @@ import one.util.streamex.StreamEx;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -86,5 +85,23 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
             t.put("statusName", CustomerEnum.ApprovalStatus.getValueByCode(Integer.valueOf(Objects.toString(t.get("approvalStatus"), "0"))));
         });
         return mapList;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Optional<String> approval(MarketApprovalResultInput input) {
+        CustomerMarket customerMarket = this.queryByMarketAndCustomerId(input.getMarketId(), input.getCustomerId());
+        if (Objects.isNull(customerMarket)) {
+            return Optional.of("客户市场资料信息不存在");
+        }
+        if (!CustomerEnum.ApprovalStatus.WAIT_CONFIRM.equalsToCode(customerMarket.getApprovalStatus())) {
+            return Optional.of("状态已变更，不支持此操作");
+        }
+        customerMarket.setApprovalTime(LocalDateTime.now());
+        customerMarket.setApprovalStatus(input.getPassed() ? CustomerEnum.ApprovalStatus.PASSED.getCode() : CustomerEnum.ApprovalStatus.UN_PASS.getCode());
+        customerMarket.setApprovalUserId(input.getOperatorId());
+        customerMarket.setApprovalNotes(input.getApprovalNotes());
+        this.update(customerMarket);
+        return Optional.empty();
     }
 }

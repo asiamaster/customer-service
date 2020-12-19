@@ -437,6 +437,15 @@ public class CustomerEnum {
             }
             return "";
         }
+
+        /**
+         * 对比枚举值是否相等
+         * @param code
+         * @return
+         */
+        public Boolean equalsToCode(Integer code) {
+            return this.getCode().equals(code);
+        }
     }
 
 }

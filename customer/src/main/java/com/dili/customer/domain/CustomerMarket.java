@@ -139,6 +139,12 @@ public class CustomerMarket extends BaseDomain {
     private LocalDateTime approvalTime;
 
     /**
+     * 资料审核备注
+     */
+    @Column(name = "`approval_notes`")
+    private String approvalNotes;
+
+    /**
      * 备注信息
      */
     @Column(name = "`notes`")

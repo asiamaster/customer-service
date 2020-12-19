@@ -1,20 +1,21 @@
 package com.dili.customer.api;
 
+import cn.hutool.json.JSONUtil;
 import com.dili.customer.domain.CustomerMarket;
 import com.dili.customer.domain.dto.CustomerMarketDto;
+import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.CustomerMarketService;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 客户所属市场
@@ -80,5 +81,28 @@ public class CustomerMarketController {
     @PostMapping("/statisticsApproval")
     public BaseOutput statisticsApproval(@RequestParam("marketId") Long marketId) {
         return BaseOutput.success().setData(customerMarketService.statisticsApproval(marketId));
+    }
+
+    /**
+     * 客户审核结果处理
+     * @param input 审核结果
+     * @return
+     */
+    @PostMapping("/approval")
+    public BaseOutput<Boolean> approval(@RequestBody MarketApprovalResultInput input, BindingResult bindingResult) {
+        log.info(String.format("客户信息审核结果:%s", JSONUtil.toJsonStr(input)));
+        if (bindingResult.hasErrors()) {
+            return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
+        }
+        try {
+            Optional<String> approval = customerMarketService.approval(input);
+            if (approval.isPresent()) {
+                return BaseOutput.failure(approval.get()).setData(false);
+            }
+            return BaseOutput.successData(true);
+        } catch (Exception e) {
+            log.error(String.format("客户信息审核结果:%s 修改异常:%s", JSONUtil.toJsonStr(input), e.getMessage()), e);
+            return BaseOutput.failure("系统异常").setData(false);
+        }
     }
 }

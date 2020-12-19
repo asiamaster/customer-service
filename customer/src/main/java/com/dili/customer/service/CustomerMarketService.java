@@ -2,11 +2,13 @@ package com.dili.customer.service;
 
 import com.dili.customer.domain.CustomerMarket;
 import com.dili.customer.domain.dto.CustomerMarketDto;
+import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.ss.base.BaseService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -44,4 +46,10 @@ public interface CustomerMarketService extends BaseService<CustomerMarket, Long>
      * @return
      */
     List<Map<String, Object>> statisticsApproval(Long marketId);
+
+    /**
+     * 客户市场信息审核结果
+     * @param input
+     */
+    Optional<String> approval(MarketApprovalResultInput input);
 }
