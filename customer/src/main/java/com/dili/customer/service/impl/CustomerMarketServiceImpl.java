@@ -2,17 +2,21 @@ package com.dili.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.commons.service.MarketRpcService;
+import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.CustomerMarket;
 import com.dili.customer.domain.dto.CustomerMarketDto;
 import com.dili.customer.mapper.CustomerMarketMapper;
 import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.CustomerMarketService;
+import com.dili.customer.service.CustomerService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import one.util.streamex.StreamEx;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +37,8 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
     }
 
     private final MarketRpcService marketRpcService;
+    @Autowired
+    private CustomerService customerService;
 
     @Override
     public CustomerMarket queryByMarketAndCustomerId(Long marketId, Long customerId) {
@@ -90,6 +96,10 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Optional<String> approval(MarketApprovalResultInput input) {
+        Customer customer = customerService.get(input.getCustomerId());
+        if (Objects.isNull(customer)){
+            return Optional.of("客户信息不存在");
+        }
         CustomerMarket customerMarket = this.queryByMarketAndCustomerId(input.getMarketId(), input.getCustomerId());
         if (Objects.isNull(customerMarket)) {
             return Optional.of("客户市场资料信息不存在");
@@ -97,8 +107,16 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
         if (!CustomerEnum.ApprovalStatus.WAIT_CONFIRM.equalsToCode(customerMarket.getApprovalStatus())) {
             return Optional.of("状态已变更，不支持此操作");
         }
+        customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.UN_PASS.getCode());
+        if (input.getPassed()) {
+            if (!YesOrNoEnum.YES.getCode().equals(customer.getIsCertification())) {
+                customer.setIsCertification(YesOrNoEnum.YES.getCode());
+                customerService.update(customer);
+            }
+            customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.PASSED.getCode());
+        }
         customerMarket.setApprovalTime(LocalDateTime.now());
-        customerMarket.setApprovalStatus(input.getPassed() ? CustomerEnum.ApprovalStatus.PASSED.getCode() : CustomerEnum.ApprovalStatus.UN_PASS.getCode());
+
         customerMarket.setApprovalUserId(input.getOperatorId());
         customerMarket.setApprovalNotes(input.getApprovalNotes());
         this.update(customerMarket);

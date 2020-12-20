@@ -22,6 +22,7 @@ import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import com.dili.ss.redis.service.RedisUtil;
 import com.dili.ss.util.POJOUtils;
+import com.dili.uap.sdk.domain.DataDictionaryValue;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
@@ -54,7 +55,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private CustomerMapper getActualMapper() {
         return (CustomerMapper) getDao();
     }
-    private final CustomerMarketService customerMarketService;
+
     private final ContactsService contactsService;
     private final TallyingAreaService tallyingAreaService;
     private final AddressService addressService;
@@ -67,6 +68,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final AttachmentService attachmentService;
     private final CommonDataService commonDataService;
 
+    @Autowired
+    private CustomerMarketService customerMarketService;
     @Autowired
     private UserAccountService userAccountService;
 
@@ -275,6 +278,16 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                     List<Attachment> attachmentDataList = attachmentMap.get(t.getId());
                     t.setAttachmentList(attachmentDataList);
                     t.setAttachmentGroupInfoList(attachmentService.convertToGroup(attachmentDataList, t.getOrganizationType()));
+                }
+                if (!export) {
+                    String businessNature = t.getCustomerMarket().getBusinessNature();
+                    if (StrUtil.isNotBlank(businessNature)) {
+                        List<DataDictionaryValue> dataDictionaryValues = commonDataService.queryBusinessNature(null, input.getMarketId());
+                        Optional<DataDictionaryValue> first = dataDictionaryValues.stream().filter(d -> d.getCode().equals(businessNature)).findFirst();
+                        if (first.isPresent()) {
+                            t.getCustomerMarket().setMetadata("businessNatureValue", first.get().getName());
+                        }
+                    }
                 }
             });
         }
