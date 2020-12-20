@@ -7,11 +7,11 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.commons.glossary.YesOrNoEnum;
+import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.customer.commons.service.CommonDataService;
 import com.dili.customer.config.CustomerConfig;
 import com.dili.customer.domain.*;
 import com.dili.customer.mapper.CustomerMapper;
-import com.dili.customer.sdk.constants.CustomerConstant;
 import com.dili.customer.sdk.domain.dto.*;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.*;
@@ -245,7 +245,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             List<CharacterType> characterTypeList = characterTypeService.listByCustomerAndMarket(customerIdSet, input.getMarketId());
             //获取客户车辆信息
             List<VehicleInfo> vehicleInfoList = Lists.newArrayList();
-
+            //客户附件信息
+            List<Attachment> attachmentList = Lists.newArrayList();
             //如果是不是导出，才查询一些必要的数据值
             if (!export){
                 TallyingArea tallyingArea = new TallyingArea();
@@ -253,10 +254,12 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 tallyingArea.setCustomerIdSet(customerIdSet);
                 tallyingAreaList.addAll(tallyingAreaService.listByExample(tallyingArea));
                 vehicleInfoList.addAll(vehicleInfoService.listByCustomerAndMarket(customerIdSet, input.getMarketId()));
+                attachmentList.addAll(attachmentService.listByCustomerAndMarket(customerIdSet,input.getMarketId()));
             }
             Map<Long, List<TallyingArea>> tallyingAreaMap = tallyingAreaList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(TallyingArea::getCustomerId));
             Map<Long, List<CharacterType>> characterTypeMap = characterTypeList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(CharacterType::getCustomerId));
             Map<Long, List<VehicleInfo>> vehicleInfoMap = vehicleInfoList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(VehicleInfo::getCustomerId));
+            Map<Long, List<Attachment>> attachmentMap = attachmentList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(Attachment::getCustomerId));
             list.forEach(t -> {
                 if (tallyingAreaMap.containsKey(t.getId())) {
                     t.setTallyingAreaList(tallyingAreaMap.get(t.getId()));
@@ -268,12 +271,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 if (vehicleInfoMap.containsKey(t.getId())) {
                     t.setVehicleInfoList(vehicleInfoMap.get(t.getId()));
                 }
-                //如果不是导出，才查询客户附件信息
-                if (!export) {
-                    t.setAttachmentGroupInfoList(attachmentService.listAttachment(t.getId(), input.getMarketId(), t.getOrganizationType()));
+                if (attachmentMap.containsKey(t.getId())) {
+                    t.setAttachmentGroupInfoList(attachmentService.convertToGroup(attachmentMap.get(t.getId()), t.getOrganizationType()));
                 }
             });
-
         }
         output.setData(list).setPageNum(pageNum).setTotal(total).setPageSize(input.getRows()).setPages(totalPage);
         return output;

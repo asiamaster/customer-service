@@ -22,4 +22,9 @@ public interface CustomerConstant {
      * 注册验证码消息场景code
      */
     String REGISTER_SCENE_CODE = "registerAuthCode";
+
+    /**
+     * 本地缓存前缀
+     */
+    String CACHE_KEY = "customer_cache";
 }

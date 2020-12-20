@@ -3,11 +3,9 @@ package com.dili.customer.service;
 import com.dili.customer.domain.Attachment;
 import com.dili.customer.sdk.domain.dto.AttachmentGroupInfo;
 import com.dili.ss.base.BaseService;
-import com.dili.ss.domain.BaseOutput;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 客户附件信息
@@ -39,6 +37,21 @@ public interface AttachmentService extends BaseService<Attachment, Long> {
      * @param organizationType 客户组织类型
      * @return
      */
-    @PostMapping(value = "/listAttachment")
     List<AttachmentGroupInfo> listAttachment(Long customerId, Long marketId, String organizationType);
+
+    /**
+     * 根据客户类型组装分组数据
+     * @param attachmentList 附件信息
+     * @param organizationType 客户组织类型
+     * @return
+     */
+    List<AttachmentGroupInfo> convertToGroup(List<Attachment> attachmentList,String organizationType);
+
+    /**
+     * 根据客户及市场获取附件信息
+     * @param customerIdSet 客户ID集合
+     * @param marketId 市场ID
+     * @return
+     */
+    List<Attachment> listByCustomerAndMarket(Set<Long> customerIdSet, Long marketId);
 }

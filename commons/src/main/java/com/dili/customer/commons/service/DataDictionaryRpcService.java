@@ -1,14 +1,21 @@
 package com.dili.customer.commons.service;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.uap.sdk.domain.DataDictionaryValue;
 import com.dili.uap.sdk.rpc.DataDictionaryRpc;
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +31,8 @@ import java.util.Objects;
 public class DataDictionaryRpcService {
 
     private final DataDictionaryRpc dataDictionaryRpc;
+    @Resource(name = "caffeineTimedCache")
+    private Cache<String, String> caffeineTimedCache;
 
     /**
      * 根据条件查询数据字典信息
@@ -51,17 +60,27 @@ public class DataDictionaryRpcService {
      */
     public List<DataDictionaryValue> listByDdCode(String ddCode, Integer state, Long marketId) {
         try {
+            StringBuilder keyBuilder = new StringBuilder(CustomerConstant.CACHE_KEY).append("_").append(ddCode);
             DataDictionaryValue dataDictionaryValue = DTOUtils.newInstance(DataDictionaryValue.class);
             dataDictionaryValue.setDdCode(ddCode);
             if (Objects.nonNull(state)) {
                 dataDictionaryValue.setState(state);
+                keyBuilder.append("_").append(state);
             }
             if (Objects.nonNull(marketId)) {
                 dataDictionaryValue.setFirmId(marketId);
+                keyBuilder.append("_").append(marketId);
             }
-            BaseOutput<List<DataDictionaryValue>> listBaseOutput = dataDictionaryRpc.listDataDictionaryValue(dataDictionaryValue);
-            if (Objects.nonNull(listBaseOutput) && listBaseOutput.isSuccess()) {
-                return listBaseOutput.getData();
+            String str = caffeineTimedCache.get(keyBuilder.toString(), t -> {
+                BaseOutput<List<DataDictionaryValue>> listBaseOutput = dataDictionaryRpc.listDataDictionaryValue(dataDictionaryValue);
+                if (listBaseOutput.isSuccess() && CollectionUtil.isNotEmpty(listBaseOutput.getData())) {
+                    return JSONObject.toJSONString(listBaseOutput.getData());
+                }
+                return null;
+            });
+            if (StrUtil.isNotBlank(str)) {
+                List<DataDictionaryValue> dto = JSONArray.parseArray(str, DataDictionaryValue.class);
+                return dto;
             }
         } catch (Exception e) {
             log.error(String.format("根据ddCode【%s】及状态【%s】以及市场【%d】查询数据字典异常:%s", ddCode, state, marketId, e.getMessage()), e);

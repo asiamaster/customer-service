@@ -1,6 +1,7 @@
 package com.dili.customer.constants;
 
-import com.dili.customer.sdk.constants.CustomerConstant;
+
+import com.dili.customer.commons.constants.CustomerConstant;
 
 /**
  * @author yuehongbo

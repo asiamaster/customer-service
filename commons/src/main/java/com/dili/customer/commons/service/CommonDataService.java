@@ -34,15 +34,23 @@ public class CommonDataService {
 
     /**
      * 获取经营性质数据
-     * @param state
-     * @param marketId
+     * @param state 状态
+     * @param marketId 所属市场
      * @return
      */
     public List<DataDictionaryValue> queryBusinessNature(Integer state, Long marketId) {
         return dataDictionaryRpcService.listByDdCode("business_nature", state, marketId);
     }
 
-
+    /**
+     * 获取客户来源渠道
+     * @param state 状态
+     * @param marketId 所属市场
+     * @return
+     */
+    public List<DataDictionaryValue> querySourceChannel(Integer state, Long marketId) {
+        return dataDictionaryRpcService.listByDdCode("source_channel", state, marketId);
+    }
 
     /**
      * 组装生成客户角色身份信息
