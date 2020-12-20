@@ -282,6 +282,12 @@ public class Customer extends BaseDomain {
     private List<VehicleInfo> vehicleInfoList;
 
     /**
+     * 原始附件信息
+     */
+    @Transient
+    private List<Attachment> attachmentList;
+
+    /**
      * 客户附件分组显示信息
      */
     @Transient

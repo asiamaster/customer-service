@@ -46,4 +46,9 @@ public class CustomerExtendDto extends Customer {
      * 客户车辆信息
      */
     private List<VehicleInfo> vehicleInfoList;
+
+    /**
+     * 客户附件分组显示信息
+     */
+    private List<AttachmentGroupInfo> attachmentGroupInfoList;
 }

@@ -272,7 +272,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                     t.setVehicleInfoList(vehicleInfoMap.get(t.getId()));
                 }
                 if (attachmentMap.containsKey(t.getId())) {
-                    t.setAttachmentGroupInfoList(attachmentService.convertToGroup(attachmentMap.get(t.getId()), t.getOrganizationType()));
+                    List<Attachment> attachmentDataList = attachmentMap.get(t.getId());
+                    t.setAttachmentList(attachmentDataList);
+                    t.setAttachmentGroupInfoList(attachmentService.convertToGroup(attachmentDataList, t.getOrganizationType()));
                 }
             });
         }
