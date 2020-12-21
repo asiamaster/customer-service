@@ -111,27 +111,12 @@ INSERT INTO `uap`.`data_dictionary_value`(`dd_code`,`order_number`, `name`, `cod
 
 ##经营性质
 INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `level`, `system_code`, `description`) VALUES ('business_nature', '经营性质', NULL, 'CUSTOMER', NULL);
-##杭州水产
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 11, 'hzsc', 1, '批发', 'wholesale', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 11, 'hzsc', 2, '农贸', 'agricultural_trade', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 11, 'hzsc', 3, '团体', 'team', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 11, 'hzsc', 4, '个人', 'Individual', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 11, 'hzsc', 5, '餐饮', 'catering', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 11, 'hzsc', 6, '配送商', 'distributors', 1);
-##杭州蔬菜
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 14, 'hzve', 1, '批发', 'wholesale', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 14, 'hzve', 2, '农贸', 'agricultural_trade', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 14, 'hzve', 3, '团体', 'team', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 14, 'hzve', 4, '个人', 'Individual', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 14, 'hzve', 5, '餐饮', 'catering', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 14, 'hzve', 6, '配送商', 'distributors', 1);
-##杭州果品
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 15, 'hzgp', 1, '批发', 'wholesale', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 15, 'hzgp', 2, '农贸', 'agricultural_trade', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 15, 'hzgp', 3, '团体', 'team', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 15, 'hzgp', 4, '个人', 'Individual', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 15, 'hzgp', 5, '餐饮', 'catering', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 15, 'hzgp', 6, '配送商', 'distributors', 1);
+INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 1, '批发', 'wholesale', 1);
+INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 2, '农贸', 'agricultural_trade', 1);
+INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 3, '团体', 'team', 1);
+INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 4, '个人', 'Individual', 1);
+INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 5, '餐饮', 'catering', 1);
+INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 6, '配送商', 'distributors', 1);
 
 /*==============================================================*/
 /* Table: user_account         客户账号                                 */

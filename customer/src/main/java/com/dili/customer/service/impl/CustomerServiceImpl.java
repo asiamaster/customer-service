@@ -319,7 +319,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 }
                 String businessNature = t.getCustomerMarket().getBusinessNature();
                 if (StrUtil.isNotBlank(businessNature)) {
-                    List<DataDictionaryValue> dataDictionaryValues = commonDataService.queryBusinessNature(null, input.getMarketId());
+                    List<DataDictionaryValue> dataDictionaryValues = commonDataService.queryBusinessNature(null, null);
                     Optional<DataDictionaryValue> first = dataDictionaryValues.stream().filter(d -> d.getCode().equals(businessNature)).findFirst();
                     if (first.isPresent()) {
                         t.getCustomerMarket().setMetadata("businessNatureValue", first.get().getName());
