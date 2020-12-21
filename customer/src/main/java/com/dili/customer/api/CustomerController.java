@@ -68,7 +68,7 @@ public class CustomerController {
         if (Objects.isNull(customer.getState())) {
             customer.setState(CustomerEnum.State.NORMAL.getCode());
         }
-        customer.setIsDelete(YesOrNoEnum.YES.getCode());
+        customer.setIsDelete(YesOrNoEnum.NO.getCode());
         return customerService.listForPage(customer);
     }
 
@@ -103,7 +103,7 @@ public class CustomerController {
         if (Objects.isNull(customer.getState())) {
             customer.setState(CustomerEnum.State.NORMAL.getCode());
         }
-        customer.setIsDelete(YesOrNoEnum.YES.getCode());
+        customer.setIsDelete(YesOrNoEnum.NO.getCode());
         return customerService.listSimpleForPage(customer);
     }
 
