@@ -32,18 +32,18 @@ public interface CustomerService extends BaseService<Customer, Long> {
 
     /**
      * 分页查询客户信息
+     * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
      * @param input
      * @return
      */
-    PageOutput<List<Customer>> listForPage(CustomerQueryInput input);
+    PageOutput<List<Customer>> listSimpleForPage(CustomerQueryInput input);
 
     /**
      * 分页查询客户信息
      * @param input
-     * @param export 是否导出
      * @return
      */
-    PageOutput<List<Customer>> listForPage(CustomerQueryInput input, Boolean export);
+    PageOutput<List<Customer>> listForPage(CustomerQueryInput input);
 
     /**
      * 分页查询客户基本信息，不带有任何市场属性数据

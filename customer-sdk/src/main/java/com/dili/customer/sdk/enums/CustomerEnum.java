@@ -323,7 +323,7 @@ public class CustomerEnum {
 
         经营户("business_user_character_type", "经营户", Boolean.FALSE),
         买家("buyer_character_type", "买家", Boolean.FALSE),
-        其他类型("other_character_type", "其他类型", Boolean.TRUE),
+        其他类型("other_character_type", "其他类型", Boolean.FALSE),
         ;
         @Getter
         private String code;

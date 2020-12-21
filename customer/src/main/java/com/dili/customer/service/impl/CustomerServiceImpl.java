@@ -217,12 +217,43 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     }
 
     @Override
-    public PageOutput<List<Customer>> listForPage(CustomerQueryInput input) {
-        return listForPage(input, false);
+    public PageOutput<List<Customer>> listSimpleForPage(CustomerQueryInput input) {
+        if (StringUtils.isNotBlank(input.getSort())) {
+            input.setSort(POJOUtils.humpToLineFast(input.getSort()));
+        } else {
+            input.setSort("id");
+            input.setOrder("desc");
+        }
+        if (input.getRows() != null && input.getRows() >= 1) {
+            PageHelper.startPage(input.getPage(), input.getRows());
+        }
+        List<Customer> list = getActualMapper().listForPage(input);
+        //总记录
+        Long total = list instanceof Page ? ((Page) list).getTotal() : list.size();
+        //总页数
+        int totalPage = list instanceof Page ? ((Page) list).getPages() : 1;
+        //当前页数
+        int pageNum = list instanceof Page ? ((Page) list).getPageNum() : 1;
+        PageOutput output = PageOutput.success();
+        if (CollectionUtil.isNotEmpty(list)) {
+            Set<Long> customerIdSet = list.stream().map(Customer::getId).collect(Collectors.toSet());
+            //获取客户角色身份信息
+            List<CharacterType> characterTypeList = characterTypeService.listByCustomerAndMarket(customerIdSet, input.getMarketId());
+            Map<Long, List<CharacterType>> characterTypeMap = characterTypeList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(CharacterType::getCustomerId));
+            list.forEach(t -> {
+                if (characterTypeMap.containsKey(t.getId())) {
+                    t.setCharacterTypeList(characterTypeMap.get(t.getId()));
+                    t.setCharacterTypeGroupList(commonDataService.produceCharacterTypeGroup(JSONArray.parseArray(JSONObject.toJSONString(t.getCharacterTypeList()), com.dili.customer.sdk.domain.CharacterType.class), input.getMarketId()));
+                }
+            });
+        }
+        output.setData(list).setPageNum(pageNum).setTotal(total).setPageSize(input.getRows()).setPages(totalPage);
+        return output;
     }
 
+
     @Override
-    public PageOutput<List<Customer>> listForPage(CustomerQueryInput input, Boolean export) {
+    public PageOutput<List<Customer>> listForPage(CustomerQueryInput input) {
         if (StringUtils.isNotBlank(input.getSort())) {
             input.setSort(POJOUtils.humpToLineFast(input.getSort()));
         } else {
@@ -250,19 +281,23 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             List<VehicleInfo> vehicleInfoList = Lists.newArrayList();
             //客户附件信息
             List<Attachment> attachmentList = Lists.newArrayList();
-            //如果是不是导出，才查询一些必要的数据值
-            if (!export){
-                TallyingArea tallyingArea = new TallyingArea();
-                tallyingArea.setMarketId(input.getMarketId());
-                tallyingArea.setCustomerIdSet(customerIdSet);
-                tallyingAreaList.addAll(tallyingAreaService.listByExample(tallyingArea));
-                vehicleInfoList.addAll(vehicleInfoService.listByCustomerAndMarket(customerIdSet, input.getMarketId()));
-                attachmentList.addAll(attachmentService.listByCustomerAndMarket(customerIdSet,input.getMarketId()));
-            }
+            //市场经营品类信息
+            List<BusinessCategory> businessCategoryList = Lists.newArrayList();
+
+            TallyingArea tallyingArea = new TallyingArea();
+            tallyingArea.setMarketId(input.getMarketId());
+            tallyingArea.setCustomerIdSet(customerIdSet);
+            tallyingAreaList.addAll(tallyingAreaService.listByExample(tallyingArea));
+            vehicleInfoList.addAll(vehicleInfoService.listByCustomerAndMarket(customerIdSet, input.getMarketId()));
+            attachmentList.addAll(attachmentService.listByCustomerAndMarket(customerIdSet,input.getMarketId()));
+            businessCategoryList.addAll(businessCategoryService.listByCustomerAndMarket(customerIdSet,input.getMarketId()));
+
             Map<Long, List<TallyingArea>> tallyingAreaMap = tallyingAreaList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(TallyingArea::getCustomerId));
             Map<Long, List<CharacterType>> characterTypeMap = characterTypeList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(CharacterType::getCustomerId));
             Map<Long, List<VehicleInfo>> vehicleInfoMap = vehicleInfoList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(VehicleInfo::getCustomerId));
             Map<Long, List<Attachment>> attachmentMap = attachmentList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(Attachment::getCustomerId));
+            Map<Long, List<BusinessCategory>> businessCategoryMap = businessCategoryList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(BusinessCategory::getCustomerId));
+
             list.forEach(t -> {
                 if (tallyingAreaMap.containsKey(t.getId())) {
                     t.setTallyingAreaList(tallyingAreaMap.get(t.getId()));
@@ -279,14 +314,15 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                     t.setAttachmentList(attachmentDataList);
                     t.setAttachmentGroupInfoList(attachmentService.convertToGroup(attachmentDataList, t.getOrganizationType()));
                 }
-                if (!export) {
-                    String businessNature = t.getCustomerMarket().getBusinessNature();
-                    if (StrUtil.isNotBlank(businessNature)) {
-                        List<DataDictionaryValue> dataDictionaryValues = commonDataService.queryBusinessNature(null, input.getMarketId());
-                        Optional<DataDictionaryValue> first = dataDictionaryValues.stream().filter(d -> d.getCode().equals(businessNature)).findFirst();
-                        if (first.isPresent()) {
-                            t.getCustomerMarket().setMetadata("businessNatureValue", first.get().getName());
-                        }
+                if (businessCategoryMap.containsKey(t.getId())) {
+                    produceBusinessCategoryListData(t, businessCategoryMap.get(t.getId()));
+                }
+                String businessNature = t.getCustomerMarket().getBusinessNature();
+                if (StrUtil.isNotBlank(businessNature)) {
+                    List<DataDictionaryValue> dataDictionaryValues = commonDataService.queryBusinessNature(null, input.getMarketId());
+                    Optional<DataDictionaryValue> first = dataDictionaryValues.stream().filter(d -> d.getCode().equals(businessNature)).findFirst();
+                    if (first.isPresent()) {
+                        t.getCustomerMarket().setMetadata("businessNatureValue", first.get().getName());
                     }
                 }
             });
@@ -724,6 +760,20 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         }
     }
 
+
+    /**
+     * 生成客户经营品类数据
+     * @param customer 客户信息对象
+     */
+    private void produceBusinessCategoryListData(Customer customer, List<BusinessCategory> businessCategoryList) {
+        if (CollectionUtil.isNotEmpty(businessCategoryList)) {
+            customer.setBusinessCategoryList(businessCategoryList);
+            String categoryIdStr = businessCategoryList.stream().map(o -> o.getCategoryId()).filter(StrUtil::isNotBlank).collect(Collectors.joining(","));
+            String categoryNameStr = businessCategoryList.stream().map(o -> o.getCategoryName()).filter(StrUtil::isNotBlank).collect(Collectors.joining(","));
+            customer.setMetadata("businessCategoryName", categoryNameStr);
+            customer.setMetadata("businessCategorySelectedList", categoryIdStr);
+        }
+    }
 
     /**
      *  组装客户联系人信息

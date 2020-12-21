@@ -1,10 +1,10 @@
 package com.dili.customer.service;
 
 import com.dili.customer.domain.BusinessCategory;
-import com.dili.customer.domain.TallyingArea;
 import com.dili.ss.base.BaseService;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 客户经营品类信息
@@ -21,5 +21,13 @@ public interface BusinessCategoryService extends BaseService<BusinessCategory, L
      * @return
      */
     Integer saveInfo(List<BusinessCategory> businessCategoryList, Long customerId, Long marketId);
+
+    /**
+     * 根据客户及市场经营品类信息
+     * @param customerIdSet 客户ID集合
+     * @param marketId 市场ID
+     * @return
+     */
+    List<BusinessCategory> listByCustomerAndMarket(Set<Long> customerIdSet, Long marketId);
 
 }

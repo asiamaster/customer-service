@@ -6,6 +6,7 @@ import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -30,12 +31,32 @@ public interface CustomerRpc {
     PageOutput<List<CustomerExtendDto>> listPage(CustomerQueryInput customer);
 
     /**
-     * 获取客户导出数据
+     * 分页查询正常的客户数据集
+     * 用户未删除切状态为生效的
      * @param customer
      * @return
      */
-    @PostMapping(value = "/api/customer/export")
-    PageOutput<List<CustomerExtendDto>> export(CustomerQueryInput customer);
+    @PostMapping(value = "/api/customer/listNormalPage")
+    PageOutput<List<CustomerExtendDto>> listNormalPage(@RequestBody CustomerQueryInput customer);
+
+    /**
+     * 分页查询客户数据集
+     * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * @param customer
+     * @return
+     */
+    @PostMapping(value = "/api/customer/listSimplePage")
+    PageOutput<List<CustomerSimpleExtendDto>> listSimplePage(@RequestBody CustomerQueryInput customer);
+
+    /**
+     * 分页查询正常的客户数据集
+     * 用户未删除切状态为生效的
+     * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * @param customer
+     * @return
+     */
+    @PostMapping(value = "/api/customer/listSimpleNormalPage")
+    PageOutput<List<CustomerSimpleExtendDto>> listSimpleNormalPage(@RequestBody CustomerQueryInput customer);
 
     /**
      * 获取客户列表信息

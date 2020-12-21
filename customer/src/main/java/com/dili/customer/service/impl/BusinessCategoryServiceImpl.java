@@ -3,6 +3,7 @@ package com.dili.customer.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import com.dili.customer.domain.BusinessCategory;
+import com.dili.customer.domain.dto.BusinessCategoryDto;
 import com.dili.customer.mapper.BusinessCategoryMapper;
 import com.dili.customer.service.BusinessCategoryService;
 import com.dili.ss.base.BaseServiceImpl;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * 客户经营品类
@@ -48,5 +50,13 @@ public class BusinessCategoryServiceImpl extends BaseServiceImpl<BusinessCategor
             this.batchInsert(businessCategoryList);
         }
         return 0;
+    }
+
+    @Override
+    public List<BusinessCategory> listByCustomerAndMarket(Set<Long> customerIdSet, Long marketId) {
+        BusinessCategoryDto condition = new BusinessCategoryDto();
+        condition.setCustomerIdSet(customerIdSet);
+        condition.setMarketId(marketId);
+        return listByExample(condition);
     }
 }

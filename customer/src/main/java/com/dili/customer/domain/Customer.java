@@ -299,6 +299,12 @@ public class Customer extends BaseDomain {
     @Transient
     private String certificateNumberMask;
 
+    /**
+     * 市场经营品类
+     */
+    @Transient
+    private List<BusinessCategory> businessCategoryList;
+
     public String getCertificateNumberMask() {
         if (StrUtil.isNotBlank(certificateNumber)) {
             return CustomerInfoUtil.certificateNumberHide(certificateNumber);

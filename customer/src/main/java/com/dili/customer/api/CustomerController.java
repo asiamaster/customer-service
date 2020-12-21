@@ -3,6 +3,7 @@ package com.dili.customer.api;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.sdk.domain.dto.*;
@@ -59,30 +60,51 @@ public class CustomerController {
      * @return
      */
     @PostMapping(value="/listNormalPage")
-    public PageOutput<List<Customer>> listNormalPage(@RequestBody CustomerQueryInput customer){
+    public PageOutput<List<Customer>> listNormalPage(@RequestBody CustomerQueryInput customer) {
         log.info(String.format("客户listNormalPage查询:%s", JSONUtil.toJsonStr(customer)));
         if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
         if (Objects.isNull(customer.getState())) {
-            customer.setState(1);
+            customer.setState(CustomerEnum.State.NORMAL.getCode());
         }
-        customer.setIsDelete(0);
+        customer.setIsDelete(YesOrNoEnum.YES.getCode());
         return customerService.listForPage(customer);
     }
 
     /**
-     * 获取客户导出数据
+     * 分页查询客户数据集
+     * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
      * @param customer
      * @return
      */
-    @PostMapping(value="/export")
-    public PageOutput<List<Customer>> export(@RequestBody CustomerQueryInput customer) {
-        log.info(String.format("客户export查询:%s", JSONUtil.toJsonStr(customer)));
+    @PostMapping(value="/listSimplePage")
+    public PageOutput<List<Customer>> listSimplePage(@RequestBody CustomerQueryInput customer) {
+        log.info(String.format("客户listSimplePage查询:%s", JSONUtil.toJsonStr(customer)));
         if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
-        return customerService.listForPage(customer, true);
+        return customerService.listSimpleForPage(customer);
+    }
+
+    /**
+     * 分页查询正常的客户数据集
+     * 用户未删除切状态为生效的
+     * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * @param customer
+     * @return
+     */
+    @PostMapping(value="/listSimpleNormalPage")
+    public PageOutput<List<Customer>> listSimpleNormalPage(@RequestBody CustomerQueryInput customer) {
+        log.info(String.format("客户listSimpleNormalPage查询:%s", JSONUtil.toJsonStr(customer)));
+        if (Objects.isNull(customer.getMarketId())) {
+            return PageOutput.failure("客户所属市场不能为空");
+        }
+        if (Objects.isNull(customer.getState())) {
+            customer.setState(CustomerEnum.State.NORMAL.getCode());
+        }
+        customer.setIsDelete(YesOrNoEnum.YES.getCode());
+        return customerService.listSimpleForPage(customer);
     }
 
     /**
