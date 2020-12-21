@@ -114,7 +114,7 @@ INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `level`, `system_code`, `des
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 1, '批发', 'wholesale', 1);
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 2, '农贸', 'agricultural_trade', 1);
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 3, '团体', 'team', 1);
-INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 4, '个人', 'Individual', 1);
+INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 4, '个人', 'individual', 1);
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 5, '餐饮', 'catering', 1);
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 6, '配送商', 'distributors', 1);
 
@@ -155,3 +155,7 @@ create unique index idx_user_account_code on user_account
 );
 ## 更改附件类型为营业执照
 update attachment set file_type=1;
+
+INSERT INTO `uap`.`biz_number_rule` (`name`, `type`, `prefix`, `date_format`, `length`, `range`, `create_time`, `update_time`, `is_enable`, `step`) VALUES ('客户编号', 'customerCode', NULL, NULL, 8, '1', '2020-12-21 16:28:15', '2020-12-21 16:28:15', 1, 1);
+INSERT INTO `uap`.`biz_number` (`type`, `value`, `memo`, `version`, `modified`, `created`) VALUES ('customerCode', 1, '客户编号', '176928', '2020-12-21 16:29:53', '2020-12-21 16:28:15');
+

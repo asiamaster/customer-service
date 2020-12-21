@@ -1,6 +1,7 @@
 package com.dili.customer.commons.service;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.dili.customer.sdk.domain.CharacterType;
 import com.dili.customer.sdk.domain.dto.CharacterSubTypeDto;
 import com.dili.customer.sdk.domain.dto.CharacterTypeGroupDto;
@@ -35,11 +36,10 @@ public class CommonDataService {
     /**
      * 获取经营性质数据
      * @param state 状态
-     * @param marketId 所属市场
      * @return
      */
-    public List<DataDictionaryValue> queryBusinessNature(Integer state, Long marketId) {
-        return dataDictionaryRpcService.listByDdCode("business_nature", state, marketId);
+    public List<DataDictionaryValue> queryBusinessNature(Integer state) {
+        return dataDictionaryRpcService.listByDdCode("business_nature", state, null);
     }
 
     /**
@@ -60,7 +60,7 @@ public class CommonDataService {
      */
     public List<CharacterTypeGroupDto> produceCharacterTypeGroup(List<CharacterType> characterTypeListData, Long marketId) {
         Map<String, List<String>> dataMap = StreamEx.ofNullable(characterTypeListData).flatCollection(Function.identity()).nonNull()
-                .mapToEntry(item -> item.getCharacterType(), item -> item.getSubType()).grouping();
+                .filter(t-> StrUtil.isNotBlank(t.getCharacterType())).mapToEntry(item -> item.getCharacterType(), item -> item.getSubType()).grouping();
         Integer state = null;
         if (CollectionUtil.isEmpty(characterTypeListData)) {
             state = 1;
