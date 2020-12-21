@@ -73,7 +73,7 @@ public class CustomerController {
     }
 
     /**
-     * 分页查询客户数据集
+     * 分页查询简单客户数据集
      * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
      * @param customer
      * @return
@@ -88,7 +88,7 @@ public class CustomerController {
     }
 
     /**
-     * 分页查询正常的客户数据集
+     * 分页查询正常的简单客户数据集
      * 用户未删除切状态为生效的
      * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
      * @param customer
