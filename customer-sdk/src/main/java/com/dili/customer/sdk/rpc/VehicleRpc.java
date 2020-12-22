@@ -22,8 +22,8 @@ public interface VehicleRpc {
      * @param marketId 所属市场
      * @return 客户车辆信息数据
      */
-    @PostMapping(value = "/api/vehicle/vehicle")
-    BaseOutput<List<VehicleInfo>> vehicle(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
+    @PostMapping(value = "/api/vehicle/listVehicle")
+    BaseOutput<List<VehicleInfo>> listVehicle(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
 
     /**
      * 绑定客户车辆信息
