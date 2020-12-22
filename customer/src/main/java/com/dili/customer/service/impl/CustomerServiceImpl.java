@@ -416,13 +416,12 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (Objects.isNull(customerMarket)){
             customerMarket = new CustomerMarket();
         }
-        BeanUtils.copyProperties(updateInput.getCustomerMarket(), customerMarket,"grade");
+        BeanUtils.copyProperties(updateInput.getCustomerMarket(), customerMarket,"grade","modifyTime");
         customerMarket.setCustomerId(updateInput.getId());
         customerMarket.setModifierId(updateInput.getOperatorId());
-        customerMarket.setModifyTime(LocalDateTime.now());
         if (Objects.isNull(customerMarket.getId())) {
             customerMarket.setCreatorId(updateInput.getOperatorId());
-            customerMarket.setCreateTime(customerMarket.getModifyTime());
+            customerMarket.setCreateTime(LocalDateTime.now());
         }
         customerMarketService.saveOrUpdate(customerMarket);
         //声明市场ID变量，以便使用
@@ -641,7 +640,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             }
         }
         this.update(customer);
-        CustomerMarket customerMarket = BeanUtil.copyProperties(input.getCustomerMarket(), CustomerMarket.class, "id");
+        CustomerMarket customerMarket = BeanUtil.copyProperties(input.getCustomerMarket(), CustomerMarket.class, "id","CustomerMarket","grade");
         CustomerMarket old = customerMarketService.queryByMarketAndCustomerId(customerMarket.getMarketId(), customer.getId());
         if (Objects.nonNull(old)) {
             old.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
@@ -653,7 +652,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             customerMarket.setCustomerId(customer.getId());
             customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
             customerMarket.setCreateTime(LocalDateTime.now());
-            customerMarket.setModifyTime(customerMarket.getCreateTime());
             customerMarketService.insert(customerMarket);
         }
         //更新客户经营品类信息
