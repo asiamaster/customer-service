@@ -1,7 +1,7 @@
 ##数据字典 增加客户角色身份
-INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `level`, `system_code`, `description`) VALUES ('customer_other_character_type', '客户其它角色身份', NULL, 'CUSTOMER', '客户的其它角色身份');
-INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `level`, `system_code`, `description`) VALUES ('customer_buyer_character_type', '客户买家角色身份', NULL, 'CUSTOMER', '客户买家角色身份');
-INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `level`, `system_code`, `description`) VALUES ('customer_business_user_character_type', '客户经营户角色身份', NULL, 'CUSTOMER', '经营户角色身份类型');
+INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `level`, `system_code`, `description`) VALUES ('other_character_type', '客户其它角色身份', NULL, 'CUSTOMER', '客户的其它角色身份');
+INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `level`, `system_code`, `description`) VALUES ('buyer_character_type', '客户买家角色身份', NULL, 'CUSTOMER', '客户买家角色身份');
+INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `level`, `system_code`, `description`) VALUES ('business_user_character_type', '客户经营户角色身份', NULL, 'CUSTOMER', '经营户角色身份类型');
 
 use dili-customer;
 ##删除客户表中的字段
