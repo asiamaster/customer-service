@@ -741,6 +741,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         userAccountService.insertOrUpdate(userAccount);
         data.setContactsPhone(cellphone);
         data.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
+        this.update(data);
         return null;
     }
 
