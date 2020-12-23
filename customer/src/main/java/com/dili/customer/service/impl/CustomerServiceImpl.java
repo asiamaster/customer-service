@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.commons.glossary.YesOrNoEnum;
+import com.dili.customer.commons.config.CustomerCommonConfig;
 import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.customer.commons.service.CommonDataService;
 import com.dili.customer.config.CustomerConfig;
@@ -67,6 +68,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final RedisUtil redisUtil;
     private final AttachmentService attachmentService;
     private final CommonDataService commonDataService;
+    private final CustomerCommonConfig customerCommonConfig;
 
     @Autowired
     private CustomerMarketService customerMarketService;
@@ -640,7 +642,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             }
         }
         this.update(customer);
-        CustomerMarket customerMarket = BeanUtil.copyProperties(input.getCustomerMarket(), CustomerMarket.class, "id","CustomerMarket","grade");
+        CustomerMarket customerMarket = BeanUtil.copyProperties(input.getCustomerMarket(), CustomerMarket.class, "id","grade");
         CustomerMarket old = customerMarketService.queryByMarketAndCustomerId(customerMarket.getMarketId(), customer.getId());
         if (Objects.nonNull(old)) {
             old.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
@@ -649,6 +651,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             old.setApprovalTime(null);
             customerMarketService.update(old);
         } else {
+            customerMarket.setGrade(customerCommonConfig.getDefaultGrade(customerMarket.getMarketId()).getCode());
             customerMarket.setCustomerId(customer.getId());
             customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
             customerMarket.setCreateTime(LocalDateTime.now());
