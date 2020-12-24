@@ -42,6 +42,7 @@ public interface CustomerRpc {
     /**
      * 分页查询客户数据集
      * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * 如不关心客户的理货区、车辆、图片等附加数据，建议用此接口
      * @param customer
      * @return
      */
@@ -52,6 +53,7 @@ public interface CustomerRpc {
      * 分页查询正常的客户数据集
      * 用户未删除切状态为生效的
      * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * 如不关心客户的理货区、车辆、图片等附加数据，建议用此接口
      * @param customer
      * @return
      */
@@ -125,6 +127,17 @@ public interface CustomerRpc {
      */
     @PostMapping(value="/api/customer/get")
     BaseOutput<CustomerExtendDto> get(@RequestParam("id") Long id, @RequestParam("marketId") Long marketId);
+
+    /**
+     * 根据id及市场，查询客户的信息
+     * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * 如不关心客户的理货区、车辆、图片等附加数据，建议用此接口
+     * @param id       客户ID
+     * @param marketId 市场ID
+     * @return
+     */
+    @PostMapping(value = "/api/customer/getSimple")
+    BaseOutput<CustomerSimpleExtendDto> getSimple(@RequestParam("id") Long id, @RequestParam("marketId") Long marketId);
 
     /**
      * 根据id查询客户的基本信息，不带有任何的市场属性数据

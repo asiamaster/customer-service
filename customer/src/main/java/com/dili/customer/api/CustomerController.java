@@ -75,6 +75,7 @@ public class CustomerController {
     /**
      * 分页查询简单客户数据集
      * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * 如不关心客户的理货区、车辆、图片等附加数据，建议用此接口
      * @param customer
      * @return
      */
@@ -91,6 +92,7 @@ public class CustomerController {
      * 分页查询正常的简单客户数据集
      * 用户未删除切状态为生效的
      * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * 如不关心客户的理货区、车辆、图片等附加数据，建议用此接口
      * @param customer
      * @return
      */
@@ -135,6 +137,27 @@ public class CustomerController {
         condition.setId(id);
         condition.setMarketId(marketId);
         PageOutput<List<Customer>> pageOutput = customerService.listForPage(condition);
+        Customer customer = pageOutput.getData().stream().findFirst().orElse(null);
+        return BaseOutput.success().setData(customer);
+    }
+
+    /**
+     * 根据id及市场，查询客户的信息
+     * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * 如不关心客户的理货区、车辆、图片等附加数据，建议用此接口
+     * @param id 客户ID
+     * @param marketId 市场ID
+     * @return
+     */
+    @PostMapping(value = "/getSimple")
+    public BaseOutput<CustomerSimpleExtendDto> getSimple(@RequestParam("id") Long id, @RequestParam("marketId") Long marketId){
+        if (Objects.isNull(id) || Objects.isNull(marketId)) {
+            return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
+        }
+        CustomerQueryInput condition = new CustomerQueryInput();
+        condition.setId(id);
+        condition.setMarketId(marketId);
+        PageOutput<List<Customer>> pageOutput = customerService.listSimpleForPage(condition);
         Customer customer = pageOutput.getData().stream().findFirst().orElse(null);
         return BaseOutput.success().setData(customer);
     }
