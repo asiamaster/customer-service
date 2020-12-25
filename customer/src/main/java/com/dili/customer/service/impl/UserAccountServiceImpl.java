@@ -343,7 +343,12 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
      * @param saveData
      */
     private void setPassword(UserAccount saveData) {
-        saveData.setPassword(new BCryptPasswordEncoder().encode(CustomerServiceConstant.DEFAULT_PASSWORD));
+        //如果存在输入密码的情况，则直接加密输入的密码
+        if (StrUtil.isBlank(saveData.getPassword())) {
+            saveData.setPassword(new BCryptPasswordEncoder().encode(saveData.getPassword()));
+        } else {
+            saveData.setPassword(new BCryptPasswordEncoder().encode(CustomerServiceConstant.DEFAULT_PASSWORD));
+        }
     }
 
     /**
