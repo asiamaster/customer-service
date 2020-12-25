@@ -1,6 +1,7 @@
 package com.dili.customer.api;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.dili.commons.glossary.YesOrNoEnum;
@@ -358,6 +359,9 @@ public class CustomerController {
         log.info(String.format("个人客户信息完善:%s", JSONUtil.toJsonStr(input)));
         if (bindingResult.hasErrors()) {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
+        }
+        if (!IdcardUtil.isValidCard(input.getCertificateNumber())) {
+            return BaseOutput.failure("个人证件号码错误");
         }
         input.setOrganizationType(CustomerEnum.OrganizationType.INDIVIDUAL.getCode());
         return completeInfo(input);
