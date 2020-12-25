@@ -77,25 +77,25 @@
         <if test="null != certificateType">
             and c.certificate_type = #{certificateType}
         </if>
-        <if test="certificateNumber != null">
+        <if test="certificateNumber != null and '' != certificateNumber">
             and c.certificate_number = #{certificateNumber}
         </if>
-        <if test="certificateNumberMatch != null">
+        <if test="certificateNumberMatch != null and '' != certificateNumberMatch ">
             and c.certificate_number LIKE CONCAT('',#{certificateNumberMatch},'%')
         </if>
-        <if test="code != null">
+        <if test="code != null and '' != code ">
             and c.code = #{code}
         </if>
-        <if test="organizationType != null">
+        <if test="organizationType != null and '' != organizationType ">
             and c.organization_type = #{organizationType}
         </if>
-        <if test="contactsPhone != null">
+        <if test="contactsPhone != null and '' != contactsPhone ">
             and c.contacts_phone = #{contactsPhone}
         </if>
-        <if test="sourceSystem != null">
+        <if test="sourceSystem != null and '' != sourceSystem">
             and c.source_system = #{sourceSystem}
         </if>
-        <if test="sourceChannel != null">
+        <if test="sourceChannel != null and '' != sourceChannel">
             and c.source_channel = #{sourceChannel}
         </if>
         <if test="state != null">
@@ -110,7 +110,7 @@
         <if test="isDelete != null">
             and c.is_delete = #{isDelete}
         </if>
-        <if test="keyword != null">
+        <if test="keyword != null and '' != keyword">
             and ( c.certificate_number = #{keyword} or c.name like concat('%', #{keyword}, '%') or c.code like
             concat('%', #{keyword}, '%') or c.contacts_phone like concat('', #{keyword}, '%') )
         </if>
