@@ -600,6 +600,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customer.setContactsPhone(input.getContactsPhone());
                 customer.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
                 UserAccount userAccount = byCustomerId.get();
+                userAccount.setCertificateNumber(input.getCertificateNumber());
                 if (Objects.nonNull(accountData)){
                     userAccount.setChangedPwdTime(accountData.getChangedPwdTime()).setWechatTerminalCode(accountData.getWechatTerminalCode()).setAvatarUrl(accountData.getAvatarUrl());
                     accountData.setNewAccountId(userAccount.getId());
