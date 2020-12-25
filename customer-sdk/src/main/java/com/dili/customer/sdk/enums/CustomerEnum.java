@@ -42,10 +42,8 @@ public class CustomerEnum {
             this.value = value;
         }
 
-
         /**
          * 获取某个枚举值实例信息
-         *
          * @param code
          * @return
          */
@@ -56,6 +54,15 @@ public class CustomerEnum {
                 }
             }
             return null;
+        }
+
+        /**
+         * 对比枚举值是否相等
+         * @param code
+         * @return
+         */
+        public Boolean equalsToCode(Integer code) {
+            return this.getCode().equals(code);
         }
     }
 
@@ -374,7 +381,7 @@ public class CustomerEnum {
          * @param code
          * @return
          */
-        public Boolean equalsToCode(Integer code) {
+        public Boolean equalsToCode(String code) {
             return this.getCode().equals(code);
         }
     }

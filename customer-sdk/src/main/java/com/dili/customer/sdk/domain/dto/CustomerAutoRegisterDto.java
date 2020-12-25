@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 /**
  * @author yuehongbo
@@ -15,6 +16,13 @@ import javax.validation.constraints.Pattern;
 @Accessors(chain = true)
 @Data
 public class CustomerAutoRegisterDto {
+
+    /**
+     * 客户名称
+     */
+    @NotBlank(message = "名称不能为空")
+    @Size(max = 40, message = "名称不能超过40个字符")
+    private String name;
 
     /**
      * 联系电话

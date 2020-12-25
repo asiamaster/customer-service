@@ -111,12 +111,14 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
         if (input.getPassed()) {
             if (!YesOrNoEnum.YES.getCode().equals(customer.getIsCertification())) {
                 customer.setIsCertification(YesOrNoEnum.YES.getCode());
-                customerService.update(customer);
             }
+            if (CustomerEnum.State.USELESS.equalsToCode(customer.getState())) {
+                customer.setState(CustomerEnum.State.NORMAL.getCode());
+            }
+            customerService.update(customer);
             customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.PASSED.getCode());
         }
         customerMarket.setApprovalTime(LocalDateTime.now());
-
         customerMarket.setApprovalUserId(input.getOperatorId());
         customerMarket.setApprovalNotes(input.getApprovalNotes());
         this.update(customerMarket);

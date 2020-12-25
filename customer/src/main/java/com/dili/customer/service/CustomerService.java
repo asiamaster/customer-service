@@ -92,9 +92,10 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * 根据联系电话自动注册，此方法只会创建客户，不会创建对应的账号
      * @param contactsPhone 联系电话
      * @param sourceSystem 来源系统
+     * @param name 客户名称
      * @return
      */
-    BaseOutput<Customer> insertByContactsPhone(String contactsPhone, String sourceSystem);
+    BaseOutput<Customer> insertByContactsPhone(String contactsPhone, String sourceSystem, String name);
 
     /**
      * 更改客户-手机号验证

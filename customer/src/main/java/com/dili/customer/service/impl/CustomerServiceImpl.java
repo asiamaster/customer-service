@@ -553,13 +553,13 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (byCellphone.isPresent()) {
             return BaseOutput.failure("您的联系电话系统已存在对应账号，请更换其他号码，谢谢！");
         }
-        BaseOutput<Customer> customerBaseOutput = this.insertByContactsPhone(dto.getContactsPhone(), dto.getSourceSystem());
+        BaseOutput<Customer> customerBaseOutput = this.insertByContactsPhone(dto.getContactsPhone(), dto.getSourceSystem(),dto.getName());
         if (customerBaseOutput.isSuccess()) {
             Customer customer = customerBaseOutput.getData();
             UserAccount userAccount = new UserAccount();
             userAccount.setCellphone(customer.getContactsPhone()).setCustomerId(customer.getId())
                     .setCustomerCode(customer.getCode()).setCellphoneValid(customer.getIsCellphoneValid())
-                    .setAccountName(customer.getContactsPhone()).setAccountCode(customer.getContactsPhone()).setPassword(dto.getPassword());
+                    .setAccountName(customer.getName()).setAccountCode(customer.getContactsPhone()).setPassword(dto.getPassword());
             userAccountService.add(userAccount);
             return BaseOutput.successData(customer);
         } else {
@@ -693,12 +693,13 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BaseOutput<Customer> insertByContactsPhone(String contactsPhone, String sourceSystem) {
+    public BaseOutput<Customer> insertByContactsPhone(String contactsPhone, String sourceSystem, String name) {
         List<Customer> validatedCellphoneCustomerList = getValidatedCellphoneCustomer(contactsPhone);
         if (CollectionUtil.isNotEmpty(validatedCellphoneCustomerList)) {
             return BaseOutput.failure("您的联系电话系统已存在，请更换其他号码，谢谢！");
         }
         Customer customer = new Customer();
+        customer.setName(name);
         customer.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
         customer.setContactsPhone(contactsPhone);
         customer.setSourceSystem(sourceSystem);
@@ -752,7 +753,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     @Transactional(rollbackFor = Exception.class)
     public void defaultRegister(Customer customer) {
         if (Objects.nonNull(customer)) {
-            customer.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
             customer.setCode(getCustomerCode());
             customer.setState(CustomerEnum.State.USELESS.getCode());
             customer.setCreateTime(LocalDateTime.now());
