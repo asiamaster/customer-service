@@ -1,7 +1,5 @@
 package com.dili.customer.config;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.dili.customer.domain.wechat.AppletSecret;
 import com.google.common.collect.Maps;
@@ -30,7 +28,7 @@ public class AppletSecretConfig {
     @PostConstruct
     public void init() {
         wechatAppletSecret.forEach((t, v) -> {
-            initAppIdSecretMaps.put(t, JSONUtil.toBean(JSONUtil.toJsonStr(v), AppletSecret.class));
+            initAppIdSecretMaps.put(t.toUpperCase(), JSONUtil.toBean(JSONUtil.toJsonStr(v), AppletSecret.class));
         });
     }
 
