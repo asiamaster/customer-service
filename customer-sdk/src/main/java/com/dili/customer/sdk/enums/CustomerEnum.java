@@ -421,7 +421,7 @@ public class CustomerEnum {
          * @param code
          * @return
          */
-        public static ApprovalStatus getInstance(String code) {
+        public static ApprovalStatus getInstance(Integer code) {
             for (ApprovalStatus as : ApprovalStatus.values()) {
                 if (as.getCode().equals(code)) {
                     return as;
