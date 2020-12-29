@@ -226,6 +226,20 @@ public class CustomerController {
     }
 
     /**
+     * 查询客户数据集
+     * @param customer
+     * @return
+     */
+    @PostMapping(value="/listSimple")
+    public BaseOutput<List<Customer>> listSimple(@RequestBody CustomerQueryInput customer) {
+        if (Objects.isNull(customer.getMarketId())) {
+            return BaseOutput.failure("客户所属市场不能为空");
+        }
+        PageOutput<List<Customer>> pageOutput = customerService.listSimpleForPage(customer);
+        return BaseOutput.success().setData(pageOutput.getData());
+    }
+
+    /**
      * 客户信息更新
      * @param updateInput 更新数据
      * @return BaseOutput

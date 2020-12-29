@@ -70,6 +70,16 @@ public interface CustomerRpc {
 
     /**
      * 获取客户列表信息
+     * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * 如不关心客户的理货区、车辆、图片等附加数据，建议用此接口
+     * @param customer
+     * @return
+     */
+    @PostMapping(value = "/api/customer/listSimple")
+    BaseOutput<List<CustomerSimpleExtendDto>> listSimple(CustomerQueryInput customer);
+
+    /**
+     * 获取客户列表信息
      * @param customer
      * @return
      */
