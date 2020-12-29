@@ -3,6 +3,7 @@ package com.dili.customer.utils;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.dili.customer.domain.AccountTerminal;
@@ -10,8 +11,6 @@ import com.dili.customer.domain.UserAccount;
 import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.sdk.constants.SecurityConstant;
 import com.dili.customer.sdk.domain.dto.UserAccountJwtDto;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.springframework.beans.BeanUtils;
 
 import java.util.Date;
@@ -35,9 +34,9 @@ public class LoginUtil {
         userAccount.setPassword("");
         LoginSuccessData loginSuccessData = new LoginSuccessData();
         loginSuccessData.setAccessToken(token);
-        JsonObject jsonObject = GsonBuilderUtil.create().toJsonTree(userAccount).getAsJsonObject();
+        JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(userAccount));
         if (Objects.nonNull(accountTerminal)) {
-            jsonObject.addProperty("avatarUrl", accountTerminal.getAvatarUrl());
+            jsonObject.put("avatarUrl", accountTerminal.getAvatarUrl());
         }
         loginSuccessData.setUserInfo(jsonObject);
         return loginSuccessData;

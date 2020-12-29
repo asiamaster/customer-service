@@ -1,7 +1,6 @@
 package com.dili.customer.domain.wechat;
 
-import com.dili.customer.domain.UserAccount;
-import com.google.gson.JsonObject;
+import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,5 +22,5 @@ public class LoginSuccessData {
     /**
      * 用户信息
      */
-    private JsonObject userInfo;
+    private JSONObject userInfo;
 }
