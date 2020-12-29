@@ -130,7 +130,7 @@ public class WeChatService {
      * @return
      */
     public BaseOutput bindingWechat(String terminalCode, String cellphone, String wechatAvatarUrl, String appId) {
-        Optional<AccountTerminal> byWechat = accountTerminalService.getByAppAndTerminalCode(terminalCode, UserAccountEnum.AccountTerminalType.WE_CHAT, appId);
+        Optional<AccountTerminal> byWechat = accountTerminalService.getByAppAndTerminalCode(appId, UserAccountEnum.AccountTerminalType.WE_CHAT, terminalCode);
         if (byWechat.isPresent()) {
             AccountTerminal accountTerminal = byWechat.get();
             UserAccount userAccount = userAccountService.get(accountTerminal.getAccountId());
@@ -165,7 +165,7 @@ public class WeChatService {
      * @return
      */
     public BaseOutput<LoginSuccessData> loginByWechat(String terminalCode, String appId) {
-        Optional<AccountTerminal> byWechat = accountTerminalService.getByAppAndTerminalCode(terminalCode, UserAccountEnum.AccountTerminalType.WE_CHAT, appId);
+        Optional<AccountTerminal> byWechat = accountTerminalService.getByAppAndTerminalCode(appId, UserAccountEnum.AccountTerminalType.WE_CHAT, terminalCode);
         if (byWechat.isPresent()) {
             AccountTerminal accountTerminal = byWechat.get();
             UserAccount userAccount = userAccountService.get(accountTerminal.getAccountId());
