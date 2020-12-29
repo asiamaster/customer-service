@@ -12,6 +12,7 @@ import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.sdk.validator.*;
 import com.dili.customer.service.CustomerService;
 import com.dili.customer.service.UserAccountService;
+import com.dili.customer.utils.LoginUtil;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
@@ -376,7 +377,7 @@ public class CustomerController {
         try {
             BaseOutput<Customer> customerBaseOutput = customerService.completeInfo(input);
             if (customerBaseOutput.isSuccess()) {
-                return BaseOutput.successData(userAccountService.getLoginSuccessData(userAccountService.getByCellphone(input.getContactsPhone()).get()));
+                return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccountService.getByCellphone(input.getContactsPhone()).get(), null));
             }
             return BaseOutput.failure(customerBaseOutput.getMessage());
         } catch (Exception e) {

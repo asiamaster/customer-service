@@ -134,8 +134,6 @@ create table user_account
     password             varchar(100) comment '用户密码',
     cellphone_valid      tinyint comment '手机号是否已验证',
     is_enable            tinyint comment '是否启用',
-    wechat_terminal_code varchar(30) comment '微信终端号',
-    avatar_url           varchar(255) comment '头像地址',
     notes                varchar(255) comment '备注',
     changed_pwd_time     datetime comment '更新密码的时间',
     new_account_id      bigint comment '账号合并后关联的新ID',
@@ -159,3 +157,22 @@ update attachment set file_type=1;
 INSERT INTO `uap`.`biz_number_rule` (`name`, `type`, `prefix`, `date_format`, `length`, `range`, `create_time`, `update_time`, `is_enable`, `step`) VALUES ('客户编号', 'customerCode', NULL, NULL, 8, '1', '2020-12-21 16:28:15', '2020-12-21 16:28:15', 1, 1);
 INSERT INTO `uap`.`biz_number` (`type`, `value`, `memo`, `version`, `modified`, `created`) VALUES ('customerCode', 1, '客户编号', '176928', '2020-12-21 16:29:53', '2020-12-21 16:28:15');
 
+
+
+/*==============================================================*/
+/* Table: account_terminal    用户账号绑定的终端类型                                  */
+/*==============================================================*/
+drop table if exists account_terminal;
+create table account_terminal
+(
+    id                   bigint not null auto_increment comment '主键ID',
+    account_id           bigint comment '所属账号',
+    app_id               varchar(64) comment '第三方ID',
+    terminal_type        tinyint comment '终端类型(微信?支付宝?)',
+    terminal_code        varchar(30) comment '微信终端号',
+    avatar_url           varchar(255) comment '头像地址',
+    create_time          datetime default CURRENT_TIMESTAMP comment '创建时间',
+    modify_time          datetime default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '修改时间',
+    primary key (id)
+);
+alter table account_terminal comment '用户账号绑定的终端信息';

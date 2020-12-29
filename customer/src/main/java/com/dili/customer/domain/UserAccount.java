@@ -99,18 +99,6 @@ public class UserAccount extends BaseDomain implements Serializable {
     private Integer isEnable;
 
     /**
-     * 微信终端号(openId)
-     */
-    @Column(name = "wechat_terminal_code")
-    private String wechatTerminalCode;
-
-    /**
-     * 头像地址
-     */
-    @Column(name = "avatar_url")
-    private String avatarUrl;
-
-    /**
      * 备注
      */
     @Column(name = "notes")

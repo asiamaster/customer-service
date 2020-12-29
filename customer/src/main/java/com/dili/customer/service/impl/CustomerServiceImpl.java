@@ -69,7 +69,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final AttachmentService attachmentService;
     private final CommonDataService commonDataService;
     private final CustomerCommonConfig customerCommonConfig;
-
+    private final AccountTerminalService accountTerminalService;
     @Autowired
     private CustomerMarketService customerMarketService;
     @Autowired
@@ -602,7 +602,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 UserAccount userAccount = byCustomerId.get();
                 userAccount.setCertificateNumber(input.getCertificateNumber());
                 if (Objects.nonNull(accountData)){
-                    userAccount.setChangedPwdTime(accountData.getChangedPwdTime()).setWechatTerminalCode(accountData.getWechatTerminalCode()).setAvatarUrl(accountData.getAvatarUrl());
+                    userAccount.setChangedPwdTime(accountData.getChangedPwdTime());
                     accountData.setNewAccountId(userAccount.getId());
                     accountData.setDeleted(YesOrNoEnum.YES.getCode());
                     userAccountService.update(accountData);
@@ -610,6 +610,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 userAccount.setPassword(accountData.getPassword());
                 userAccount.setCellphone(input.getContactsPhone()).setCellphoneValid(YesOrNoEnum.YES.getCode());
                 userAccountService.update(userAccount);
+                accountTerminalService.updateAccountId(accountData.getId(), userAccount.getId());
             }
         } else {
             if (CustomerEnum.OrganizationType.INDIVIDUAL.equalsToCode(input.getOrganizationType())) {

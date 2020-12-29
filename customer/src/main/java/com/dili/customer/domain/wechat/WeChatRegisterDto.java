@@ -29,6 +29,13 @@ public class WeChatRegisterDto {
      */
     @NotBlank(message = "微信openId不能为空")
     private String openId;
+
+    /**
+     * 应用ID
+     */
+    @NotBlank(message = "应用AppId不能为空")
+    private String appId;
+
     /**
      * 头像
      */

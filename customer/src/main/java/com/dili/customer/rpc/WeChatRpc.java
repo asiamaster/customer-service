@@ -64,7 +64,7 @@ public class WeChatRpc {
                 log.info("code2session responseBody << " + responseBody);
                 JsCode2Session jsCode2Session = JsCode2Session.fromJson(responseBody);
                 if (Objects.isNull(jsCode2Session.getErrCode()) || jsCode2Session.getErrCode() == 0) {
-                    return BaseOutput.successData(jsCode2Session);
+                    return BaseOutput.successData(jsCode2Session).setMetadata(appletSecret.getAppId());
                 }
                 return BaseOutput.failure(jsCode2Session.getErrMsg()).setCode(String.valueOf(jsCode2Session.getErrCode()));
             } else {

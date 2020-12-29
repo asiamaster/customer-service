@@ -8,7 +8,7 @@ import com.dili.customer.domain.wechat.JsCode2Session;
 import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.domain.wechat.WeChatRegisterDto;
 import com.dili.customer.rpc.WeChatRpc;
-import com.dili.customer.service.UserAccountService;
+import com.dili.customer.service.WeChatService;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 微信端服务接口
@@ -30,8 +31,8 @@ import java.util.Map;
 public class WeChatController {
 
     private final WeChatRpc weChatRpc;
-    private final UserAccountService userAccountService;
     private final AppletSystemInfo appletSystemInfo;
+    private final WeChatService weChatService;
 
     /**
      * 微信号登录校验
@@ -45,7 +46,7 @@ public class WeChatController {
         }
         BaseOutput<JsCode2Session> baseOutput = weChatRpc.code2session(code);
         if (baseOutput.isSuccess()) {
-            return userAccountService.loginByWechat(baseOutput.getData().getOpenId());
+            return weChatService.loginByWechat(baseOutput.getData().getOpenId(), Objects.toString(baseOutput.getMetadata(), ""));
         }
         return BaseOutput.failure(baseOutput.getMessage()).setCode(baseOutput.getCode());
     }
@@ -69,7 +70,7 @@ public class WeChatController {
         }
         BaseOutput<JsCode2Session> baseOutput = weChatRpc.code2session(code);
         if (baseOutput.isSuccess()) {
-            return userAccountService.bindingWechat(baseOutput.getData().getOpenId(), cellphone, avatarUrl);
+            return weChatService.bindingWechat(baseOutput.getData().getOpenId(), cellphone, avatarUrl,Objects.toString(baseOutput.getMetadata(),""));
         }
         return baseOutput;
     }
@@ -107,7 +108,7 @@ public class WeChatController {
     @AppletRequest
     @PostMapping(value = "/weChatRegister")
     public BaseOutput weChatRegister(@RequestBody WeChatRegisterDto dto) {
-        return userAccountService.weChatRegister(dto, appletSystemInfo.getAppletSystem(), false);
+        return weChatService.weChatRegister(dto, appletSystemInfo.getAppletSystem(), false);
     }
 
     /**
@@ -118,6 +119,6 @@ public class WeChatController {
     @AppletRequest
     @PostMapping(value = "/registerAndLogin")
     public BaseOutput registerAndLogin(@RequestBody WeChatRegisterDto dto) {
-        return userAccountService.weChatRegister(dto, appletSystemInfo.getAppletSystem(), true);
+        return weChatService.weChatRegister(dto, appletSystemInfo.getAppletSystem(), true);
     }
 }

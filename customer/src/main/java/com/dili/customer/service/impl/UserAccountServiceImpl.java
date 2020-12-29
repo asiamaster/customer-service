@@ -1,38 +1,27 @@
 package com.dili.customer.service.impl;
 
-import cn.hutool.core.date.DateField;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.validation.BeanValidationResult;
-import cn.hutool.extra.validation.ValidationUtil;
-import cn.hutool.json.JSONUtil;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.constants.CustomerServiceConstant;
-import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.UserAccount;
 import com.dili.customer.domain.wechat.LoginSuccessData;
-import com.dili.customer.domain.wechat.WeChatRegisterDto;
 import com.dili.customer.mapper.UserAccountMapper;
-import com.dili.customer.sdk.constants.SecurityConstant;
-import com.dili.customer.sdk.domain.dto.UserAccountJwtDto;
+import com.dili.customer.service.AccountTerminalService;
 import com.dili.customer.service.CustomerService;
 import com.dili.customer.service.UserAccountService;
+import com.dili.customer.utils.LoginUtil;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,6 +38,8 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
     private final UserAccountMapper userAccountMapper;
     @Autowired
     private CustomerService customerService;
+
+    private final AccountTerminalService accountTerminalService;
 
     @Override
     public BaseOutput<Boolean> changePassword(Long id, String oldPassword, String newPassword) {
@@ -87,8 +78,7 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
         if (!encoder.matches(password, info.getPassword())) {
             return BaseOutput.failure("账号或密码不正确").setCode(ResultCode.UNAUTHORIZED);
         }
-        return BaseOutput.successData(getLoginSuccessData(info));
-
+        return BaseOutput.successData(LoginUtil.getLoginSuccessData(info,null));
     }
 
     @Override
@@ -112,46 +102,6 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
             setPassword(userAccount);
             this.update(userAccount);
         }
-    }
-
-    @Override
-    public BaseOutput<LoginSuccessData> loginByWechat(String terminalCode) {
-        Optional<UserAccount> byWechat = this.getByWechat(terminalCode);
-        UserAccount userAccount = null;
-        if (byWechat.isPresent()){
-            userAccount = byWechat.get();
-            if (!userAccount.getIsEnable().equals(YesOrNoEnum.YES.getCode())){
-                return BaseOutput.failure("用户为不可用状态,不能进行此操作").setCode(ResultCode.DATA_ERROR);
-            }
-        } else {
-            return BaseOutput.failure("未注册任何账号").setCode(ResultCode.NOT_FOUND);
-        }
-        return BaseOutput.successData(getLoginSuccessData(userAccount));
-    }
-
-    @Override
-    public BaseOutput bindingWechat(String terminalCode, String cellphone, String wechatAvatarUrl) {
-        Optional<UserAccount> byWechat = this.getByWechat(terminalCode);
-        if (byWechat.isPresent()) {
-            UserAccount userAccount = byWechat.get();
-            if (!userAccount.getCellphone().equals(cellphone)) {
-                return BaseOutput.failure("该微信号已经绑定其他账号").setCode(ResultCode.FORBIDDEN);
-            } else {
-                //如果已和当前手机号绑定，则直接返回，认为已绑定
-                return BaseOutput.success();
-            }
-        }
-        Optional<UserAccount> byCellphone = this.getByCellphone(cellphone);
-        if (byCellphone.isEmpty()) {
-            return BaseOutput.failure("对应的账号不存").setCode(ResultCode.PARAMS_ERROR);
-        }
-        UserAccount userAccount = byCellphone.get();
-        userAccount.setWechatTerminalCode(terminalCode);
-        if (StrUtil.isBlank(userAccount.getAvatarUrl())) {
-            userAccount.setAvatarUrl(wechatAvatarUrl);
-        }
-        this.update(userAccount);
-        return BaseOutput.success();
     }
 
     /**
@@ -189,83 +139,6 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public BaseOutput weChatRegister(WeChatRegisterDto dto, String system, Boolean login) {
-        if (Objects.isNull(dto)) {
-            return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
-        }
-        BeanValidationResult beanValidationResult = ValidationUtil.warpValidate(dto);
-        if (!beanValidationResult.isSuccess()) {
-            return BaseOutput.failure(beanValidationResult.getErrorMessages().get(0).getMessage()).setCode(ResultCode.PARAMS_ERROR);
-        }
-        /**
-         * 根据微信openId获取微信绑定账号
-         */
-        Optional<UserAccount> byWechat = this.getByWechat(dto.getOpenId());
-        if (byWechat.isPresent()) {
-            UserAccount userAccount = byWechat.get();
-            if (StrUtil.isBlank(userAccount.getAvatarUrl())) {
-                userAccount.setAvatarUrl(dto.getAvatarUrl());
-            }
-            if (StrUtil.isBlank(userAccount.getAccountName())) {
-                userAccount.setAccountName(dto.getNickName());
-            }
-            this.update(userAccount);
-            if (login) {
-                if (!userAccount.getIsEnable().equals(YesOrNoEnum.YES.getCode())) {
-                    return BaseOutput.failure("用户为不可用状态,不能进行此操作").setCode(ResultCode.DATA_ERROR);
-                }
-                return BaseOutput.successData(getLoginSuccessData(userAccount));
-            }
-            return BaseOutput.successData(true);
-        }
-        Optional<UserAccount> byCellphone = this.getByCellphone(dto.getCellphone());
-        UserAccount userAccount = null;
-        /**
-         * 如果手机号已注册，则判断注册的
-         */
-        if (byCellphone.isPresent()) {
-            userAccount = byCellphone.get();
-            //如果此账号已绑定微信终端，则需要判断绑定的微信终端是否为当前传入
-            if (StrUtil.isNotBlank(userAccount.getWechatTerminalCode())) {
-                return BaseOutput.failure("此手机号已绑定其它终端").setData(false).setCode(ResultCode.DATA_ERROR);
-            }
-        }
-        /**
-         * 终端号绑定为空，且用户账号也为空，则认为是新用户，未注册过
-         */
-        if (Objects.isNull(userAccount)) {
-            Customer customer = new Customer();
-            customer.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
-            customer.setContactsPhone(dto.getCellphone());
-            customer.setSourceSystem(system);
-            customer.setName(dto.getNickName());
-            customerService.defaultRegister(customer);
-            userAccount = new UserAccount();
-            userAccount.setCellphone(dto.getCellphone()).setCustomerId(customer.getId()).setCustomerCode(customer.getCode())
-                    .setCertificateNumber(customer.getCertificateNumber()).setCellphoneValid(YesOrNoEnum.YES.getCode());
-            produceSaveData(userAccount);
-
-        }
-        if (StrUtil.isBlank(userAccount.getAvatarUrl())) {
-            userAccount.setAvatarUrl(dto.getAvatarUrl());
-        }
-        if (StrUtil.isBlank(userAccount.getAccountName())) {
-            userAccount.setAccountName(dto.getNickName());
-        }
-        userAccount.setModifyTime(LocalDateTime.now());
-        userAccount.setWechatTerminalCode(dto.getOpenId());
-        this.saveOrUpdate(userAccount);
-        if (login) {
-            if (!userAccount.getIsEnable().equals(YesOrNoEnum.YES.getCode())) {
-                return BaseOutput.failure("用户为不可用状态,不能进行此操作").setCode(ResultCode.DATA_ERROR);
-            }
-            return BaseOutput.successData(getLoginSuccessData(userAccount));
-        }
-        return BaseOutput.successData(true);
-    }
-
-    @Override
     public BaseOutput<LoginSuccessData> loginByCertificateNumber(String certificateNumber, String password) {
         if (StrUtil.isBlank(certificateNumber) || StrUtil.isBlank(password)) {
             return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
@@ -285,7 +158,7 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
         if (!encoder.matches(password, info.getPassword())) {
             return BaseOutput.failure("账号或密码不正确").setCode(ResultCode.UNAUTHORIZED);
         }
-        return BaseOutput.successData(getLoginSuccessData(info));
+        return BaseOutput.successData(LoginUtil.getLoginSuccessData(info, null));
     }
 
     @Override
@@ -296,31 +169,6 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
         return list(condition).stream().findFirst();
     }
 
-    @Override
-    public LoginSuccessData getLoginSuccessData(UserAccount userAccount) {
-        String token = getToken(userAccount);
-        userAccount.setPassword("");
-        LoginSuccessData loginSuccessData = new LoginSuccessData();
-        loginSuccessData.setAccessToken(token);
-        loginSuccessData.setUserInfo(userAccount);
-        return loginSuccessData;
-    }
-
-    /**
-     * 根据微信终端号，获取账号信息
-     * @param terminalCode 微信终端号
-     * @return
-     */
-    private Optional<UserAccount> getByWechat(String terminalCode) {
-        if (StrUtil.isBlank(terminalCode)) {
-            return Optional.empty();
-        }
-        UserAccount queryCondition = new UserAccount();
-        queryCondition.setWechatTerminalCode(terminalCode);
-        queryCondition.setDeleted(YesOrNoEnum.NO.getCode());
-        List<UserAccount> accountList = this.list(queryCondition);
-        return accountList.stream().findFirst();
-    }
 
     /**
      * 生成默认保存数据
@@ -344,30 +192,11 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
      */
     private void setPassword(UserAccount saveData) {
         //如果存在输入密码的情况，则直接加密输入的密码
-        if (StrUtil.isBlank(saveData.getPassword())) {
+        if (StrUtil.isNotBlank(saveData.getPassword())) {
             saveData.setPassword(new BCryptPasswordEncoder().encode(saveData.getPassword()));
         } else {
             saveData.setPassword(new BCryptPasswordEncoder().encode(CustomerServiceConstant.DEFAULT_PASSWORD));
         }
     }
 
-    /**
-     * 登录后，获取token
-     * @param info 账号信息
-     * @return 生成的token
-     */
-    private String getToken(UserAccount info) {
-        UserAccountJwtDto jwtInfoDto = new UserAccountJwtDto();
-        BeanUtils.copyProperties(info, jwtInfoDto);
-        String token = JWT.create()
-                //主题 放入用户名
-                .withSubject(info.getAccountCode())
-                //自定义属性 放入用户拥有请求权限
-                .withClaim(SecurityConstant.JWT_CLAIMS_BODY, JSONUtil.toJsonStr(jwtInfoDto))
-                //失效时间(先给个365天的失效时间)
-                .withExpiresAt(DateUtil.offset(new Date(), DateField.YEAR, 1))
-                //签名算法和密钥
-                .sign(Algorithm.HMAC512(SecurityConstant.JWT_SIGN_KEY));
-        return token;
-    }
 }

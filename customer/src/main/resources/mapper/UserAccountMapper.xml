@@ -12,8 +12,6 @@
         <result column="account_code" property="accountCode"/>
         <result column="password" property="password"/>
         <result column="is_enable" property="isEnable"/>
-        <result column="wechat_terminal_code" property="wechatTerminalCode" />
-        <result column="avatar_url"  property="avatarUrl"/>
         <result column="notes" property="notes"/>
         <result column="operator_id" property="operatorId"/>
         <result column="create_time" property="createTime"/>
@@ -40,7 +38,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id,cellphone,account_name,account_code,password, is_enable,wechat_terminal_code,wechat_avatar_url,notes,operator_id,create_time,modify_time
+        id,cellphone,account_name,account_code,password, is_enable,notes,operator_id,create_time,modify_time
     </sql>
     <select id="selectByQuery" parameterType="com.dili.customer.sdk.domain.dto.UserAccountQuery" resultMap="BaseResultMap">
         select

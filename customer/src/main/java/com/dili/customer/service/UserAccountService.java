@@ -50,21 +50,7 @@ public interface UserAccountService extends BaseService<UserAccount, Long> {
      */
     void resetPassword(Long id);
 
-    /**
-     * 根据微信登录
-     * @param terminalCode 微信终端号
-     * @return
-     */
-    BaseOutput<LoginSuccessData> loginByWechat(String terminalCode);
 
-    /**
-     * 客户微信绑定
-     * @param terminalCode 微信终端号
-     * @param cellphone    客户手机号
-     * @param wechatAvatarUrl 微信头像地址
-     * @return
-     */
-    BaseOutput bindingWechat(String terminalCode, String cellphone, String wechatAvatarUrl);
 
     /**
      * 根据手机号查询用户账户信息
@@ -88,15 +74,6 @@ public interface UserAccountService extends BaseService<UserAccount, Long> {
     Integer insertOrUpdate(UserAccount userAccount);
 
     /**
-     * 微信一键注册
-     * @param dto 微信注册信息
-     * @param system 来源系统
-     * @param login 注册后是否登录
-     * @return
-     */
-    BaseOutput weChatRegister(WeChatRegisterDto dto, String system, Boolean login);
-
-    /**
      * 根据证件号加密码登录
      * @param certificateNumber 客户证件号
      * @param password 用户密码
@@ -111,10 +88,4 @@ public interface UserAccountService extends BaseService<UserAccount, Long> {
      */
     Optional<UserAccount> getByCustomerId(Long customerId);
 
-    /**
-     * 组装返回登录成功后的数据
-     * @param userAccount 登录成功的账号信息
-     * @return
-     */
-    LoginSuccessData getLoginSuccessData(UserAccount userAccount);
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dili.customer.mapper.AccountTerminalMapper">
+    <resultMap id="BaseResultMap" type="com.dili.customer.domain.AccountTerminal">
+        <id column="id" property="id"/>
+        <result column="account_id" property="accountId"/>
+        <result column="app_id" property="appId" />
+        <result column="terminal_type" property="terminalType" />
+        <result column="terminal_code" property="terminalCode" />
+        <result column="avatar_url"  property="avatarUrl"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modify_time" property="modifyTime"/>
+    </resultMap>
+
+</mapper>
