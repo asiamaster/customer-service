@@ -1,11 +1,10 @@
 package com.dili.customer.sdk.enums;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.Getter;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <B>客户信息相关的枚举定义</B>
@@ -416,18 +415,24 @@ public class CustomerEnum {
         }
 
         /**
+         * 初始化map
+         */
+        private static Map<Integer, ApprovalStatus> initMaps = Maps.newHashMap();
+
+        static {
+            for (ApprovalStatus as : ApprovalStatus.values()) {
+                initMaps.put(as.getCode(), as);
+            }
+        }
+
+        /**
          * 获取某个枚举值实例信息
          *
          * @param code
          * @return
          */
         public static ApprovalStatus getInstance(Integer code) {
-            for (ApprovalStatus as : ApprovalStatus.values()) {
-                if (as.getCode().equals(code)) {
-                    return as;
-                }
-            }
-            return null;
+            return initMaps.getOrDefault(code,null);
         }
 
         /**
@@ -437,10 +442,9 @@ public class CustomerEnum {
          * @return
          */
         public static String getValueByCode(Integer code) {
-            for (ApprovalStatus as : ApprovalStatus.values()) {
-                if (as.getCode().equals(code)) {
-                    return as.value;
-                }
+            ApprovalStatus approvalStatus = initMaps.get(code);
+            if (Objects.nonNull(approvalStatus)){
+                return approvalStatus.getValue();
             }
             return "";
         }

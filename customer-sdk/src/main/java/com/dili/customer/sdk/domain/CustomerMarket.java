@@ -171,4 +171,12 @@ public class CustomerMarket extends BaseDomain {
         }
         return "";
     }
+
+    /**
+     * 获取客户审核状态显示值
+     * @return
+     */
+    public String getApprovalStatusValue() {
+        return CustomerEnum.ApprovalStatus.getValueByCode(this.getGrade());
+    }
 }
