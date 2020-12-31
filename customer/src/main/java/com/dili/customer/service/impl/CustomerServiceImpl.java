@@ -418,7 +418,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (Objects.isNull(customerMarket)){
             customerMarket = new CustomerMarket();
         }
-        BeanUtils.copyProperties(updateInput.getCustomerMarket(), customerMarket,"grade","modifyTime");
+        BeanUtils.copyProperties(updateInput.getCustomerMarket(), customerMarket, "grade", "modifyTime", "approvalStatus","approvalUserId","approvalTime","approvalNotes");
         customerMarket.setCustomerId(updateInput.getId());
         customerMarket.setModifierId(updateInput.getOperatorId());
         if (Objects.isNull(customerMarket.getId())) {
