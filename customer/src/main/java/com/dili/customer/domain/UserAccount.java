@@ -46,7 +46,7 @@ public class UserAccount extends BaseDomain implements Serializable {
     /**
      * 客户证件号
      */
-    @Column(name = "certificate_number", updatable = false)
+    @Column(name = "certificate_number")
     @NotBlank(message = "客户证件不能为空", groups = AddView.class)
     private String certificateNumber;
 

@@ -49,7 +49,7 @@ public class Customer extends BaseDomain {
     /**
      * 证件号
      */
-    @Column(name = "`certificate_number`", updatable = false)
+    @Column(name = "`certificate_number`")
     @NotBlank(message = "客户证件号不能为空")
     @Size(min = 1, max = 40, message = "证件号码请保持在40个字以内")
     private String certificateNumber;

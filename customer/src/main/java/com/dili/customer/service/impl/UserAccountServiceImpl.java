@@ -175,10 +175,10 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
      * @param saveData
      */
     private void produceSaveData(UserAccount saveData) {
-        saveData.setModifyTime(LocalDateTime.now());
         if (Objects.isNull(saveData.getId())) {
             setPassword(saveData);
             saveData.setIsEnable(YesOrNoEnum.YES.getCode());
+            saveData.setModifyTime(LocalDateTime.now());
             saveData.setCreateTime(saveData.getModifyTime());
             saveData.setAccountCode("c_" + IdUtil.getSnowflake(1, 1).nextIdStr());
             saveData.setDeleted(YesOrNoEnum.NO.getCode());

@@ -172,9 +172,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         }
         marketInfo.setCustomerId(customer.getId());
         marketInfo.setModifierId(baseInfo.getOperatorId());
-        marketInfo.setModifyTime(LocalDateTime.now());
         if (Objects.isNull(marketInfo.getId())) {
             marketInfo.setCreatorId(baseInfo.getOperatorId());
+            marketInfo.setModifyTime(LocalDateTime.now());
             marketInfo.setCreateTime(marketInfo.getModifyTime());
         }
         customerMarketService.saveOrUpdate(marketInfo);
@@ -424,6 +424,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (Objects.isNull(customerMarket.getId())) {
             customerMarket.setCreatorId(updateInput.getOperatorId());
             customerMarket.setCreateTime(LocalDateTime.now());
+            customerMarket.setModifyTime(LocalDateTime.now());
         }
         customerMarketService.saveOrUpdate(customerMarket);
         //声明市场ID变量，以便使用
@@ -602,15 +603,16 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 UserAccount userAccount = byCustomerId.get();
                 userAccount.setCertificateNumber(input.getCertificateNumber());
                 if (Objects.nonNull(accountData)){
-                    userAccount.setChangedPwdTime(accountData.getChangedPwdTime());
-                    accountData.setNewAccountId(userAccount.getId());
-                    accountData.setDeleted(YesOrNoEnum.YES.getCode());
-                    userAccountService.update(accountData);
+                    if (!Objects.equals(accountData.getId(),userAccount.getId())){
+                        userAccount.setChangedPwdTime(accountData.getChangedPwdTime());
+                        accountData.setNewAccountId(userAccount.getId());
+                        accountData.setDeleted(YesOrNoEnum.YES.getCode());
+                        userAccount.setPassword(accountData.getPassword());
+                        userAccount.setCellphone(input.getContactsPhone()).setCellphoneValid(YesOrNoEnum.YES.getCode());
+                        userAccountService.update(userAccount);
+                        accountTerminalService.updateAccountId(accountData.getId(), userAccount.getId());
+                    }
                 }
-                userAccount.setPassword(accountData.getPassword());
-                userAccount.setCellphone(input.getContactsPhone()).setCellphoneValid(YesOrNoEnum.YES.getCode());
-                userAccountService.update(userAccount);
-                accountTerminalService.updateAccountId(accountData.getId(), userAccount.getId());
             }
         } else {
             if (CustomerEnum.OrganizationType.INDIVIDUAL.equalsToCode(input.getOrganizationType())) {
@@ -626,10 +628,12 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (Objects.isNull(accountData)){
             accountData = new UserAccount();
         }
-        accountData.setCustomerId(customer.getId()).setCustomerCode(customer.getCode()).setCertificateNumber(customer.getCertificateNumber());
-        if (StrUtil.isBlank(accountData.getAccountName())){
+        accountData.setCustomerId(customer.getId()).setCustomerCode(customer.getCode()).setCertificateNumber(customer.getCertificateNumber())
+                .setCellphone(input.getContactsPhone()).setCellphoneValid(YesOrNoEnum.YES.getCode());
+        if (StrUtil.isBlank(accountData.getAccountName())) {
             accountData.setAccountName(customer.getName());
         }
+
         userAccountService.insertOrUpdate(accountData);
         CustomerCertificateInput customerCertificate = input.getCustomerCertificate();
         if (Objects.nonNull(customerCertificate)) {
@@ -657,6 +661,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             customerMarket.setCustomerId(customer.getId());
             customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
             customerMarket.setCreateTime(LocalDateTime.now());
+            customerMarket.setModifyTime(LocalDateTime.now());
             customerMarketService.insert(customerMarket);
         }
         //更新客户经营品类信息
