@@ -157,6 +157,11 @@
         </dependency>
         <dependency>
             <groupId>com.dili</groupId>
+            <artifactId>uid-sdk</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dili</groupId>
             <artifactId>ss-mvc</artifactId>
             <version>${sharp-sword.version}</version>
         </dependency>

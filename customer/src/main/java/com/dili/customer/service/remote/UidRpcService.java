@@ -1,7 +1,7 @@
 package com.dili.customer.service.remote;
 
-import com.dili.customer.rpc.UidRpc;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.uid.sdk.rpc.feign.UidFeignRpc;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class UidRpcService {
 
-    private final UidRpc uidRpc;
+    private final UidFeignRpc uidFeignRpc;
 
     /**
      * 获取业务编号
@@ -25,7 +25,7 @@ public class UidRpcService {
      */
     public String getBizNumber(String type) {
         try {
-            BaseOutput<String> stringBaseOutput = uidRpc.bizNumber(type);
+            BaseOutput<String> stringBaseOutput = uidFeignRpc.getBizNumber(type);
             if (stringBaseOutput.isSuccess()) {
                 return stringBaseOutput.getData();
             }
