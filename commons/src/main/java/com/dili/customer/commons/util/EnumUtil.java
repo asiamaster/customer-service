@@ -1,4 +1,4 @@
-package com.dili.customer.sdk.util;
+package com.dili.customer.commons.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializeConfig;
@@ -8,10 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 将枚举类属性字段对应转换成json格式
  * @author yuehongbo
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
- * @date 2020/7/16 15:12
+ * @date 2021/1/5 14:37
  */
 public class EnumUtil {
 

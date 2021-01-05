@@ -4,6 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.validation.BeanValidationResult;
+import cn.hutool.extra.validation.ValidationUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.commons.glossary.YesOrNoEnum;
@@ -15,6 +17,7 @@ import com.dili.customer.domain.*;
 import com.dili.customer.mapper.CustomerMapper;
 import com.dili.customer.sdk.domain.dto.*;
 import com.dili.customer.sdk.enums.CustomerEnum;
+import com.dili.customer.sdk.validator.CompleteView;
 import com.dili.customer.service.*;
 import com.dili.customer.service.remote.UidRpcService;
 import com.dili.ss.base.BaseServiceImpl;
@@ -34,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.groups.Default;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -571,6 +575,14 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public BaseOutput<Customer> completeInfo(CustomerUpdateInput input) {
+        BeanValidationResult beanValidationResult = ValidationUtil.warpValidate(input, CompleteView.class, Default.class);
+        if (!beanValidationResult.isSuccess()) {
+            return BaseOutput.failure(beanValidationResult.getErrorMessages().get(0).getMessage());
+        }
+        Optional<String> s = validationCompleteData(input);
+        if (s.isPresent()) {
+            return BaseOutput.failure(s.get());
+        }
         Customer customer = this.get(input.getId());
         if (Objects.isNull(customer)) {
             return BaseOutput.failure("客户信息不存在");
@@ -760,6 +772,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     @Transactional(rollbackFor = Exception.class)
     public void defaultRegister(Customer customer) {
         if (Objects.nonNull(customer)) {
+            customer.setIsDelete(YesOrNoEnum.NO.getCode());
             customer.setCode(getCustomerCode());
             customer.setState(CustomerEnum.State.USELESS.getCode());
             customer.setCreateTime(LocalDateTime.now());
@@ -873,5 +886,24 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             return null;
         }
         return "验证码不正确";
+    }
+
+    /**
+     * 验证完善资料时的数据
+     * @param input
+     * @return
+     */
+    private Optional<String> validationCompleteData(CustomerUpdateInput input){
+        //客户行业ID是否为空
+        boolean profession = StrUtil.isNotBlank(input.getCustomerMarket().getProfession());
+        //客户行业名称是否为空
+        boolean professionName = StrUtil.isNotBlank(input.getCustomerMarket().getProfessionName());
+        if (profession && !professionName) {
+            return Optional.of("客户行业名称不能为空");
+        }
+        if (!profession && professionName) {
+            return Optional.of("客户行业ID不能为空");
+        }
+        return Optional.empty();
     }
 }

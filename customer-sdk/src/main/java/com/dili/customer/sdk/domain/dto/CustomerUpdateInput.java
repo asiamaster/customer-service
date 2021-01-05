@@ -106,12 +106,14 @@ public class CustomerUpdateInput implements Serializable {
     /**
      * 客户经营品类信息
      */
+    @Valid
     private List<BusinessCategory> businessCategoryList;
 
     /**
      * 客户身份信息
      */
     @NotNull(message = "客户角色身份信息不能为空")
+    @Size(min = 1, message = "客户角色身份信息不能为空")
     private List<CharacterType> characterTypeList;
 
     /**

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -35,11 +37,13 @@ public class BusinessCategory extends BaseDomain {
     /**
      * 经营品类ID路径
      */
+    @NotNull(message = "品类Id不能为空")
     private String categoryId;
 
     /**
      * 经营品类名称全路径
      */
+    @NotBlank(message = "品类名称不能为空")
     private String categoryName;
 
     /**

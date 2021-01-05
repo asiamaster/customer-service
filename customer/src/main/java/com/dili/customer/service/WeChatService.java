@@ -4,6 +4,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.validation.BeanValidationResult;
 import cn.hutool.extra.validation.ValidationUtil;
 import com.dili.commons.glossary.YesOrNoEnum;
+import com.dili.customer.commons.constants.CustomerConstant;
+import com.dili.customer.commons.constants.CustomerResultCode;
+import com.dili.customer.constants.CustomerServiceConstant;
 import com.dili.customer.domain.AccountTerminal;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.UserAccount;
@@ -59,21 +62,17 @@ public class WeChatService {
         if (byAppAndTerminalCode.isPresent()) {
             AccountTerminal accountTerminal = byAppAndTerminalCode.get();
             UserAccount userAccount = userAccountService.get(accountTerminal.getAccountId());
-            if (StrUtil.isBlank(accountTerminal.getAvatarUrl())) {
-                accountTerminal.setAvatarUrl(dto.getAvatarUrl());
-            }
-            if (StrUtil.isBlank(userAccount.getAccountName())) {
-                userAccount.setAccountName(dto.getNickName());
-            }
-            userAccountService.update(userAccount);
-            accountTerminalService.update(accountTerminal);
             if (login) {
                 if (!userAccount.getIsEnable().equals(YesOrNoEnum.YES.getCode())) {
                     return BaseOutput.failure("用户为不可用状态,不能进行此操作").setCode(ResultCode.DATA_ERROR);
                 }
-                return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccount,accountTerminal));
+                return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccount, accountTerminal));
+            } else {
+                if (!Objects.equals(dto.getCellphone(), userAccount.getCellphone())) {
+                    return BaseOutput.failure("此微信已注册其它手机号").setCode(ResultCode.INVALID_REQUEST);
+                }
+                return BaseOutput.failure("请勿重复注册").setCode(CustomerResultCode.DUPLICATE_DATA);
             }
-            return BaseOutput.successData(true);
         }
         Optional<UserAccount> byCellphone = userAccountService.getByCellphone(dto.getCellphone());
         UserAccount userAccount = null;
@@ -118,7 +117,7 @@ public class WeChatService {
             }
             return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccount, accountTerminal));
         }
-        return BaseOutput.successData(true);
+        return BaseOutput.successData(CustomerServiceConstant.DEFAULT_PASSWORD);
     }
 
     /**

@@ -2,6 +2,7 @@ package com.dili.customer.commons.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import com.dili.customer.commons.enums.DdCodeEnum;
 import com.dili.customer.sdk.domain.CharacterType;
 import com.dili.customer.sdk.domain.dto.CharacterSubTypeDto;
 import com.dili.customer.sdk.domain.dto.CharacterTypeGroupDto;
@@ -39,32 +40,44 @@ public class CommonDataService {
      * @return
      */
     public List<DataDictionaryValue> queryBusinessNature(Integer state) {
-        return dataDictionaryRpcService.listByDdCode("business_nature", state, null);
+        return dataDictionaryRpcService.listByDdCode(DdCodeEnum.business_nature.name(), state, null);
     }
 
     /**
      * 获取客户来源渠道
-     * @param state 状态
+     * @param state    状态
      * @param marketId 所属市场
      * @return
      */
     public List<DataDictionaryValue> querySourceChannel(Integer state, Long marketId) {
-        return dataDictionaryRpcService.listByDdCode("source_channel", state, marketId);
+        return dataDictionaryRpcService.listByDdCode(DdCodeEnum.source_channel.name(), state, marketId);
     }
 
     /**
      * 组装生成客户角色身份信息
-     * @param characterTypeListData
-     * @param marketId
+     * @param characterTypeListData 已有角色分类数据对象
+     * @param marketId 所属市场ID
      * @return
      */
     public List<CharacterTypeGroupDto> produceCharacterTypeGroup(List<CharacterType> characterTypeListData, Long marketId) {
-        Map<String, List<String>> dataMap = StreamEx.ofNullable(characterTypeListData).flatCollection(Function.identity()).nonNull()
-                .filter(t-> StrUtil.isNotBlank(t.getCharacterType())).mapToEntry(item -> item.getCharacterType(), item -> item.getSubType()).grouping();
-        Integer state = null;
+        Boolean enable = true;
         if (CollectionUtil.isEmpty(characterTypeListData)) {
-            state = 1;
+            enable = false;
         }
+        return produceCharacterTypeGroup(characterTypeListData, marketId, enable);
+    }
+
+    /**
+     * 组装生成客户角色身份信息
+     * @param characterTypeListData 已有角色分类数据对象
+     * @param marketId 所属市场ID
+     * @param enable 是否只查询启用
+     * @return
+     */
+    public List<CharacterTypeGroupDto> produceCharacterTypeGroup(List<CharacterType> characterTypeListData, Long marketId, Boolean enable) {
+        Map<String, List<String>> dataMap = StreamEx.ofNullable(characterTypeListData).flatCollection(Function.identity()).nonNull()
+                .filter(t -> StrUtil.isNotBlank(t.getCharacterType())).mapToEntry(item -> item.getCharacterType(), item -> item.getSubType()).grouping();
+        Integer state = enable ? 1 : 0;
         List<CharacterTypeGroupDto> characterTypeList = new ArrayList<>();
         for (CustomerEnum.CharacterType type : CustomerEnum.CharacterType.values()) {
             CharacterTypeGroupDto dto = new CharacterTypeGroupDto();
