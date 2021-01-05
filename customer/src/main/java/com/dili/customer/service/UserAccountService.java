@@ -2,7 +2,6 @@ package com.dili.customer.service;
 
 import com.dili.customer.domain.UserAccount;
 import com.dili.customer.domain.wechat.LoginSuccessData;
-import com.dili.customer.domain.wechat.WeChatRegisterDto;
 import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
 

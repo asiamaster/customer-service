@@ -53,7 +53,7 @@ public class UserAccountController {
     public BaseOutput<Boolean> changePassword(@RequestBody Map<String, Object> params) {
         log.info(String.format("更改账号密码参数为:%s", JSONUtil.toJsonStr(params)));
         try {
-            Long id = (Long) params.getOrDefault("id", null);
+            Long id = Long.valueOf(Objects.toString(params.get("accountId"), "-1"));
             String oldPassword = Objects.toString(params.get("oldPassword"), null);
             String newPassword = Objects.toString(params.get("newPassword"), null);
             return userAccountService.changePassword(id, oldPassword, newPassword);

@@ -8,15 +8,12 @@ import com.dili.customer.constants.CustomerServiceConstant;
 import com.dili.customer.domain.UserAccount;
 import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.mapper.UserAccountMapper;
-import com.dili.customer.service.AccountTerminalService;
-import com.dili.customer.service.CustomerService;
 import com.dili.customer.service.UserAccountService;
 import com.dili.customer.utils.LoginUtil;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,10 +33,6 @@ import java.util.Optional;
 public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> implements UserAccountService {
 
     private final UserAccountMapper userAccountMapper;
-    @Autowired
-    private CustomerService customerService;
-
-    private final AccountTerminalService accountTerminalService;
 
     @Override
     public BaseOutput<Boolean> changePassword(Long id, String oldPassword, String newPassword) {
