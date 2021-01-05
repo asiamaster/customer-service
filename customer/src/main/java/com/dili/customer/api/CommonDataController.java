@@ -12,7 +12,10 @@ import com.dili.uap.sdk.domain.DataDictionaryValue;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
@@ -62,18 +65,27 @@ public class CommonDataController {
         if (Objects.isNull(marketId)) {
             return BaseOutput.failure("参数丢失").setCode(ResultCode.PARAMS_ERROR);
         }
-        Integer state = Boolean.valueOf(Objects.toString(enable, "false")) ? 1 : 0;
+        Integer state = Boolean.valueOf(Objects.toString(enable, "false")) ? 1 : null;
         List<DataDictionaryValue> dataDictionaryValuesBuyer = dataDictionaryRpcService.listByDdCode(CustomerEnum.CharacterType.买家.getCode(), state, Long.valueOf(marketId.toString()));
         List<DataDictionaryValue> dataDictionaryValuesSeller = dataDictionaryRpcService.listByDdCode(CustomerEnum.CharacterType.经营户.getCode(), state, Long.valueOf(marketId.toString()));
         List<DataDictionaryValue> dataDictionaryValuesOther = dataDictionaryRpcService.listByDdCode(CustomerEnum.CharacterType.其他类型.getCode(), state, Long.valueOf(marketId.toString()));
         List<DataDictionaryValue> allData = Lists.newArrayList();
         if (CollectionUtil.isNotEmpty(dataDictionaryValuesBuyer)) {
+            dataDictionaryValuesBuyer.forEach(t -> {
+                t.setName(CustomerEnum.CharacterType.买家.getValue() + "_" + t.getName());
+            });
             allData.addAll(dataDictionaryValuesBuyer);
         }
         if (CollectionUtil.isNotEmpty(dataDictionaryValuesSeller)) {
+            dataDictionaryValuesSeller.forEach(t -> {
+                t.setName(CustomerEnum.CharacterType.经营户.getValue() + "_" + t.getName());
+            });
             allData.addAll(dataDictionaryValuesSeller);
         }
         if (CollectionUtil.isNotEmpty(dataDictionaryValuesOther)) {
+            dataDictionaryValuesOther.forEach(t -> {
+                t.setName(CustomerEnum.CharacterType.其他类型.getValue() + "_" + t.getName());
+            });
             allData.addAll(dataDictionaryValuesOther);
         }
         return BaseOutput.successData(allData);
