@@ -2,6 +2,7 @@ package com.dili.customer.service.impl;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.core.util.StrUtil;
 import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.commons.constants.CustomerConstant;
@@ -93,6 +94,12 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
 
     @Override
     public Optional<String> resetPassword(String cellphone, String verificationCode, String newPassword) {
+        if (StrUtil.isBlank(cellphone) || StrUtil.isBlank(verificationCode) || StrUtil.isBlank(newPassword)) {
+            return Optional.of("必要参数丢失");
+        }
+        if (!PhoneUtil.isMobile(cellphone)) {
+            return Optional.of("手机号格式不正确");
+        }
         Optional<UserAccount> byCellphone = this.getByCellphone(cellphone);
         if (byCellphone.isEmpty()) {
             return Optional.of("账号不存在");
