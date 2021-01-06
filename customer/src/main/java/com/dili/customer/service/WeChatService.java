@@ -4,9 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.validation.BeanValidationResult;
 import cn.hutool.extra.validation.ValidationUtil;
 import com.dili.commons.glossary.YesOrNoEnum;
-import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.customer.commons.constants.CustomerResultCode;
-import com.dili.customer.constants.CustomerServiceConstant;
 import com.dili.customer.domain.AccountTerminal;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.UserAccount;
@@ -117,7 +115,7 @@ public class WeChatService {
             }
             return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccount, accountTerminal));
         }
-        return BaseOutput.successData(CustomerServiceConstant.DEFAULT_PASSWORD);
+        return BaseOutput.success();
     }
 
     /**
