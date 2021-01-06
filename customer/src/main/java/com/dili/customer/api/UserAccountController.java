@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 客户账号服务接口
@@ -76,6 +77,32 @@ public class UserAccountController {
         } catch (Exception e) {
             log.error(String.format("用户登录异常,证件号[%s],密码[%s],异常:%s", certificateNumber, password, e.getMessage()), e);
             return BaseOutput.failure("用户登录异常");
+        }
+    }
+
+    /**
+     * 账号重置登录密码
+     * @param params 接口参数
+     *  cellphone 手机号
+     *  verificationCode 短信验证码
+     *  newPassword 新密码
+     * @return 是否更新成功
+     */
+    @PostMapping("/resetPassword")
+    public BaseOutput<Boolean> resetPassword(@RequestBody Map<String, Object> params) {
+        log.info(String.format("重置账号密码参数为:%s", JSONUtil.toJsonStr(params)));
+        try {
+            String cellphone = Objects.toString(params.get("cellphone"), null);
+            String oldPassword = Objects.toString(params.get("verificationCode"), null);
+            String newPassword = Objects.toString(params.get("newPassword"), null);
+            Optional<String> s = userAccountService.resetPassword(cellphone, oldPassword, newPassword);
+            if (s.isPresent()) {
+                return BaseOutput.failure(s.get());
+            }
+            return BaseOutput.success();
+        } catch (Exception e) {
+            log.error(String.format("根据【%s】重置账户密码异常:", JSONUtil.toJsonStr(params), e.getMessage()), e);
+            return BaseOutput.failure("密码重置异常");
         }
     }
 }

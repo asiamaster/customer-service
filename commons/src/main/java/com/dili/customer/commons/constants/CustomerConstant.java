@@ -24,6 +24,11 @@ public interface CustomerConstant {
     String REGISTER_SCENE_CODE = "registerAuthCode";
 
     /**
+     * 重置密码短信验证码code
+     */
+    String RESET_AUTH_CODE = "resetAuthcode";
+
+    /**
      * 本地缓存前缀
      */
     String CACHE_KEY = "customer_cache";

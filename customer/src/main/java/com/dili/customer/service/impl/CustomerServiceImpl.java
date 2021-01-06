@@ -550,9 +550,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     @Transactional(rollbackFor = Exception.class)
     public BaseOutput<Customer> autoRegister(CustomerAutoRegisterDto dto) {
         //验证短信验证码是否正确
-        String s = this.checkVerificationCode(dto.getContactsPhone(), CustomerConstant.REGISTER_SCENE_CODE, dto.getVerificationCode());
-        if (StrUtil.isNotBlank(s)) {
-            return BaseOutput.failure(s);
+        Optional<String> s = commonDataService.checkVerificationCode(dto.getContactsPhone(), CustomerConstant.REGISTER_SCENE_CODE, dto.getVerificationCode());
+        if (s.isPresent()) {
+            return BaseOutput.failure(s.get());
         }
         Optional<UserAccount> byCellphone = userAccountService.getByCellphone(dto.getContactsPhone());
         if (byCellphone.isPresent()) {
@@ -865,27 +865,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
      */
     private String getCustomerCode() {
         return uidRpcService.getBizNumber(UID_TYPE);
-    }
-
-    /**
-     * 检查手机验证码是否有效
-     * @param cellphone 手机号
-     * @param sceneCode 验证码场景
-     * @param verificationCode 验证码
-     * @return 通过返回null，未通过，返回错误信息
-     */
-    private String checkVerificationCode(String cellphone, String sceneCode, String verificationCode) {
-        String redisKey = CustomerConstant.REDIS_KEY_PREFIX + "verificationCode:" + sceneCode + ":" + cellphone;
-        Object o = redisUtil.get(redisKey);
-        if (Objects.isNull(o)) {
-            return "验证码已失效";
-        }
-        String number = String.valueOf(o);
-        if (verificationCode.equalsIgnoreCase(number)) {
-            redisUtil.remove(redisKey);
-            return null;
-        }
-        return "验证码不正确";
     }
 
     /**

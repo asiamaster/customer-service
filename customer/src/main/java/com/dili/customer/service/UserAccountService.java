@@ -44,12 +44,12 @@ public interface UserAccountService extends BaseService<UserAccount, Long> {
     void disableAll(Long[] ids);
 
     /**
-     * 根据ID重置账号密码
-     * @param id 需要重置密码的数据ID
+     * 重置账号密码
+     * @param cellphone        手机号
+     * @param verificationCode 短信验证码
+     * @param newPassword      新密码
      */
-    void resetPassword(Long id);
-
-
+    Optional<String> resetPassword(String cellphone, String verificationCode, String newPassword);
 
     /**
      * 根据手机号查询用户账户信息

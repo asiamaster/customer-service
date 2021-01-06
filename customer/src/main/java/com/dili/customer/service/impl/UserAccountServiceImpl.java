@@ -4,6 +4,8 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.dili.commons.glossary.YesOrNoEnum;
+import com.dili.customer.commons.constants.CustomerConstant;
+import com.dili.customer.commons.service.CommonDataService;
 import com.dili.customer.constants.CustomerServiceConstant;
 import com.dili.customer.domain.UserAccount;
 import com.dili.customer.domain.wechat.LoginSuccessData;
@@ -33,6 +35,7 @@ import java.util.Optional;
 public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> implements UserAccountService {
 
     private final UserAccountMapper userAccountMapper;
+    private final CommonDataService commonDataService;
 
     @Override
     public BaseOutput<Boolean> changePassword(Long id, String oldPassword, String newPassword) {
@@ -89,12 +92,20 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
     }
 
     @Override
-    public void resetPassword(Long id) {
-        UserAccount userAccount = this.get(id);
-        if (Objects.nonNull(userAccount)) {
-            setPassword(userAccount);
-            this.update(userAccount);
+    public Optional<String> resetPassword(String cellphone, String verificationCode, String newPassword) {
+        Optional<UserAccount> byCellphone = this.getByCellphone(cellphone);
+        if (byCellphone.isEmpty()) {
+            return Optional.of("账号不存在");
         }
+        Optional<String> s = commonDataService.checkVerificationCode(cellphone, CustomerConstant.RESET_AUTH_CODE, verificationCode);
+        if (s.isPresent()) {
+            return s;
+        }
+        UserAccount userAccount = byCellphone.get();
+        userAccount.setPassword(newPassword);
+        setPassword(userAccount);
+        this.update(userAccount);
+        return Optional.empty();
     }
 
     /**
@@ -190,6 +201,6 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
         } else {
             saveData.setPassword(new BCryptPasswordEncoder().encode(CustomerServiceConstant.DEFAULT_PASSWORD));
         }
+        saveData.setChangedPwdTime(LocalDateTime.now());
     }
-
 }

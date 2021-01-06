@@ -2,11 +2,13 @@ package com.dili.customer.commons.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.customer.commons.enums.DdCodeEnum;
 import com.dili.customer.sdk.domain.CharacterType;
 import com.dili.customer.sdk.domain.dto.CharacterSubTypeDto;
 import com.dili.customer.sdk.domain.dto.CharacterTypeGroupDto;
 import com.dili.customer.sdk.enums.CustomerEnum;
+import com.dili.ss.redis.service.RedisUtil;
 import com.dili.uap.sdk.domain.DataDictionaryValue;
 import com.google.common.collect.Sets;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import one.util.streamex.StreamEx;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -31,8 +30,8 @@ import java.util.function.Function;
 @Service
 public class CommonDataService {
 
-
     private final DataDictionaryRpcService dataDictionaryRpcService;
+    private final RedisUtil redisUtil;
 
     /**
      * 获取经营性质数据
@@ -77,7 +76,7 @@ public class CommonDataService {
     public List<CharacterTypeGroupDto> produceCharacterTypeGroup(List<CharacterType> characterTypeListData, Long marketId, Boolean enable) {
         Map<String, List<String>> dataMap = StreamEx.ofNullable(characterTypeListData).flatCollection(Function.identity()).nonNull()
                 .filter(t -> StrUtil.isNotBlank(t.getCharacterType())).mapToEntry(item -> item.getCharacterType(), item -> item.getSubType()).grouping();
-        Integer state = enable ? 1 : 0;
+        Integer state = enable ? 1 : null;
         List<CharacterTypeGroupDto> characterTypeList = new ArrayList<>();
         for (CustomerEnum.CharacterType type : CustomerEnum.CharacterType.values()) {
             CharacterTypeGroupDto dto = new CharacterTypeGroupDto();
@@ -106,4 +105,25 @@ public class CommonDataService {
         return characterTypeList;
     }
 
+
+    /**
+     * 检查手机验证码是否有效
+     * @param cellphone 手机号
+     * @param sceneCode 验证码场景
+     * @param verificationCode 验证码
+     * @return 通过返回null，未通过，返回错误信息
+     */
+    public Optional<String> checkVerificationCode(String cellphone, String sceneCode, String verificationCode) {
+        String redisKey = CustomerConstant.REDIS_KEY_PREFIX + "verificationCode:" + sceneCode + ":" + cellphone;
+        Object o = redisUtil.get(redisKey);
+        if (Objects.isNull(o)) {
+            return Optional.of("验证码已失效");
+        }
+        String number = String.valueOf(o);
+        if (verificationCode.equalsIgnoreCase(number)) {
+            redisUtil.remove(redisKey);
+            return Optional.empty();
+        }
+        return Optional.of("验证码不正确");
+    }
 }
