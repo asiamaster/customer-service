@@ -59,6 +59,12 @@ public class AccountTerminal extends BaseDomain implements Serializable {
     private String terminalCode;
 
     /**
+     * 终端昵称
+     */
+    @Column(name = "nick_name")
+    private String nickName;
+
+    /**
      * 头像地址
      */
     @Column(name = "avatar_url")

@@ -7,6 +7,7 @@
         <result column="app_id" property="appId" />
         <result column="terminal_type" property="terminalType" />
         <result column="terminal_code" property="terminalCode" />
+        <result column="nick_name" property="nickName" />
         <result column="avatar_url"  property="avatarUrl"/>
         <result column="create_time" property="createTime"/>
         <result column="modify_time" property="modifyTime"/>

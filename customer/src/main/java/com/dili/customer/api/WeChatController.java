@@ -65,12 +65,13 @@ public class WeChatController {
         String code = jsonObject.getStr("code");
         String cellphone = jsonObject.getStr("cellphone");
         String avatarUrl = jsonObject.getStr("avatarUrl");
+        String nickName = jsonObject.getStr("nickName");
         if (StrUtil.isBlank(code) || StrUtil.isBlank(cellphone) || StrUtil.isBlank(avatarUrl)) {
             return BaseOutput.failure("必要参数丢失");
         }
         BaseOutput<JsCode2Session> baseOutput = weChatRpc.code2session(code);
         if (baseOutput.isSuccess()) {
-            return weChatService.bindingWechat(baseOutput.getData().getOpenId(), cellphone, avatarUrl,Objects.toString(baseOutput.getMetadata(),""));
+            return weChatService.bindingWechat(baseOutput.getData().getOpenId(), cellphone, avatarUrl, Objects.toString(baseOutput.getMetadata(), ""), nickName);
         }
         return baseOutput;
     }

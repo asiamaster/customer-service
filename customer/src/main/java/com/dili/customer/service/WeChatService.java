@@ -101,6 +101,7 @@ public class WeChatService {
         userAccountService.insertOrUpdate(userAccount);
         //构建客户终端信息
         AccountTerminal accountTerminal = new AccountTerminal();
+        accountTerminal.setNickName(dto.getNickName());
         accountTerminal.setAvatarUrl(dto.getAvatarUrl());
         accountTerminal.setTerminalCode(dto.getOpenId());
         accountTerminal.setAppId(dto.getAppId());
@@ -124,9 +125,10 @@ public class WeChatService {
      * @param cellphone    客户手机号
      * @param wechatAvatarUrl 微信头像地址
      * @param appId 应用ID
+     * @param nickName 终端号对应的昵称
      * @return
      */
-    public BaseOutput bindingWechat(String terminalCode, String cellphone, String wechatAvatarUrl, String appId) {
+    public BaseOutput bindingWechat(String terminalCode, String cellphone, String wechatAvatarUrl, String appId,String nickName) {
         Optional<AccountTerminal> byWechat = accountTerminalService.getByAppAndTerminalCode(appId, UserAccountEnum.AccountTerminalType.WE_CHAT, terminalCode);
         if (byWechat.isPresent()) {
             AccountTerminal accountTerminal = byWechat.get();
@@ -135,7 +137,7 @@ public class WeChatService {
                 return BaseOutput.failure("该微信号已经绑定其他账号").setCode(ResultCode.FORBIDDEN);
             } else {
                 //如果已和当前手机号绑定，则直接返回，认为已绑定
-                return BaseOutput.success();
+                return BaseOutput.failure("请勿重复绑定").setCode(CustomerResultCode.DUPLICATE_DATA);
             }
         }
         Optional<UserAccount> byCellphone = userAccountService.getByCellphone(cellphone);
@@ -144,6 +146,7 @@ public class WeChatService {
         }
         UserAccount userAccount = byCellphone.get();
         AccountTerminal accountTerminal = new AccountTerminal();
+        accountTerminal.setNickName(nickName);
         accountTerminal.setAvatarUrl(wechatAvatarUrl);
         accountTerminal.setTerminalCode(terminalCode);
         accountTerminal.setAppId(appId);

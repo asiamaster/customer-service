@@ -169,8 +169,9 @@ create table account_terminal
     account_id           bigint comment '所属账号',
     app_id               varchar(64) comment '第三方ID',
     terminal_type        tinyint comment '终端类型(微信?支付宝?)',
-    terminal_code        varchar(30) comment '微信终端号',
+    terminal_code        varchar(30) comment '终端号(openId)',
     avatar_url           varchar(255) comment '头像地址',
+    nick_name            varchar(100) comment '终端账号对应昵称',
     create_time          datetime default CURRENT_TIMESTAMP comment '创建时间',
     modify_time          datetime default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '修改时间',
     primary key (id)

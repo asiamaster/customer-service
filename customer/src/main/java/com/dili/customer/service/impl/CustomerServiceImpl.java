@@ -583,6 +583,16 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (s.isPresent()) {
             return BaseOutput.failure(s.get());
         }
+        List<Customer> validatedCellphoneCustomer = this.getValidatedCellphoneCustomer(input.getContactsPhone());
+        if (CollectionUtil.isNotEmpty(validatedCellphoneCustomer)) {
+            if (validatedCellphoneCustomer.size() > 1) {
+                return BaseOutput.failure("数据有误,手机号已被多个客户实名");
+            }
+            Customer customer = validatedCellphoneCustomer.get(0);
+            if (!Objects.equals(customer.getCertificateNumber(), input.getCertificateNumber())) {
+                return BaseOutput.failure("该手机号已认证绑定的其它证件客户");
+            }
+        }
         Customer customer = this.get(input.getId());
         if (Objects.isNull(customer)) {
             return BaseOutput.failure("客户信息不存在");
@@ -842,7 +852,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
      */
     private List<Customer> getByContactsPhone(String contactsPhone,String organizationType) {
         Customer queryPhone = new Customer();
-        queryPhone.setOrganizationType(organizationType);
+        if (StrUtil.isNotBlank(organizationType)) {
+            queryPhone.setOrganizationType(organizationType);
+        }
         queryPhone.setContactsPhone(contactsPhone);
         return list(queryPhone);
     }
