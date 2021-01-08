@@ -66,7 +66,7 @@ public class WeChatController {
         String cellphone = jsonObject.getStr("cellphone");
         String avatarUrl = jsonObject.getStr("avatarUrl");
         String nickName = jsonObject.getStr("nickName");
-        if (StrUtil.isBlank(code) || StrUtil.isBlank(cellphone) || StrUtil.isBlank(avatarUrl)) {
+        if (StrUtil.isBlank(code) || StrUtil.isBlank(cellphone)) {
             return BaseOutput.failure("必要参数丢失");
         }
         BaseOutput<JsCode2Session> baseOutput = weChatRpc.code2session(code);
@@ -87,7 +87,7 @@ public class WeChatController {
         String sessionKey = wxInfo.get("sessionKey");
         String encryptedData = wxInfo.get("encryptedData");
         String iv = wxInfo.get("iv");
-        return weChatRpc.decodePhone(sessionKey, encryptedData, iv);
+        return weChatService.decodePhone(sessionKey, encryptedData, iv);
     }
 
     /**

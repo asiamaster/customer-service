@@ -8,10 +8,12 @@ import com.dili.customer.commons.constants.CustomerResultCode;
 import com.dili.customer.domain.AccountTerminal;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.UserAccount;
+import com.dili.customer.domain.wechat.AppletPhone;
 import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.domain.wechat.WeChatRegisterDto;
 import com.dili.customer.enums.UserAccountEnum;
 import com.dili.customer.utils.LoginUtil;
+import com.dili.customer.utils.WeChatAppletAesUtil;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
@@ -175,6 +177,33 @@ public class WeChatService {
             return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccount, accountTerminal));
         } else {
             return BaseOutput.failure("未注册任何账号").setCode(ResultCode.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 解密手机号信息
+     *
+     * @param sessionKey    会话密钥
+     * @param encryptedData 包括敏感数据在内的完整用户信息的加密数据
+     * @param iv            加密算法的初始向量
+     * @return
+     */
+    public BaseOutput<AppletPhone> decodePhone(String sessionKey, String encryptedData, String iv) {
+        if (StrUtil.isBlank(sessionKey) || StrUtil.isBlank(encryptedData) || StrUtil.isBlank(iv)) {
+            return BaseOutput.failure("必要参数丢失");
+        }
+        log.info(String.format("解密手机号,原始值 == sessionKey:%s,encryptedData:%s,iv:%s", sessionKey, encryptedData, iv));
+        try {
+            String decryStr = WeChatAppletAesUtil.decrypt(encryptedData, sessionKey, iv);
+            log.info(String.format("解密后手机号信息:%s", decryStr));
+            if (StrUtil.isBlank(decryStr)) {
+                return BaseOutput.failure("解密手机号码为空");
+            }
+            AppletPhone phone = AppletPhone.fromJson(decryStr);
+            return BaseOutput.successData(phone);
+        } catch (Exception e) {
+            log.error("解密手机号码错误", e);
+            return BaseOutput.failure("解密手机号码错误");
         }
     }
 }

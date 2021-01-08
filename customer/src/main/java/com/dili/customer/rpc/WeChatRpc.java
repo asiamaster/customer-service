@@ -1,14 +1,11 @@
 package com.dili.customer.rpc;
 
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.dili.customer.config.AppletSecretConfig;
-import com.dili.customer.domain.wechat.AppletPhone;
 import com.dili.customer.domain.wechat.AppletSecret;
 import com.dili.customer.domain.wechat.AppletSystemInfo;
 import com.dili.customer.domain.wechat.JsCode2Session;
-import com.dili.customer.utils.WeChatAppletAesUtil;
 import com.dili.ss.domain.BaseOutput;
 import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
@@ -75,33 +72,6 @@ public class WeChatRpc {
         } catch (Exception e) {
             log.error(String.format("根据code[%s]调用code2session异常[%s]！", code, e.getMessage()), e);
             return BaseOutput.failure("登录凭证校验异常");
-        }
-    }
-
-    /**
-     * 解密手机号信息
-     *
-     * @param sessionKey    会话密钥
-     * @param encryptedData 包括敏感数据在内的完整用户信息的加密数据
-     * @param iv            加密算法的初始向量
-     * @return
-     */
-    public BaseOutput<AppletPhone> decodePhone(String sessionKey, String encryptedData, String iv) {
-        if (StrUtil.isBlank(sessionKey) || StrUtil.isBlank(encryptedData) || StrUtil.isBlank(iv)) {
-            return BaseOutput.failure("必要参数丢失");
-        }
-        log.info(String.format("解密手机号,原始值 == sessionKey:%s,encryptedData:%s,iv:%s", sessionKey, encryptedData, iv));
-        try {
-            String decryStr = WeChatAppletAesUtil.decrypt(encryptedData, sessionKey, iv);
-            log.info(String.format("解密后手机号信息:%s", decryStr));
-            if (StrUtil.isBlank(decryStr)) {
-                return BaseOutput.failure("解密手机号码为空");
-            }
-            AppletPhone phone = AppletPhone.fromJson(decryStr);
-            return BaseOutput.successData(phone);
-        } catch (Exception e) {
-            log.error("解密手机号码错误", e);
-            return BaseOutput.failure("解密手机号码错误");
         }
     }
 }

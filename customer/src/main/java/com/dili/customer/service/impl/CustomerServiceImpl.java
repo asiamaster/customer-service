@@ -670,52 +670,67 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             }
         }
         this.update(customer);
-        CustomerMarket customerMarket = BeanUtil.copyProperties(input.getCustomerMarket(), CustomerMarket.class, "id","grade");
-        CustomerMarket old = customerMarketService.queryByMarketAndCustomerId(customerMarket.getMarketId(), customer.getId());
-        if (Objects.nonNull(old)) {
-            old.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
-            old.setBusinessNature(customerMarket.getBusinessNature());
-            old.setApprovalUserId(null);
-            old.setApprovalTime(null);
-            customerMarketService.update(old);
+        CustomerMarket oldCustomerMarket = customerMarketService.queryByMarketAndCustomerId(input.getCustomerMarket().getMarketId(), customer.getId());
+        if (Objects.nonNull(oldCustomerMarket)) {
+            oldCustomerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
+            oldCustomerMarket.setBusinessNature(input.getCustomerMarket().getBusinessNature());
+            oldCustomerMarket.setApprovalUserId(null);
+            oldCustomerMarket.setApprovalTime(null);
+            customerMarketService.update(oldCustomerMarket);
         } else {
-            customerMarket.setGrade(customerCommonConfig.getDefaultGrade(customerMarket.getMarketId()).getCode());
-            customerMarket.setCustomerId(customer.getId());
-            customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
-            customerMarket.setCreateTime(LocalDateTime.now());
-            customerMarket.setModifyTime(LocalDateTime.now());
-            customerMarketService.insert(customerMarket);
+            Boolean saveMarketInfo = true;
+            if (Objects.nonNull(input.getCustomerMarket().getId())) {
+                CustomerMarket old = customerMarketService.get(input.getCustomerMarket().getId());
+                if (Objects.nonNull(old) && old.getCustomerId().equals(customer.getId())) {
+                    old.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
+                    old.setBusinessNature(input.getCustomerMarket().getBusinessNature());
+                    old.setApprovalUserId(null);
+                    old.setApprovalTime(null);
+                    customerMarketService.update(old);
+                    saveMarketInfo = false;
+                }
+            }
+            if (saveMarketInfo) {
+                CustomerMarket customerMarket = BeanUtil.copyProperties(input.getCustomerMarket(), CustomerMarket.class, "id", "grade");
+                customerMarket.setGrade(customerCommonConfig.getDefaultGrade(customerMarket.getMarketId()).getCode());
+                customerMarket.setCustomerId(customer.getId());
+                customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
+                customerMarket.setCreateTime(LocalDateTime.now());
+                customerMarket.setModifyTime(LocalDateTime.now());
+                customerMarketService.insert(customerMarket);
+            }
         }
+        Long marketId = input.getCustomerMarket().getMarketId();
         //更新客户经营品类信息
         if (CollectionUtil.isNotEmpty(input.getBusinessCategoryList())) {
             List<BusinessCategory> businessCategoryList = JSONArray.parseArray(JSONObject.toJSONString(input.getBusinessCategoryList()), BusinessCategory.class);
-            businessCategoryService.saveInfo(businessCategoryList, customer.getId(), customerMarket.getMarketId());
+            businessCategoryService.saveInfo(businessCategoryList, customer.getId(), marketId);
         }
         /**
          * 如果客户理货区不为空，则保存对应的理货区信息
          */
         if (CollectionUtil.isNotEmpty(input.getTallyingAreaList())) {
             List<TallyingArea> tallyingAreaList = JSONArray.parseArray(JSONObject.toJSONString(input.getTallyingAreaList()), TallyingArea.class);
-            tallyingAreaService.saveInfo(tallyingAreaList, customer.getId(), customerMarket.getMarketId());
+            tallyingAreaService.saveInfo(tallyingAreaList, customer.getId(), marketId);
         } else {
             //如果传入的客户理货区为空，则表示该客户在该市场没有租赁理货区(手动关联的，可编辑)，所有可以直接删除
-            tallyingAreaService.deleteByCustomerId(customer.getId(), customerMarket.getMarketId());
+            tallyingAreaService.deleteByCustomerId(customer.getId(), marketId);
         }
         //更新客户经营品类信息
         if (CollectionUtil.isNotEmpty(input.getBusinessCategoryList())) {
             List<BusinessCategory> businessCategoryList = JSONArray.parseArray(JSONObject.toJSONString(input.getBusinessCategoryList()), BusinessCategory.class);
-            businessCategoryService.saveInfo(businessCategoryList, customer.getId(), customerMarket.getMarketId());
+            businessCategoryService.saveInfo(businessCategoryList, customer.getId(), marketId);
         }
         //组装保存客户角色身份信息
-        if (CollectionUtil.isNotEmpty(input.getCharacterTypeList())){
+        if (CollectionUtil.isNotEmpty(input.getCharacterTypeList())) {
             List<CharacterType> characterTypeList = JSONArray.parseArray(JSONObject.toJSONString(input.getCharacterTypeList()), CharacterType.class);
-            characterTypeService.saveInfo(characterTypeList,customer.getId(),customerMarket.getMarketId());
+            characterTypeService.saveInfo(characterTypeList, customer.getId(), marketId);
             customer.setCharacterTypeList(characterTypeList);
         }
         //组装保存客户附件信息
         if (CollectionUtil.isNotEmpty(input.getAttachmentList())) {
             List<Attachment> attachmentList = JSONArray.parseArray(JSONObject.toJSONString(input.getAttachmentList()), Attachment.class);
-            attachmentService.batchSave(attachmentList, customer.getId(), customerMarket.getMarketId());
+            attachmentService.batchSave(attachmentList, customer.getId(), marketId);
         }
         return BaseOutput.successData(customer);
     }
