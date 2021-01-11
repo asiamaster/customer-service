@@ -589,7 +589,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 return BaseOutput.failure("数据有误,手机号已被多个客户实名");
             }
             Customer customer = validatedCellphoneCustomer.get(0);
-            if (!Objects.equals(customer.getCertificateNumber(), input.getCertificateNumber())) {
+            if (StrUtil.isNotBlank(customer.getCertificateNumber()) && !Objects.equals(customer.getCertificateNumber(), input.getCertificateNumber())) {
                 return BaseOutput.failure("该手机号已认证绑定的其它证件客户");
             }
         }
@@ -672,6 +672,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         this.update(customer);
         CustomerMarket oldCustomerMarket = customerMarketService.queryByMarketAndCustomerId(input.getCustomerMarket().getMarketId(), customer.getId());
         if (Objects.nonNull(oldCustomerMarket)) {
+            oldCustomerMarket.setAlias(input.getName());
             oldCustomerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
             oldCustomerMarket.setBusinessNature(input.getCustomerMarket().getBusinessNature());
             oldCustomerMarket.setApprovalUserId(null);
@@ -682,6 +683,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             if (Objects.nonNull(input.getCustomerMarket().getId())) {
                 CustomerMarket old = customerMarketService.get(input.getCustomerMarket().getId());
                 if (Objects.nonNull(old) && old.getCustomerId().equals(customer.getId())) {
+                    old.setAlias(input.getName());
                     old.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
                     old.setBusinessNature(input.getCustomerMarket().getBusinessNature());
                     old.setApprovalUserId(null);
@@ -697,6 +699,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
                 customerMarket.setCreateTime(LocalDateTime.now());
                 customerMarket.setModifyTime(LocalDateTime.now());
+                customerMarket.setAlias(input.getName());
                 customerMarketService.insert(customerMarket);
             }
         }
