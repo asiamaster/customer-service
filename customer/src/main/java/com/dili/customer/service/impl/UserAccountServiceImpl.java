@@ -65,7 +65,7 @@ public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> i
         }
         Optional<UserAccount> byCellphone = this.getByCellphone(cellphone);
         if (byCellphone.isEmpty()) {
-            return BaseOutput.failure("账号或密码不正确").setCode(ResultCode.UNAUTHORIZED);
+            return BaseOutput.failure("账号不存在或未认证").setCode(ResultCode.NOT_FOUND);
         }
         UserAccount info = byCellphone.get();
         if (!info.getIsEnable().equals(YesOrNoEnum.YES.getCode())) {
