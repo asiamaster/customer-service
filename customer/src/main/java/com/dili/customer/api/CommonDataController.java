@@ -46,6 +46,33 @@ public class CommonDataController {
     }
 
     /**
+     * 获取行业主数据
+     * @return
+     */
+    @PostMapping(value = "/listIndustry")
+    public BaseOutput<List<DataDictionaryValue>> listIndustry() {
+        return BaseOutput.successData(commonDataService.queryIndustry(null));
+    }
+
+    /**
+     * 获取个人证件类型
+     * @return
+     */
+    @PostMapping(value = "/listIndividualCertificate")
+    public BaseOutput<List<DataDictionaryValue>> listIndividualCertificate() {
+        return BaseOutput.successData(commonDataService.queryIndividualCertificate(null));
+    }
+
+    /**
+     * 获取企业证件类型
+     * @return
+     */
+    @PostMapping(value = "/listEnterpriseCertificate")
+    public BaseOutput<List<DataDictionaryValue>> listEnterpriseCertificate() {
+        return BaseOutput.successData(commonDataService.queryEnterpriseCertificate(null));
+    }
+
+    /**
      * 获取角色主信息
      * @return
      */
@@ -55,7 +82,7 @@ public class CommonDataController {
     }
 
     /**
-     * 获取市场角色分类信息
+     * 获取市场角色身份分类信息
      * @return
      */
     @PostMapping(value = "/listCharacterSubType")

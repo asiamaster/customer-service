@@ -53,6 +53,33 @@ public class CommonDataService {
     }
 
     /**
+     * 获取经营行业
+     * @param state 状态
+     * @return
+     */
+    public List<DataDictionaryValue> queryIndustry(Integer state) {
+        return dataDictionaryRpcService.listByDdCode(DdCodeEnum.customer_business.name(), state, null);
+    }
+
+    /**
+     * 获取个人证件类型
+     * @param state 状态
+     * @return
+     */
+    public List<DataDictionaryValue> queryIndividualCertificate(Integer state) {
+        return dataDictionaryRpcService.listByDdCode(DdCodeEnum.individual_certificate.name(), state, null);
+    }
+
+    /**
+     * 获取企业证件类型
+     * @param state 状态
+     * @return
+     */
+    public List<DataDictionaryValue> queryEnterpriseCertificate(Integer state) {
+        return dataDictionaryRpcService.listByDdCode(DdCodeEnum.enterprise_certificate.name(), state, null);
+    }
+
+    /**
      * 组装生成客户角色身份信息
      * @param characterTypeListData 已有角色分类数据对象
      * @param marketId 所属市场ID

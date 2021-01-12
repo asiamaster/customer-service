@@ -17,6 +17,18 @@ public enum DdCodeEnum {
      * 客户来源渠道
      */
     source_channel,
+    /**
+     * 个人证件类型
+     */
+    individual_certificate,
+    /**
+     * 企业证件类型
+     */
+    enterprise_certificate,
+    /**
+     * 客户行业
+     */
+    customer_business,
     ;
 
 }
