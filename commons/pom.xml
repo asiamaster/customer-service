@@ -87,9 +87,13 @@
         </dependency>
         <dependency>
             <groupId>com.dili</groupId>
+            <artifactId>ss-redis</artifactId>
+            <version>${sharp-sword.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dili</groupId>
             <artifactId>uap-sdk</artifactId>
             <version>2.11.0-SNAPSHOT</version>
-            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>ss-beetl</artifactId>
@@ -100,11 +104,6 @@
                     <groupId>com.dili</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.dili</groupId>
-            <artifactId>ss-redis</artifactId>
-            <version>${sharp-sword.version}</version>
         </dependency>
     </dependencies>
 

@@ -164,6 +164,7 @@ public class IndividualCustomerInput implements Serializable {
     /**
      * 客户经营品类信息
      */
+    @Valid
     private List<BusinessCategory> businessCategoryList;
 
     /**

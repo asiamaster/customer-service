@@ -12,6 +12,8 @@ import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.commons.config.CustomerCommonConfig;
 import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.customer.commons.service.CommonDataService;
+import com.dili.customer.commons.service.DepartmentRpcService;
+import com.dili.customer.commons.service.UapUserRpcService;
 import com.dili.customer.config.CustomerConfig;
 import com.dili.customer.domain.*;
 import com.dili.customer.mapper.CustomerMapper;
@@ -24,9 +26,10 @@ import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
-import com.dili.ss.redis.service.RedisUtil;
 import com.dili.ss.util.POJOUtils;
 import com.dili.uap.sdk.domain.DataDictionaryValue;
+import com.dili.uap.sdk.domain.Department;
+import com.dili.uap.sdk.domain.User;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
@@ -69,15 +72,16 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final CharacterTypeService characterTypeService;
     private final VehicleInfoService vehicleInfoService;
     private final UidRpcService uidRpcService;
-    private final RedisUtil redisUtil;
     private final AttachmentService attachmentService;
     private final CommonDataService commonDataService;
     private final CustomerCommonConfig customerCommonConfig;
     private final AccountTerminalService accountTerminalService;
+    private final UapUserRpcService uapUserRpcService;
+    private final DepartmentRpcService departmentRpcService;
+    private final UserAccountService userAccountService;
     @Autowired
     private CustomerMarketService customerMarketService;
-    @Autowired
-    private UserAccountService userAccountService;
+
 
     @Override
     public Customer getBaseInfoByCertificateNumber(String certificateNumber) {
@@ -323,14 +327,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 if (businessCategoryMap.containsKey(t.getId())) {
                     produceBusinessCategoryListData(t, businessCategoryMap.get(t.getId()));
                 }
-                String businessNature = t.getCustomerMarket().getBusinessNature();
-                if (StrUtil.isNotBlank(businessNature)) {
-                    List<DataDictionaryValue> dataDictionaryValues = commonDataService.queryBusinessNature(null);
-                    Optional<DataDictionaryValue> first = dataDictionaryValues.stream().filter(d -> d.getCode().equals(businessNature)).findFirst();
-                    if (first.isPresent()) {
-                        t.getCustomerMarket().setMetadata("businessNatureValue", first.get().getName());
-                    }
-                }
+                produceCustomerMarketOutputData(t.getCustomerMarket());
             });
         }
         output.setData(list).setPageNum(pageNum).setTotal(total).setPageSize(input.getRows()).setPages(totalPage);
@@ -914,5 +911,35 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             return Optional.of("客户行业ID不能为空");
         }
         return Optional.empty();
+    }
+
+    /**
+     * 生成客户市场数据输出对象
+     * @param customerMarket 客户信息对象
+     */
+    private void produceCustomerMarketOutputData(CustomerMarket customerMarket) {
+        if (Objects.isNull(customerMarket)){
+            return;
+        }
+        String businessNature = customerMarket.getBusinessNature();
+        if (StrUtil.isNotBlank(businessNature)) {
+            List<DataDictionaryValue> dataDictionaryValues = commonDataService.queryBusinessNature(null);
+            Optional<DataDictionaryValue> first = dataDictionaryValues.stream().filter(d -> d.getCode().equals(businessNature)).findFirst();
+            if (first.isPresent()) {
+                customerMarket.setMetadata("businessNatureValue", first.get().getName());
+            }
+        }
+        if (Objects.nonNull(customerMarket.getOwnerId())) {
+            Optional<User> userById = uapUserRpcService.getUserById(customerMarket.getOwnerId());
+            if (userById.isPresent()) {
+                customerMarket.setMetadata("userRealName", userById.get().getRealName());
+            }
+        }
+        if (Objects.nonNull(customerMarket.getDepartmentId())) {
+            Optional<Department> departmentById = departmentRpcService.getById(customerMarket.getDepartmentId());
+            if (departmentById.isPresent()) {
+                customerMarket.setMetadata("departmentName", departmentById.get().getName());
+            }
+        }
     }
 }

@@ -22,4 +22,12 @@ public class CaffeineConfig {
         return Caffeine.newBuilder().expireAfterWrite(10L, TimeUnit.MINUTES).build();
     }
 
+    /**
+     * 本地缓存,指定最大存储数
+     */
+    @Bean("caffeineMaxSizeCache")
+    public Cache<String, String> caffeineMaxSizeCache() {
+        return Caffeine.newBuilder().maximumSize(500).build();
+    }
+
 }
