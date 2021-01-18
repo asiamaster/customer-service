@@ -16,6 +16,7 @@ import com.dili.customer.utils.LoginUtil;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
+import com.dili.ss.exception.AppException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -249,7 +250,14 @@ public class CustomerController {
         if (bindingResult.hasErrors()) {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
-        return customerService.update(updateInput);
+        try {
+            return customerService.update(updateInput);
+        } catch (AppException appException) {
+            return BaseOutput.failure(appException.getMessage());
+        } catch (Exception e) {
+            log.error(String.format("客户数据:%s 修改异常:%s", JSONUtil.toJsonStr(updateInput), e.getMessage()), e);
+            return BaseOutput.failure("系统异常，请稍后再试");
+        }
     }
 
     /**

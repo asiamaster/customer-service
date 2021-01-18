@@ -7,6 +7,7 @@ import com.dili.customer.mapper.VehicleInfoMapper;
 import com.dili.customer.service.VehicleInfoService;
 import com.dili.ss.base.BaseServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,6 +39,7 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Integer batchSaveOrUpdate(List<VehicleInfo> vehicleInfoList) {
         if (CollectionUtil.isEmpty(vehicleInfoList)) {
             return 0;

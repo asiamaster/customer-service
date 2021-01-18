@@ -26,6 +26,7 @@ import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
+import com.dili.ss.exception.AppException;
 import com.dili.ss.util.POJOUtils;
 import com.dili.uap.sdk.domain.DataDictionaryValue;
 import com.dili.uap.sdk.domain.Department;
@@ -33,6 +34,7 @@ import com.dili.uap.sdk.domain.User;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -500,10 +502,17 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
          */
         if (CollectionUtil.isNotEmpty(updateInput.getVehicleInfoList())) {
             List<VehicleInfo> vehicleInfoList = Lists.newArrayList();
-            updateInput.getVehicleInfoList().forEach(t -> {
-                if (Objects.nonNull(t)) {
+            Boolean exist = false;
+            Set<String> registrationNumberSet = Sets.newHashSetWithExpectedSize(updateInput.getVehicleInfoList().size());
+            for (com.dili.customer.sdk.domain.VehicleInfo vehicleInfo : updateInput.getVehicleInfoList()) {
+                if (Objects.nonNull(vehicleInfo)) {
+                    if (registrationNumberSet.contains(vehicleInfo.getRegistrationNumber())) {
+                        exist = true;
+                        break;
+                    }
+                    registrationNumberSet.add(vehicleInfo.getRegistrationNumber());
                     VehicleInfo temp = new VehicleInfo();
-                    BeanUtils.copyProperties(t, temp);
+                    BeanUtils.copyProperties(vehicleInfo, temp);
                     temp.setCustomerId(customer.getId());
                     temp.setMarketId(marketId);
                     temp.setModifyTime(LocalDateTime.now());
@@ -514,7 +523,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                     }
                     vehicleInfoList.add(temp);
                 }
-            });
+            }
+            if (exist){
+                throw new AppException("车辆信息车牌号存在重复");
+            }
             vehicleInfoService.batchSaveOrUpdate(vehicleInfoList);
         } else {
             vehicleInfoService.deleteByCustomerAndMarket(customer.getId(), marketId);
