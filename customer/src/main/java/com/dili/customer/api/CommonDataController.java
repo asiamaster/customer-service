@@ -6,6 +6,7 @@ import com.dili.customer.commons.service.DataDictionaryRpcService;
 import com.dili.customer.commons.util.EnumUtil;
 import com.dili.customer.sdk.domain.dto.CharacterTypeGroupDto;
 import com.dili.customer.sdk.enums.CustomerEnum;
+import com.dili.customer.sdk.enums.NationEnum;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.uap.sdk.domain.DataDictionaryValue;
@@ -131,4 +132,15 @@ public class CommonDataController {
         }
         return BaseOutput.successData(commonDataService.produceCharacterTypeGroup(null, Long.valueOf(marketId.toString()), Boolean.valueOf(enable.toString())));
     }
+
+
+    /**
+     * 获取民族信息
+     * @return
+     */
+    @PostMapping(value = "/listNation")
+    public BaseOutput listNation() {
+        return BaseOutput.successData(EnumUtil.toObject(NationEnum.class));
+    }
+
 }
