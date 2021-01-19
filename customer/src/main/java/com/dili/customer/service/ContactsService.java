@@ -33,4 +33,12 @@ public interface ContactsService extends BaseService<Contacts, Long> {
      * @return 记录数
      */
     Integer batchSaveOrUpdate(List<Contacts> contactsList);
+
+    /**
+     * 更改数据为默认标记
+     * @param customerId 客户ID
+     * @param marketId   所属市场
+     * @param id         需要更更改为默认联系人的数据ID
+     */
+    void updateDefaultFlag(Long customerId, Long marketId, Long id);
 }

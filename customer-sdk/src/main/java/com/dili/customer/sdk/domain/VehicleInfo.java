@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -35,11 +37,13 @@ public class VehicleInfo extends BaseDomain {
     /**
      * 注册车牌号
      */
+    @NotBlank(message = "注册车牌号不能为空")
     private String registrationNumber;
 
     /**
      * 车型编号
      */
+    @NotNull(message = "注册车型不能为空")
     private Long typeNumber;
 
     /**

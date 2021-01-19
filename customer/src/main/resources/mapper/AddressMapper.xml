@@ -8,7 +8,7 @@
     <id column="id"  property="id" />
     <result column="customer_id"  property="customerId" />
     <result column="market_id"  property="marketId" />
-    <result column="city_id"  property="cityId" />
+    <result column="city_path"  property="cityPath" />
     <result column="city_name"  property="cityName" />
     <result column="address"  property="address" />
     <result column="is_current"  property="isCurrent" />
@@ -17,5 +17,16 @@
     <result column="creator_id"  property="creatorId" />
     <result column="modifier_id"  property="modifierId" />
   </resultMap>
+
+  <!--  更改是否当前地址的标记  -->
+  <update id="updateDefaultFlag" parameterType="map">
+    update address
+    set is_current = 0
+    where customer_id = #{customerId}
+      and market_id = #{marketId};
+    update address
+    set is_current = 1
+    where id = #{id};
+  </update>
 
 </mapper>

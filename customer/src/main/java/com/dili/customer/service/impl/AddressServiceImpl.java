@@ -1,16 +1,18 @@
 package com.dili.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.domain.Address;
 import com.dili.customer.domain.dto.AddressDto;
 import com.dili.customer.mapper.AddressMapper;
 import com.dili.customer.service.AddressService;
 import com.dili.ss.base.BaseServiceImpl;
+import com.google.common.collect.Maps;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -55,5 +57,31 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
             }
         });
         return addressList.size();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Optional<String> saveAddress(Address address) {
+        if (Objects.isNull(address.getModifyTime())) {
+            address.setModifyTime(LocalDateTime.now());
+        }
+        if (Objects.isNull(address.getId())) {
+            address.setCreateTime(address.getModifyTime());
+            address.setCreatorId(address.getModifierId());
+        }
+        this.saveOrUpdate(address);
+        if (YesOrNoEnum.YES.getCode().equals(address.getIsCurrent())) {
+            updateDefaultFlag(address.getCustomerId(), address.getMarketId(), address.getId());
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public void updateDefaultFlag(Long customerId, Long marketId, Long id) {
+        Map<String, Object> params = Maps.newHashMapWithExpectedSize(3);
+        params.put("customerId", customerId);
+        params.put("marketId", marketId);
+        params.put("id", id);
+        getActualMapper().updateDefaultFlag(params);
     }
 }

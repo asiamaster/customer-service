@@ -4,6 +4,7 @@ import com.dili.customer.domain.Contacts;
 import com.dili.customer.service.ContactsService;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,13 +23,12 @@ public class ContactsController {
     private final ContactsService contactsService;
 
     /**
-     * 删除CustomerContacts
-     * @param id
+     * 删除客户联系人
+     * @param id 数据ID
      * @return BaseOutput
      */
     @PostMapping(value = "/delete")
-    @ResponseBody
-    public BaseOutput delete(Long id) {
+    public BaseOutput delete(@RequestParam("id") Long id) {
         contactsService.delete(id);
         return BaseOutput.success("删除成功");
     }
@@ -39,7 +39,10 @@ public class ContactsController {
      * @return BaseOutput
      */
     @PostMapping(value = "/saveContacts")
-    public BaseOutput saveContacts(@Validated @RequestBody Contacts customerContacts) {
+    public BaseOutput saveContacts(@Validated @RequestBody Contacts customerContacts, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
+        }
         return contactsService.saveContacts(customerContacts);
     }
 

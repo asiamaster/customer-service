@@ -56,6 +56,7 @@ public class VehicleInfo extends BaseDomain {
      * 车型编号
      */
     @Column(name = "`type_number`")
+    @NotNull(message = "注册车型不能为空")
     private Long typeNumber;
 
     /**
@@ -86,6 +87,7 @@ public class VehicleInfo extends BaseDomain {
      * 修改人
      */
     @Column(name = "`modifier_id`")
+    @NotNull(message = "操作人不能为空")
     private Long modifierId;
 
     /**

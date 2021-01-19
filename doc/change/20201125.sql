@@ -117,9 +117,11 @@ INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `co
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 4, '个人', 'individual', 1);
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 5, '餐饮', 'catering', 1);
 INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('business_nature', 6, '配送商', 'distributors', 1);
+INSERT INTO `uap`.`data_dictionary_value`(`dd_code`, `order_number`, `name`, `code`,`state`) VALUES ('source_channel', 9, '地利工作台', 'workbench', 1);
+
 
 /*==============================================================*/
-/* Table: user_account         客户账号                                 */
+/* Table: user_account         客户账号                           */
 /*==============================================================*/
 drop table if exists user_account;
 create table user_account

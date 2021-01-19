@@ -4,9 +4,12 @@ import com.dili.customer.domain.Address;
 import com.dili.customer.service.AddressService;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 客户地址信息
@@ -32,5 +35,34 @@ public class AddressController {
         condition.setCustomerId(customerId);
         condition.setMarketId(marketId);
         return BaseOutput.success().setData(addressService.list(condition));
+    }
+
+    /**
+     * 删除客户地址信息
+     * @param id
+     * @return BaseOutput
+     */
+    @PostMapping(value = "/delete")
+    @ResponseBody
+    public BaseOutput delete(@RequestParam("id") Long id) {
+        addressService.delete(id);
+        return BaseOutput.success("删除成功");
+    }
+
+    /**
+     * 保存客户地址信息
+     * @param address 地址信息
+     * @return BaseOutput
+     */
+    @PostMapping(value = "/saveAddress")
+    public BaseOutput saveAddress(@Validated @RequestBody Address address, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
+        }
+        Optional<String> s = addressService.saveAddress(address);
+        if (s.isPresent()) {
+            return BaseOutput.failure(s.get());
+        }
+        return BaseOutput.success();
     }
 }

@@ -1,15 +1,16 @@
 package com.dili.customer.api;
 
-import cn.hutool.core.util.StrUtil;
 import com.dili.customer.domain.VehicleInfo;
 import com.dili.customer.service.VehicleInfoService;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 客户车辆信息
@@ -45,11 +46,25 @@ public class VehicleController {
      * @return 客户地址信息数据
      */
     @PostMapping(value = "/bindingVehicle")
-    public BaseOutput<Boolean> bindingVehicle(@Validated @RequestBody VehicleInfo vehicleInfo) {
-        String s = vehicleInfoService.bindingVehicle(vehicleInfo);
-        if (StrUtil.isNotBlank(s)) {
+    public BaseOutput<Boolean> bindingVehicle(@Validated @RequestBody VehicleInfo vehicleInfo, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
+        }
+        Optional<String> s = vehicleInfoService.bindingVehicle(vehicleInfo);
+        if (s.isEmpty()) {
             return BaseOutput.successData(true);
         }
-        return BaseOutput.failure(s).setData(false);
+        return BaseOutput.failure(s.get()).setData(false);
+    }
+
+    /**
+     * 删除客户车辆信息
+     * @param id 数据ID
+     * @return
+     */
+    @PostMapping(value = "/delete")
+    public BaseOutput delete(@RequestParam("id") Long id) {
+        vehicleInfoService.delete(id);
+        return BaseOutput.success("删除成功");
     }
 }

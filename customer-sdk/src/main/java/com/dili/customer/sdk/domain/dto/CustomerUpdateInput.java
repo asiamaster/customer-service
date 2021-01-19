@@ -96,6 +96,7 @@ public class CustomerUpdateInput implements Serializable {
     /**
      * 客户理货区
      */
+    @Valid
     private List<TallyingArea> tallyingAreaList;
 
     /**

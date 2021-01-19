@@ -28,13 +28,15 @@
     id, customer_id, firm_id,name, gender, phone, address, position, birthdate, notes, is_default,create_time,
     modify_time, creator_id, modifier_id
   </sql>
-  <select id="selectBy" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    select 
-    <include refid="Base_Column_List" />
-    from customer_contacts
-    where id = #{id,jdbcType=BIGINT}
-  </select>
+
+  <!--  更改是否当前地址的标记  -->
+  <update id="updateDefaultFlag" parameterType="map">
+    update contacts
+    set is_default = 0
+    where customer_id = #{customerId}
+      and market_id = #{marketId};
+    update contacts
+    set is_default = 1
+    where id = #{id};
+  </update>
 </mapper>

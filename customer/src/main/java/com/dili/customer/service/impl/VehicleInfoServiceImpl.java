@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -70,17 +71,26 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
     }
 
     @Override
-    public String bindingVehicle(VehicleInfo vehicleInfo) {
+    public Optional<String> bindingVehicle(VehicleInfo vehicleInfo) {
         VehicleInfo condition = new VehicleInfo();
         condition.setMarketId(vehicleInfo.getMarketId());
         condition.setCustomerId(vehicleInfo.getCustomerId());
         condition.setRegistrationNumber(vehicleInfo.getRegistrationNumber());
-        if (CollectionUtil.isNotEmpty(list(condition))) {
-            return "此车辆信息已被绑定,无需重复绑定";
+        List<VehicleInfo> vehicleInfoList = list(condition);
+        if (Objects.isNull(vehicleInfo.getId())) {
+            if (CollectionUtil.isNotEmpty(vehicleInfoList)) {
+                return Optional.of("此车辆信息已被绑定,无需重复绑定");
+            }
+        } else {
+            long count = vehicleInfoList.stream().filter(t -> t.getRegistrationNumber().equalsIgnoreCase(vehicleInfo.getRegistrationNumber()) && !t.getId().equals(vehicleInfo.getId())).count();
+            if (count > 0) {
+                return Optional.of("此车辆信息已被绑定,无需重复绑定");
+            }
+            vehicleInfo.setCreateTime(LocalDateTime.now());
+            vehicleInfo.setCreatorId(vehicleInfo.getModifierId());
         }
-        vehicleInfo.setCreateTime(LocalDateTime.now());
         vehicleInfo.setModifyTime(vehicleInfo.getCreateTime());
-        this.insert(vehicleInfo);
-        return null;
+        this.saveOrUpdateSelective(vehicleInfo);
+        return Optional.empty();
     }
 }

@@ -4,6 +4,7 @@ import com.dili.customer.domain.VehicleInfo;
 import com.dili.ss.base.BaseService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -41,5 +42,5 @@ public interface VehicleInfoService extends BaseService<VehicleInfo, Long> {
      * @param vehicleInfo 绑定信息
      * @return
      */
-    String bindingVehicle(VehicleInfo vehicleInfo);
+    Optional<String> bindingVehicle(VehicleInfo vehicleInfo);
 }

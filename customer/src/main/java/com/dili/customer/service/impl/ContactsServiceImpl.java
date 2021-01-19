@@ -1,17 +1,20 @@
 package com.dili.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.domain.Contacts;
 import com.dili.customer.domain.dto.ContactsDto;
 import com.dili.customer.mapper.ContactsMapper;
 import com.dili.customer.service.ContactsService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
+import com.google.common.collect.Maps;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,6 +31,7 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public BaseOutput saveContacts(Contacts customerContacts) {
         //构造查询条件，用于查询该客户是否已有该联系人
         Contacts condition = new Contacts();
@@ -56,6 +60,9 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
                 }
             }
             this.update(customerContacts);
+        }
+        if (YesOrNoEnum.YES.getCode().equals(customerContacts.getIsDefault())) {
+            updateDefaultFlag(customerContacts.getCustomerId(), customerContacts.getMarketId(), customerContacts.getId());
         }
         return BaseOutput.success();
     }
@@ -91,5 +98,14 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
             }
         });
         return contactsList.size();
+    }
+
+    @Override
+    public void updateDefaultFlag(Long customerId, Long marketId, Long id) {
+        Map<String, Object> params = Maps.newHashMapWithExpectedSize(3);
+        params.put("customerId", customerId);
+        params.put("marketId", marketId);
+        params.put("id", id);
+        getActualMapper().updateDefaultFlag(params);
     }
 }

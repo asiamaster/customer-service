@@ -54,6 +54,12 @@
             <artifactId>ss-core</artifactId>
             <version>${sharp-sword.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>druid-spring-boot-starter</artifactId>
+                    <groupId>com.alibaba</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
@@ -72,7 +78,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>5.5.4</version>
+            <version>5.5.7</version>
         </dependency>
         <dependency>
             <groupId>one.util</groupId>
