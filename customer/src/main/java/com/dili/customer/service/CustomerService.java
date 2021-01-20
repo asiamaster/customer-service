@@ -7,6 +7,7 @@ import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -65,7 +66,7 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @param updateInput 需要更新的数据
      * @return
      */
-    BaseOutput<Customer> update(CustomerUpdateInput updateInput);
+    BaseOutput update(CustomerUpdateInput updateInput);
 
     /**
      * 获取被某手机号验证的客户
@@ -110,4 +111,18 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @param customer
      */
     void defaultRegister(Customer customer);
+
+    /**
+     * 更改客户基本信息
+     * @param input 客户基本信息
+     * @return
+     */
+    BaseOutput updateBaseInfo(CustomerBaseUpdateInput input);
+
+    /**
+     * 更改客户证件信息
+     * @param input 证件信息
+     * @return
+     */
+    Optional<String> updateCertificateInfo(CustomerCertificateInput input);
 }

@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.groups.Default;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 客户基础信息
@@ -388,6 +389,45 @@ public class CustomerController {
         }
         input.setOrganizationType(CustomerEnum.OrganizationType.INDIVIDUAL.getCode());
         return completeInfo(input);
+    }
+
+    /**
+     * 更改客户基本信息
+     * @param input 待完善的信息
+     * @return
+     */
+    @PostMapping(value = "/updateBaseInfo")
+    public BaseOutput updateBaseInfo(@Validated({UpdateView.class, Default.class}) @RequestBody CustomerBaseUpdateInput input, BindingResult bindingResult) {
+        log.info(String.format("客户基本信息修改:%s", JSONUtil.toJsonStr(input)));
+        if (bindingResult.hasErrors()) {
+            return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
+        }
+        try {
+            return customerService.updateBaseInfo(input);
+        } catch (Exception e) {
+            log.error(String.format("客户基本信息: %s 修改发生异常:%s", JSONUtil.toJsonStr(input), e.getMessage()), e);
+            return BaseOutput.failure("系统异常");
+        }
+    }
+
+    /**
+     * 更改客户证件信息
+     * @param input 证件信息
+     * @return
+     */
+    @PostMapping(value = "/updateCertificateInfo")
+    public BaseOutput updateCertificateInfo(@RequestBody CustomerCertificateInput input) {
+        log.info(String.format("客户证件信息修改:%s", JSONUtil.toJsonStr(input)));
+        try {
+            Optional<String> s = customerService.updateCertificateInfo(input);
+            if (s.isPresent()) {
+                return BaseOutput.failure(s.get());
+            }
+            return BaseOutput.success();
+        } catch (Exception e) {
+            log.error(String.format("客户证件信息: %s 修改发生异常:%s", JSONUtil.toJsonStr(input), e.getMessage()), e);
+            return BaseOutput.failure("系统异常");
+        }
     }
 
     /**

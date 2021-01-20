@@ -3,6 +3,7 @@ package com.dili.customer.sdk.domain;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.sdk.validator.CompleteView;
+import com.dili.customer.sdk.validator.UpdateView;
 import com.dili.ss.domain.BaseDomain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -49,6 +50,7 @@ public class CustomerMarket extends BaseDomain {
     /**
      * 所有者
      */
+    @NotNull(message = "客户所属人不能为空", groups = {UpdateView.class})
     private Long ownerId;
 
     /**
