@@ -1,6 +1,9 @@
 package com.dili.customer.sdk.domain.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -20,11 +23,17 @@ public class CustomerQueryInput extends CustomerBaseQueryInput {
     /**
      * 客户所在市场中的创建时间-开始
      */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime marketCreateTimeStart;
 
     /**
      * 客户所在市场中的创建时间-介绍
      */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime marketCreateTimeEnd;
 
     /**
