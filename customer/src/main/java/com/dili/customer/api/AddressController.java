@@ -45,7 +45,7 @@ public class AddressController {
     @PostMapping(value = "/delete")
     @ResponseBody
     public BaseOutput delete(@RequestParam("id") Long id) {
-        addressService.delete(id);
+        addressService.deleteWithLogger(id);
         return BaseOutput.success("删除成功");
     }
 

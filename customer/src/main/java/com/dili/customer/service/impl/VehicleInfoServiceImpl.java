@@ -1,19 +1,19 @@
 package com.dili.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.dili.assets.sdk.dto.CarTypeDTO;
+import com.dili.customer.commons.service.CarTypeRpcService;
 import com.dili.customer.domain.VehicleInfo;
 import com.dili.customer.domain.dto.VehicleInfoDto;
 import com.dili.customer.mapper.VehicleInfoMapper;
 import com.dili.customer.service.VehicleInfoService;
 import com.dili.ss.base.BaseServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -21,12 +21,15 @@ import java.util.stream.Collectors;
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
  * @date 2020/11/29 11:07
  */
+@RequiredArgsConstructor
 @Service
 public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> implements VehicleInfoService {
 
     public VehicleInfoMapper getActualMapper() {
         return (VehicleInfoMapper)getDao();
     }
+
+    private final CarTypeRpcService carTypeRpcService;
 
     @Override
     public Integer deleteByCustomerAndMarket(Long customerId, Long marketId) {
@@ -92,5 +95,22 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
         vehicleInfo.setModifyTime(vehicleInfo.getCreateTime());
         this.saveOrUpdateSelective(vehicleInfo);
         return Optional.empty();
+    }
+
+    @Override
+    public List<VehicleInfo> listByCustomerAndMarket(Long customerId, Long marketId) {
+        VehicleInfo condition = new VehicleInfo();
+        condition.setCustomerId(customerId);
+        condition.setMarketId(marketId);
+        List<VehicleInfo> list = this.list(condition);
+        if (CollectionUtil.isNotEmpty(list)) {
+            Map<Long, CarTypeDTO> longCarTypeDTOMap = carTypeRpcService.listMapInfo();
+            list.forEach(t -> {
+                if (longCarTypeDTOMap.containsKey(t.getTypeNumber())) {
+                    t.setMetadata("carTypeName", longCarTypeDTOMap.get(t.getTypeNumber()).getName());
+                }
+            });
+        }
+        return list;
     }
 }

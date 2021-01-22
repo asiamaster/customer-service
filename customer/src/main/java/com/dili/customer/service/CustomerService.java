@@ -5,6 +5,7 @@ import com.dili.customer.sdk.domain.dto.*;
 import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
@@ -120,9 +121,34 @@ public interface CustomerService extends BaseService<Customer, Long> {
     BaseOutput updateBaseInfo(CustomerBaseUpdateInput input);
 
     /**
-     * 更改客户证件信息
-     * @param input 证件信息
+     * 更改客户基本信息
+     * @param input    客户基本信息
+     * @param isLogger 是否需要记录操作日志
      * @return
      */
-    Optional<String> updateCertificateInfo(CustomerCertificateInput input);
+    BaseOutput updateBaseInfo(CustomerBaseUpdateInput input, Boolean isLogger);
+
+    /**
+     * 更改客户证件信息
+     * @param input 证件信息
+     * @param isLogger 是否需要记录操作日志
+     * @return
+     */
+    Optional<String> updateCertificateInfo(CustomerCertificateInput input, Boolean isLogger);
+
+    /**
+     * 获取客户及对应所在市场的详细数据信息
+     * @param id 客户ID
+     * @param marketId 市场ID
+     * @return
+     */
+    Customer get(Long id, Long marketId);
+
+    /**
+     * 更改客户状态
+     * @param customerId 客户ID
+     * @param state 客户状态
+     */
+    void updateState(Long customerId, Integer state);
+
 }

@@ -27,4 +27,9 @@ public interface SecurityConstant {
      * 对象信息参考
      */
     String JWT_CLAIMS_BODY = "JwtClaimsBody";
+
+    /**
+     * uap token key
+     */
+    String UAP_TOKEN_KEY = "UAP_SessionId";
 }

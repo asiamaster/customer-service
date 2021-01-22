@@ -76,7 +76,7 @@ public class CustomerBaseUpdateInput {
     /**
      * 操作人ID
      */
-    @NotNull(message = "操作人不能为空")
+    @NotNull(message = "操作人不能为空", groups = {UpdateView.class})
     private Long operatorId;
 
     /**

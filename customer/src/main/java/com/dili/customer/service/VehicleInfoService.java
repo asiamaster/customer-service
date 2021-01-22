@@ -43,4 +43,13 @@ public interface VehicleInfoService extends BaseService<VehicleInfo, Long> {
      * @return
      */
     Optional<String> bindingVehicle(VehicleInfo vehicleInfo);
+
+    /**
+     * 根据客户及市场获取车辆信息
+     * 此方法会冗余返回车型文本信息
+     * @param customerId 客户ID
+     * @param marketId 市场ID
+     * @return
+     */
+    List<VehicleInfo> listByCustomerAndMarket(Long customerId, Long marketId);
 }

@@ -5,12 +5,15 @@ import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.dili.commons.glossary.YesOrNoEnum;
+import com.dili.customer.annotation.UapToken;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.wechat.LoginSuccessData;
+import com.dili.customer.sdk.constants.MqConstant;
 import com.dili.customer.sdk.domain.dto.*;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.sdk.validator.*;
 import com.dili.customer.service.CustomerService;
+import com.dili.customer.service.MqService;
 import com.dili.customer.service.UserAccountService;
 import com.dili.customer.utils.LoginUtil;
 import com.dili.ss.constant.ResultCode;
@@ -42,6 +45,7 @@ public class CustomerController {
 
     private final CustomerService customerService;
     private final UserAccountService userAccountService;
+    private final MqService mqService;
 
     /**
      * 分页查询客户数据集
@@ -133,16 +137,11 @@ public class CustomerController {
      * @return
      */
     @PostMapping(value="/get")
-    public BaseOutput<CustomerExtendDto> get(@RequestParam("id") Long id, @RequestParam("marketId") Long marketId){
+    public BaseOutput<CustomerExtendDto> get(@RequestParam("id") Long id, @RequestParam("marketId") Long marketId) {
         if (Objects.isNull(id) || Objects.isNull(marketId)) {
             return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
         }
-        CustomerQueryInput condition = new CustomerQueryInput();
-        condition.setId(id);
-        condition.setMarketId(marketId);
-        PageOutput<List<Customer>> pageOutput = customerService.listForPage(condition);
-        Customer customer = pageOutput.getData().stream().findFirst().orElse(null);
-        return BaseOutput.success().setData(customer);
+        return BaseOutput.success().setData(customerService.get(id, marketId));
     }
 
     /**
@@ -204,13 +203,11 @@ public class CustomerController {
      * @param state      状态值
      * @return
      */
+    @UapToken
     @PostMapping(value = "/updateState")
     public BaseOutput<Customer> updateState(@RequestParam("customerId") Long customerId, @RequestParam("state") Integer state) {
-        Customer data = customerService.get(customerId);
-        data.setId(customerId);
-        data.setState(state);
-        customerService.updateSelective(data);
-        return BaseOutput.success().setData(data);
+        customerService.updateState(customerId, state);
+        return BaseOutput.success();
     }
 
     /**
@@ -246,13 +243,18 @@ public class CustomerController {
      * @param updateInput 更新数据
      * @return BaseOutput
      */
+    @UapToken
     @PostMapping(value="/update")
     public BaseOutput<Customer> update(@Validated({UpdateView.class, Default.class}) @RequestBody CustomerUpdateInput updateInput, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
         try {
-            return customerService.update(updateInput);
+            BaseOutput update = customerService.update(updateInput);
+            if (update.isSuccess()) {
+                mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, updateInput.getId(), updateInput.getCustomerMarket().getMarketId());
+            }
+            return update;
         } catch (AppException appException) {
             return BaseOutput.failure(appException.getMessage());
         } catch (Exception e) {
@@ -266,13 +268,24 @@ public class CustomerController {
      * @param customer
      * @return BaseOutput
      */
+    @UapToken
     @PostMapping(value="/registerEnterprise")
     public BaseOutput<Customer> registerEnterprise(@Validated({AddView.class, EnterpriseView.class}) @RequestBody EnterpriseCustomerInput customer, BindingResult bindingResult) {
         log.info(String.format("企业客户注册:%s", JSONUtil.toJsonStr(customer)));
         if (bindingResult.hasErrors()){
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
-        return customerService.register(customer);
+        try {
+            BaseOutput<Customer> baseOutput = customerService.register(customer);
+            if (baseOutput.isSuccess()) {
+                mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_ADD_MQ_FANOUT_EXCHANGE, baseOutput.getData().getId(), customer.getCustomerMarket().getMarketId());
+            }
+            return baseOutput;
+        } catch (Exception e) {
+            log.error(String.format("企业客户注册:%s 异常:%s", JSONUtil.toJsonStr(customer), e.getMessage()), e);
+            return BaseOutput.failure("系统异常");
+        }
+
     }
 
     /**
@@ -280,15 +293,25 @@ public class CustomerController {
      * @param customer
      * @return BaseOutput
      */
-    @PostMapping(value="/registerIndividual")
+    @UapToken
+    @PostMapping(value = "/registerIndividual")
     public BaseOutput<Customer> registerIndividual(@Validated({AddView.class}) @RequestBody IndividualCustomerInput customer, BindingResult bindingResult) {
         log.info(String.format("个人客户注册:%s", JSONUtil.toJsonStr(customer)));
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
         EnterpriseCustomerInput input = new EnterpriseCustomerInput();
-        BeanUtils.copyProperties(customer,input);
-        return customerService.register(input);
+        BeanUtils.copyProperties(customer, input);
+        try {
+            BaseOutput<Customer> baseOutput = customerService.register(input);
+            if (baseOutput.isSuccess()) {
+                mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_ADD_MQ_FANOUT_EXCHANGE, baseOutput.getData().getId(), input.getCustomerMarket().getMarketId());
+            }
+            return baseOutput;
+        } catch (Exception e) {
+            log.error(String.format("个人客户注册:%s 异常:%s", JSONUtil.toJsonStr(customer), e.getMessage()), e);
+            return BaseOutput.failure("系统异常");
+        }
     }
 
 
@@ -309,6 +332,7 @@ public class CustomerController {
      * @param cellphone  手机号
      * @return
      */
+    @UapToken
     @PostMapping(value = "/updateCellphoneValid")
     public BaseOutput<Boolean> updateCellphoneValid(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone) {
         log.info(String.format("客户【%s】手机号【%s】认证", customerId, cellphone));
@@ -396,6 +420,7 @@ public class CustomerController {
      * @param input 待完善的信息
      * @return
      */
+    @UapToken
     @PostMapping(value = "/updateBaseInfo")
     public BaseOutput updateBaseInfo(@Validated({UpdateView.class, Default.class}) @RequestBody CustomerBaseUpdateInput input, BindingResult bindingResult) {
         log.info(String.format("客户基本信息修改:%s", JSONUtil.toJsonStr(input)));
@@ -403,7 +428,11 @@ public class CustomerController {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
         try {
-            return customerService.updateBaseInfo(input);
+            BaseOutput baseOutput = customerService.updateBaseInfo(input, true);
+            if (baseOutput.isSuccess()) {
+                mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, input.getId(), input.getCustomerMarket().getMarketId());
+            }
+            return baseOutput;
         } catch (Exception e) {
             log.error(String.format("客户基本信息: %s 修改发生异常:%s", JSONUtil.toJsonStr(input), e.getMessage()), e);
             return BaseOutput.failure("系统异常");
@@ -415,11 +444,12 @@ public class CustomerController {
      * @param input 证件信息
      * @return
      */
+    @UapToken
     @PostMapping(value = "/updateCertificateInfo")
     public BaseOutput updateCertificateInfo(@RequestBody CustomerCertificateInput input) {
         log.info(String.format("客户证件信息修改:%s", JSONUtil.toJsonStr(input)));
         try {
-            Optional<String> s = customerService.updateCertificateInfo(input);
+            Optional<String> s = customerService.updateCertificateInfo(input,true);
             if (s.isPresent()) {
                 return BaseOutput.failure(s.get());
             }

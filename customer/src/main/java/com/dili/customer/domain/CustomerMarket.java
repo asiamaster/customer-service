@@ -161,6 +161,7 @@ public class CustomerMarket extends BaseDomain {
      */
     @Column(name = "`create_time`",updatable = false)
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
@@ -175,6 +176,7 @@ public class CustomerMarket extends BaseDomain {
      */
     @Column(name = "`modify_time`")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Version(nextVersion = DateNextVersion.class)
     private LocalDateTime modifyTime;

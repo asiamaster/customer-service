@@ -16,6 +16,7 @@ import one.util.streamex.StreamEx;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,7 +56,9 @@ public class AttachmentServiceImpl extends BaseServiceImpl<Attachment, Long> imp
         attachmentList.forEach(t -> {
             t.setCustomerId(customerId);
             t.setMarketId(marketId);
+            t.setModifyTime(LocalDateTime.now());
             if (Objects.isNull(t.getId())) {
+                t.setCreateTime(t.getModifyTime());
                 this.insert(t);
             } else {
                 this.update(t);

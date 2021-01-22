@@ -1,5 +1,6 @@
 package com.dili.customer.sdk.rpc;
 
+import com.dili.customer.sdk.constants.SecurityConstant;
 import com.dili.customer.sdk.domain.Customer;
 import com.dili.customer.sdk.domain.dto.*;
 import com.dili.ss.domain.BaseOutput;
@@ -7,6 +8,7 @@ import com.dili.ss.domain.PageOutput;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -92,7 +94,7 @@ public interface CustomerRpc {
      * @return
      */
     @PostMapping(value = "/api/customer/registerEnterprise")
-    BaseOutput<CustomerExtendDto> registerEnterprise(EnterpriseCustomerInput baseInfo);
+    BaseOutput<CustomerExtendDto> registerEnterprise(EnterpriseCustomerInput baseInfo, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 
     /**
      * 个人用户注册
@@ -100,7 +102,7 @@ public interface CustomerRpc {
      * @return
      */
     @PostMapping(value = "/api/customer/registerIndividual")
-    BaseOutput<CustomerExtendDto> registerIndividual(IndividualCustomerInput baseInfo);
+    BaseOutput<CustomerExtendDto> registerIndividual(IndividualCustomerInput baseInfo, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 
 
     /**
@@ -109,7 +111,7 @@ public interface CustomerRpc {
      * @return
      */
     @PostMapping(value = "/api/customer/update")
-    BaseOutput<CustomerExtendDto> update(CustomerUpdateInput updateInput);
+    BaseOutput<CustomerExtendDto> update(CustomerUpdateInput updateInput, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 
     /**
      * 更新用户状态
@@ -118,7 +120,7 @@ public interface CustomerRpc {
      * @return
      */
     @PostMapping(value = "/api/customer/updateState")
-    BaseOutput<Customer> updateState(@RequestParam("customerId") Long customerId, @RequestParam("state") Integer state);
+    BaseOutput<Customer> updateState(@RequestParam("customerId") Long customerId, @RequestParam("state") Integer state, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 
     /**
      * 根据证件号检测某个客户在某市场是否已存在
@@ -174,7 +176,7 @@ public interface CustomerRpc {
      * @return
      */
     @PostMapping(value = "/api/customer/updateCellphoneValid")
-    BaseOutput<Boolean> updateCellphoneValid(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone, @RequestParam("valid") Boolean valid);
+    BaseOutput<Boolean> updateCellphoneValid(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone, @RequestParam("valid") Boolean valid, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 
     /**
      * 获取被某手机号验证的客户

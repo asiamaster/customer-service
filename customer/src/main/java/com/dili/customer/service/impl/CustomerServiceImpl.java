@@ -11,27 +11,35 @@ import com.alibaba.fastjson.JSONObject;
 import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.commons.config.CustomerCommonConfig;
 import com.dili.customer.commons.constants.CustomerConstant;
+import com.dili.customer.commons.service.BusinessLogRpcService;
 import com.dili.customer.commons.service.CommonDataService;
 import com.dili.customer.commons.service.DepartmentRpcService;
 import com.dili.customer.commons.service.UapUserRpcService;
 import com.dili.customer.config.CustomerConfig;
 import com.dili.customer.domain.*;
+import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.mapper.CustomerMapper;
+import com.dili.customer.sdk.constants.MqConstant;
 import com.dili.customer.sdk.domain.dto.*;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.sdk.validator.CompleteView;
 import com.dili.customer.sdk.validator.EnterpriseView;
 import com.dili.customer.service.*;
 import com.dili.customer.service.remote.UidRpcService;
+import com.dili.logger.sdk.annotation.BusinessLogger;
+import com.dili.logger.sdk.util.LoggerUtil;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import com.dili.ss.exception.AppException;
+import com.dili.ss.mvc.util.RequestUtils;
 import com.dili.ss.util.POJOUtils;
 import com.dili.uap.sdk.domain.DataDictionaryValue;
 import com.dili.uap.sdk.domain.Department;
 import com.dili.uap.sdk.domain.User;
+import com.dili.uap.sdk.domain.UserTicket;
+import com.dili.uap.sdk.util.WebContent;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
@@ -42,7 +50,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.yaml.snakeyaml.events.Event;
 
 import javax.validation.groups.Default;
 import java.time.LocalDateTime;
@@ -68,9 +75,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         return (CustomerMapper) getDao();
     }
 
-    private final ContactsService contactsService;
     private final TallyingAreaService tallyingAreaService;
-    private final AddressService addressService;
     private final BusinessCategoryService businessCategoryService;
     private final CustomerConfig customerConfig;
     private final CharacterTypeService characterTypeService;
@@ -83,8 +88,16 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final UapUserRpcService uapUserRpcService;
     private final DepartmentRpcService departmentRpcService;
     private final UserAccountService userAccountService;
+    private final BusinessLogRpcService businessLogRpcService;
+    private final UapUserTicket uapUserTicket;
+    @Autowired
+    private MqService mqService;
     @Autowired
     private CustomerMarketService customerMarketService;
+    @Autowired
+    private ContactsService contactsService;
+    @Autowired
+    private AddressService addressService;
 
 
     @Override
@@ -99,9 +112,13 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @BusinessLogger(businessType = "customer", systemCode = "CUSTOMER",operationType = "add")
     public BaseOutput<Customer> register(EnterpriseCustomerInput baseInfo) {
         if (Objects.isNull(baseInfo.getCustomerMarket())){
             return BaseOutput.failure("客户所属市场信息丢失");
+        }
+        if (Objects.isNull(baseInfo.getOperatorId())) {
+            baseInfo.setOperatorId(getOperatorUserTicket().getId());
         }
         //客户归属市场信息
         CustomerMarket marketInfo = new CustomerMarket();
@@ -230,6 +247,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             customer.setCharacterTypeList(characterTypeList);
         }
         customer.setCustomerMarket(marketInfo);
+        StringBuffer str = new StringBuffer();
+        str.append(getOperatorUserTicket().getRealName()).append("创建").append(CustomerEnum.OrganizationType.getInstance(customer.getOrganizationType()).getValue())
+                .append("客户[").append(customer.getName()).append("]成功");
+        LoggerUtil.buildBusinessLoggerContext(customer.getId(), customer.getCode(), getOperatorUserTicket().getId(), getOperatorUserTicket().getRealName(), getOperatorUserTicket().getFirmId(), str.toString());
         return BaseOutput.success().setData(customer);
     }
 
@@ -394,9 +415,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (!baseOutput.isSuccess()){
             return BaseOutput.failure(baseOutput.getMessage());
         }
-        if (Objects.nonNull(updateInput.getCustomerCertificate())){
-            Optional<String> s = this.updateCertificateInfo(updateInput.getCustomerCertificate());
-            if (s.isPresent()){
+        if (Objects.nonNull(updateInput.getCustomerCertificate())) {
+            Optional<String> s = this.updateCertificateInfo(updateInput.getCustomerCertificate(), false);
+            if (s.isPresent()) {
                 throw new AppException(s.get());
             }
         }
@@ -752,6 +773,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         data.setContactsPhone(cellphone);
         data.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
         this.update(data);
+        saveBusinessLogger(customerId, data.getCode(), String.format("手机号%s验证通过", cellphone), "手机号验证通过", "edit");
         return null;
     }
 
@@ -771,7 +793,13 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BaseOutput updateBaseInfo(CustomerBaseUpdateInput updateInput) {
+    public BaseOutput updateBaseInfo(CustomerBaseUpdateInput input) {
+        return updateBaseInfo(input, false);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public BaseOutput updateBaseInfo(CustomerBaseUpdateInput updateInput, Boolean isLogger) {
         Customer customer = this.get(updateInput.getId());
         if (Objects.isNull(customer)) {
             return BaseOutput.failure("客户信息已不存在").setCode(ResultCode.DATA_ERROR);
@@ -834,12 +862,33 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (update == 0) {
             return BaseOutput.failure("数据已变更，更新失败");
         }
+        if (isLogger) {
+            StringBuffer content = new StringBuffer("修改后的数据为：");
+            List<CharacterTypeGroupDto> characterTypeGroupDtoList = commonDataService.produceCharacterTypeGroup(updateInput.getCharacterTypeList(), getOperatorUserTicket().getFirmId());
+            StringBuffer characterType = new StringBuffer("角色身份：");
+            characterTypeGroupDtoList.stream().forEach(t->{
+                if (t.getSelected()){
+                    characterType.append(" &").append(t.getValue());
+                    if (CollectionUtil.isNotEmpty(t.getSubTypeList())){
+                        t.getSubTypeList().forEach(s->{
+                            if (s.getSelected()){
+                                characterType.append(" ").append(s.getName());
+                            }
+                        });
+                    }
+                }
+            });
+            content.append("客户名称").append(customer.getName()).append(characterType)
+                    .append("手机号:").append(customer.getContactsPhone())
+                    .append("客户状态:").append(CustomerEnum.State.getInstance(customer.getState()).getValue());
+            saveBusinessLogger(customer.getId(), customer.getCode(), content.toString(), "修改渠道:APP", "edit");
+        }
         return BaseOutput.success();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Optional<String> updateCertificateInfo(CustomerCertificateInput customerCertificate) {
+    public Optional<String> updateCertificateInfo(CustomerCertificateInput customerCertificate, Boolean isLogger) {
         if (Objects.isNull(customerCertificate.getId())) {
             return Optional.of("数据ID不能为空");
         }
@@ -855,6 +904,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         }
         customer.setCertificateRange(customerCertificate.getCertificateRange());
         customer.setCertificateAddr(customerCertificate.getCertificateAddr());
+        if (Objects.isNull(customerCertificate.getCertificateLongTerm())) {
+            customerCertificate.setCertificateLongTerm(YesOrNoEnum.NO.getCode());
+        }
         customer.setCertificateLongTerm(customerCertificate.getCertificateLongTerm());
         //以下数据为企业客户才有的数据
         customer.setCorporationCertificateType(customerCertificate.getCorporationCertificateType());
@@ -864,9 +916,37 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (update == 0) {
             return Optional.of("数据已变更，更新失败");
         }
+        if (isLogger) {
+            StringBuffer content = new StringBuffer("修改后的数据为：");
+            content.append("证件有效期:").append(customer.getCertificateRange())
+                    .append("证件地址:").append(customer.getCertificateAddr())
+                    .append("证件是否长期有效:").append(YesOrNoEnum.getYesOrNoEnum(customer.getCertificateLongTerm()).getName())
+                    .append("法人姓名:").append(customer.getCorporationName())
+                    .append("法人证件号:").append(customer.getCorporationCertificateNumber());
+            saveBusinessLogger(customer.getId(), customer.getCode(), content.toString(), "修改渠道:APP", "edit");
+        }
         return Optional.empty();
     }
 
+    @Override
+    public Customer get(Long id, Long marketId) {
+        CustomerQueryInput condition = new CustomerQueryInput();
+        condition.setId(id);
+        condition.setMarketId(marketId);
+        PageOutput<List<Customer>> pageOutput = this.listForPage(condition);
+        return pageOutput.getData().stream().findFirst().orElse(null);
+    }
+
+    @Override
+    public void updateState(Long customerId, Integer state) {
+        Customer data = get(customerId);
+        if (Objects.nonNull(data)){
+            data.setId(customerId);
+            data.setState(state);
+            updateSelective(data);
+            mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE,customerId, getOperatorUserTicket().getFirmId());
+        }
+    }
 
     /**
      * 生成客户经营品类数据
@@ -1002,4 +1082,25 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             }
         }
     }
+
+    /**
+     * 获取当前操作人的信息
+     * @return
+     */
+    private UserTicket getOperatorUserTicket(){
+        return uapUserTicket.getUserTicket();
+    }
+
+    /**
+     * 保存客户操作日志
+     * @param businessId 业务ID
+     * @param businessCode 业务编号
+     * @param content 日志内容
+     * @param notes 备注
+     * @param operationType 操作类型
+     */
+    private void saveBusinessLogger(Long businessId, String businessCode, String content, String notes, String operationType) {
+        businessLogRpcService.asyncSave(businessId, businessCode, content, notes, operationType, getOperatorUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
+    }
+
 }

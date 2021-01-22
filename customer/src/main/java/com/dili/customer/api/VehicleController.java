@@ -34,10 +34,7 @@ public class VehicleController {
      */
     @PostMapping(value = "/listVehicle")
     public BaseOutput<List<VehicleInfo>> listVehicle(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId) {
-        VehicleInfo condition = new VehicleInfo();
-        condition.setCustomerId(customerId);
-        condition.setMarketId(marketId);
-        return BaseOutput.success().setData(vehicleInfoService.list(condition));
+        return BaseOutput.success().setData(vehicleInfoService.listByCustomerAndMarket(customerId, marketId));
     }
 
     /**

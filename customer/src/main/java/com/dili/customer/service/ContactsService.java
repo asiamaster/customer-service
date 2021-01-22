@@ -5,6 +5,7 @@ import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -41,4 +42,11 @@ public interface ContactsService extends BaseService<Contacts, Long> {
      * @param id         需要更更改为默认联系人的数据ID
      */
     void updateDefaultFlag(Long customerId, Long marketId, Long id);
+
+    /**
+     * 根据ID删除客户联系人信息
+     * @param id 数据ID
+     * @return
+     */
+    Optional<String> deleteWithLogger(Long id);
 }

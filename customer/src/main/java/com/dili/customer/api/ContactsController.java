@@ -1,5 +1,6 @@
 package com.dili.customer.api;
 
+import com.dili.customer.annotation.UapToken;
 import com.dili.customer.domain.Contacts;
 import com.dili.customer.service.ContactsService;
 import com.dili.ss.domain.BaseOutput;
@@ -27,9 +28,10 @@ public class ContactsController {
      * @param id 数据ID
      * @return BaseOutput
      */
+    @UapToken
     @PostMapping(value = "/delete")
     public BaseOutput delete(@RequestParam("id") Long id) {
-        contactsService.delete(id);
+        contactsService.deleteWithLogger(id);
         return BaseOutput.success("删除成功");
     }
 
@@ -38,6 +40,7 @@ public class ContactsController {
      * @param customerContacts 联系人信息
      * @return BaseOutput
      */
+    @UapToken
     @PostMapping(value = "/saveContacts")
     public BaseOutput saveContacts(@Validated @RequestBody Contacts customerContacts, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

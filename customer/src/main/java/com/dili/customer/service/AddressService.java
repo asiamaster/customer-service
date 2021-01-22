@@ -42,4 +42,10 @@ public interface AddressService extends BaseService<Address, Long> {
      */
     void updateDefaultFlag(Long customerId, Long marketId, Long id);
 
+    /**
+     * 根据ID删除客户地址信息
+     * @param id 数据ID
+     * @return
+     */
+    Optional<String> deleteWithLogger(Long id);
 }
