@@ -12,6 +12,7 @@ import com.dili.customer.service.AddressService;
 import com.dili.customer.service.CustomerService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.mvc.util.RequestUtils;
+import com.dili.uap.sdk.domain.UserTicket;
 import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
@@ -63,8 +64,11 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
         dto.setMarketId(addressList.get(0).getMarketId());
         //先删除数据库中已存在，但是不在本次传入的数据中的地址信息
         this.deleteByExample(dto);
+        LocalDateTime now = LocalDateTime.now();
         addressList.forEach(t -> {
+            t.setModifyTime(now);
             if (Objects.isNull(t.getId())) {
+                t.setCreateTime(t.getModifyTime());
                 this.insert(t);
             } else {
                 this.update(t);
@@ -76,11 +80,12 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Optional<String> saveAddress(Address address) {
-        StringBuilder content = new StringBuilder();
         String operationType = "edit";
-        if (Objects.isNull(address.getModifyTime())) {
-            address.setModifyTime(LocalDateTime.now());
+        UserTicket userTicket = uapUserTicket.getUserTicket();
+        if (Objects.isNull(address.getModifierId())){
+            address.setModifierId(userTicket.getId());
         }
+        address.setModifyTime(LocalDateTime.now());
         if (Objects.isNull(address.getId())) {
             operationType = "add";
             address.setCreateTime(address.getModifyTime());
@@ -91,7 +96,7 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
             updateDefaultFlag(address.getCustomerId(), address.getMarketId(), address.getId());
         }
         Customer customer = customerService.get(address.getCustomerId());
-        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(address, "  修改后:"), "", operationType, uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
+        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(address, "  修改后:"), "", operationType, userTicket, RequestUtils.getIpAddress(WebContent.getRequest()));
         return Optional.empty();
     }
 

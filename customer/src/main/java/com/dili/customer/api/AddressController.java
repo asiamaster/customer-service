@@ -1,5 +1,6 @@
 package com.dili.customer.api;
 
+import com.dili.customer.annotation.UapToken;
 import com.dili.customer.domain.Address;
 import com.dili.customer.service.AddressService;
 import com.dili.ss.domain.BaseOutput;
@@ -54,6 +55,7 @@ public class AddressController {
      * @param address 地址信息
      * @return BaseOutput
      */
+    @UapToken
     @PostMapping(value = "/saveAddress")
     public BaseOutput saveAddress(@Validated @RequestBody Address address, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

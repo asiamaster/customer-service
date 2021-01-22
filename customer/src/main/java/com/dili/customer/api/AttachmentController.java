@@ -1,6 +1,6 @@
 package com.dili.customer.api;
 
-import cn.hutool.core.collection.CollectionUtil;
+import com.dili.customer.annotation.UapToken;
 import com.dili.customer.domain.Attachment;
 import com.dili.customer.domain.dto.AttachmentDto;
 import com.dili.customer.sdk.domain.dto.AttachmentGroupInfo;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * 客户附件信息
@@ -58,16 +57,11 @@ public class AttachmentController {
      * @param marketId 市场ID
      * @return 删除结果
      */
+    @UapToken
     @PostMapping(value = "/delete")
-    public BaseOutput delete(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam(name = "idSet",required = false) Set<Long> idSet) {
+    public BaseOutput delete(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId) {
         if (Objects.nonNull(customerId) && Objects.nonNull(marketId)) {
-            AttachmentDto condition = new AttachmentDto();
-            condition.setCustomerId(customerId);
-            condition.setMarketId(marketId);
-            if (CollectionUtil.isNotEmpty(idSet)) {
-                condition.setIdSet(idSet);
-            }
-            attachmentService.deleteByExample(condition);
+            attachmentService.deleteByCustomerAndMarket(customerId, marketId);
             return BaseOutput.success().setData(true);
         }
         return BaseOutput.failure("必要参数丢失").setData(false);

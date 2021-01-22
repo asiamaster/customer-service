@@ -81,7 +81,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final CharacterTypeService characterTypeService;
     private final VehicleInfoService vehicleInfoService;
     private final UidRpcService uidRpcService;
-    private final AttachmentService attachmentService;
     private final CommonDataService commonDataService;
     private final CustomerCommonConfig customerCommonConfig;
     private final AccountTerminalService accountTerminalService;
@@ -98,6 +97,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private ContactsService contactsService;
     @Autowired
     private AddressService addressService;
+    @Autowired
+    private AttachmentService attachmentService;
 
 
     @Override
@@ -1080,6 +1081,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             if (departmentById.isPresent()) {
                 customerMarket.setMetadata("departmentName", departmentById.get().getName());
             }
+        }
+        if (Objects.nonNull(customerMarket.getBusinessRegionTag())) {
+            customerMarket.setMetadata("businessRegionTagValue", CustomerEnum.BusinessRegionTag.getValueByCode(customerMarket.getBusinessRegionTag()));
         }
     }
 

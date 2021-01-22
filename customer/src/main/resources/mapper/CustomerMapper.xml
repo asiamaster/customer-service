@@ -47,11 +47,13 @@
         <result column="profession" property="customerMarket.profession"/>
         <result column="profession_name" property="customerMarket.professionName" />
         <result column="business_nature" property="customerMarket.businessNature" />
+        <result column="business_region_tag" property="customerMarket.businessRegionTag" />
         <result column="sales_market" property="customerMarket.salesMarket"/>
         <result column="approval_status" property="customerMarket.approvalStatus" />
         <result column="approval_time" property="customerMarket.approvalTime" />
         <result column="approval_user_id" property="customerMarket.approvalUserId" />
         <result column="owner_id" property="customerMarket.ownerId" />
+
     </resultMap>
 
     <!-- 公共查询customer 单表 条件 -->
@@ -128,7 +130,7 @@
         c.*,
         cm.id as customerMarketId, cm.market_id,cm.create_time as marketCreateTime,cm.creator_id AS marketCreatorId,
         cm.grade,cm.department_id,cm.profession,cm.profession_name,cm.sales_market,cm.business_nature,cm.approval_status,
-        cm.approval_user_id,cm.approval_time,cm.owner_id
+        cm.approval_user_id,cm.approval_time,cm.owner_id,cm.business_region_tag
         FROM
         customer c,customer_market cm
         where c.id = cm.customer_id

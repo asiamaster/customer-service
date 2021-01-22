@@ -54,4 +54,11 @@ public interface AttachmentService extends BaseService<Attachment, Long> {
      * @return
      */
     List<Attachment> listByCustomerAndMarket(Set<Long> customerIdSet, Long marketId);
+
+    /**
+     * 根据客户及市场，删除客户的附件信息
+     * @param customerId 客户ID
+     * @param marketId 市场ID
+     */
+    void deleteByCustomerAndMarket(Long customerId, Long marketId);
 }

@@ -3,16 +3,24 @@ package com.dili.customer.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.dili.customer.commons.service.BusinessLogRpcService;
 import com.dili.customer.domain.Attachment;
+import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.dto.AttachmentDto;
+import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.mapper.AttachmentMapper;
 import com.dili.customer.sdk.domain.dto.AttachmentGroupInfo;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.AttachmentService;
+import com.dili.customer.service.CustomerService;
 import com.dili.ss.base.BaseServiceImpl;
+import com.dili.ss.mvc.util.RequestUtils;
+import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import lombok.RequiredArgsConstructor;
 import one.util.streamex.StreamEx;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,12 +33,18 @@ import java.util.stream.Collectors;
  * 由MyBatis Generator工具自动生成
  * This file was generated on 2020-07-25 17:14:18.
  */
+@RequiredArgsConstructor
 @Service
 public class AttachmentServiceImpl extends BaseServiceImpl<Attachment, Long> implements AttachmentService {
 
     public AttachmentMapper getActualMapper() {
         return (AttachmentMapper)getDao();
     }
+
+    @Autowired
+    private CustomerService customerService;
+    private final BusinessLogRpcService businessLogRpcService;
+    private final UapUserTicket uapUserTicket;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -108,4 +122,17 @@ public class AttachmentServiceImpl extends BaseServiceImpl<Attachment, Long> imp
         condition.setMarketId(marketId);
         return listByExample(condition);
     }
+
+    @Override
+    public void deleteByCustomerAndMarket(Long customerId, Long marketId) {
+        if (Objects.nonNull(customerId) && Objects.nonNull(marketId)) {
+            Attachment condition = new Attachment();
+            condition.setCustomerId(customerId);
+            condition.setMarketId(marketId);
+            getActualMapper().delete(condition);
+            Customer customer = customerService.get(customerId);
+            businessLogRpcService.asyncSave(customerId, customer.getCode(), "删除所有附件", "", "del", uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
+        }
+    }
+
 }

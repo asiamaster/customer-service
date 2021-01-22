@@ -77,24 +77,9 @@ public class CustomerMarket extends BaseDomain {
     private String businessNature;
 
     /**
-     * 经营地区##经营地区城市id
+     * 客户区域标签
      */
-    private String operatingArea;
-
-    /**
-     * 经营地区经度
-     */
-    private String operatingLng;
-
-    /**
-     * 经营地区纬度
-     */
-    private String operatingLat;
-
-    /**
-     * 其它头衔
-     */
-    private String otherTitle;
+    private Integer businessRegionTag;
 
     /**
      * 销售市场

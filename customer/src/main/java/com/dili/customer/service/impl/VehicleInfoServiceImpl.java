@@ -55,8 +55,11 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
         dto.setMarketId(vehicleInfoList.get(0).getMarketId());
         //先删除数据库中已存在，但是不在本次传入的数据中的地址信息
         this.deleteByExample(dto);
+        LocalDateTime now = LocalDateTime.now();
         vehicleInfoList.forEach(t -> {
+            t.setModifyTime(now);
             if (Objects.isNull(t.getId())) {
+                t.setCreateTime(now);
                 this.insert(t);
             } else {
                 this.update(t);

@@ -81,28 +81,11 @@ public class CustomerMarket extends BaseDomain {
     private String businessNature;
 
     /**
-     * 经营地区##经营地区城市id
+     * 客户区域标签
      */
-    @Column(name = "`operating_area`")
-    private String operatingArea;
+    @Column(name = "`business_region_tag`")
+    private Integer businessRegionTag;
 
-    /**
-     * 经营地区经度
-     */
-    @Column(name = "`operating_lng`")
-    private String operatingLng;
-
-    /**
-     * 经营地区纬度
-     */
-    @Column(name = "`operating_lat`")
-    private String operatingLat;
-
-    /**
-     * 其它头衔
-     */
-    @Column(name = "`other_title`")
-    private String otherTitle;
 
     /**
      * 销售市场

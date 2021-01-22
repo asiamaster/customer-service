@@ -459,4 +459,72 @@ public class CustomerEnum {
         }
     }
 
+    /**
+     * 客户业务区域标签
+     */
+    public enum BusinessRegionTag {
+
+        /**
+         * 南方
+         */
+        SOUTH(1, "南方"),
+
+        /**
+         * 北方
+         */
+        NORTH(2, "北方"),
+        ;
+        @Getter
+        private Integer code;
+        @Getter
+        private String value;
+
+        BusinessRegionTag(Integer code, String value) {
+            this.code = code;
+            this.value = value;
+        }
+
+        /**
+         * 初始化map
+         */
+        private static Map<Integer, BusinessRegionTag> initMaps = Maps.newHashMap();
+
+        static {
+            for (BusinessRegionTag as : BusinessRegionTag.values()) {
+                initMaps.put(as.getCode(), as);
+            }
+        }
+
+        /**
+         * 获取某个枚举值实例信息
+         * @param code
+         * @return
+         */
+        public static BusinessRegionTag getInstance(Integer code) {
+            return initMaps.getOrDefault(code,null);
+        }
+
+        /**
+         * 获取某个枚举值实例信息
+         * @param code
+         * @return
+         */
+        public static String getValueByCode(Integer code) {
+            BusinessRegionTag regionTag = initMaps.get(code);
+            if (Objects.nonNull(regionTag)){
+                return regionTag.getValue();
+            }
+            return "";
+        }
+
+        /**
+         * 对比枚举值是否相等
+         * @param code
+         * @return
+         */
+        public Boolean equalsToCode(Integer code) {
+            return this.getCode().equals(code);
+        }
+    }
+
 }

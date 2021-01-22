@@ -13,6 +13,7 @@ import com.dili.customer.service.CustomerService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.mvc.util.RequestUtils;
+import com.dili.uap.sdk.domain.UserTicket;
 import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
@@ -45,13 +46,17 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
     public BaseOutput saveContacts(Contacts customerContacts) {
         StringBuilder content = new StringBuilder();
         String operationType = "add";
+        UserTicket userTicket = uapUserTicket.getUserTicket();
+        if (Objects.isNull(customerContacts.getModifierId())){
+            customerContacts.setModifierId(userTicket.getId());
+        }
         //构造查询条件，用于查询该客户是否已有该联系人
         Contacts condition = new Contacts();
         condition.setCustomerId(customerContacts.getCustomerId());
         condition.setMarketId(customerContacts.getMarketId());
         condition.setPhone(customerContacts.getPhone());
         List<Contacts> contactsList = list(condition);
-        if (null == customerContacts.getId()) {
+        if (Objects.isNull(customerContacts.getId())) {
             if (CollectionUtil.isNotEmpty(contactsList)) {
                 return BaseOutput.failure("该手机号对应的联系人已存在");
             }
@@ -73,6 +78,7 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
                     return BaseOutput.failure("该手机号对应的联系人已存在");
                 }
             }
+            customerContacts.setModifyTime(LocalDateTime.now());
             this.update(customerContacts);
             content.append(produceLoggerContent(customerContacts, "  修改后:"));
             operationType = "edit";
@@ -81,7 +87,7 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
             updateDefaultFlag(customerContacts.getCustomerId(), customerContacts.getMarketId(), customerContacts.getId());
         }
         Customer customer = customerService.get(customerContacts.getCustomerId());
-        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), content.toString(), "", operationType, uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
+        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), content.toString(), "", operationType, userTicket, RequestUtils.getIpAddress(WebContent.getRequest()));
         return BaseOutput.success();
     }
 
@@ -108,8 +114,11 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
         dto.setCustomerId(contactsList.get(0).getCustomerId());
         dto.setMarketId(contactsList.get(0).getMarketId());
         this.deleteByExample(dto);
+        LocalDateTime now = LocalDateTime.now();
         contactsList.forEach(t -> {
+            t.setModifyTime(now);
             if (Objects.isNull(t.getId())) {
+                t.setCreateTime(t.getModifyTime());
                 this.insert(t);
             } else {
                 this.update(t);

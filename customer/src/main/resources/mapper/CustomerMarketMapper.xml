@@ -13,10 +13,6 @@
     <result column="grade" property="grade" />
     <result column="profession"  property="profession" />
     <result column="profession_name"  property="professionName" />
-    <result column="operating_area"  property="operatingArea" />
-    <result column="operating_lng"  property="operatingLng" />
-    <result column="operating_lat"  property="operatingLat" />
-    <result column="other_title"  property="otherTitle" />
     <result column="sales_market" property="salesMarket" />
     <result column="alias"  property="alias" />
     <result column="notes"  property="notes" />

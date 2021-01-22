@@ -1,13 +1,14 @@
 package com.dili.customer.sdk.rpc;
 
+import com.dili.customer.sdk.constants.SecurityConstant;
 import com.dili.customer.sdk.domain.Attachment;
 import com.dili.ss.domain.BaseOutput;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 客户附件信息服务
@@ -42,7 +43,7 @@ public interface AttachmentRpc {
      * @return 是否删除成功
      */
     @PostMapping(value = "/api/attachment/delete")
-    BaseOutput<Boolean> delete(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam(name = "idSet", required = false) Set<Long> idSet);
+    BaseOutput<Boolean> delete(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 
     /**
      * 批量保存客户附件信息

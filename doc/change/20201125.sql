@@ -81,6 +81,12 @@ ALTER TABLE customer_market ADD COLUMN `approval_status` tinyint DEFAULT NULL CO
 ALTER TABLE customer_market ADD COLUMN `approval_user_id` bigint DEFAULT NULL COMMENT '客户资料审核人ID' AFTER approval_status;
 ALTER TABLE customer_market ADD COLUMN `approval_time` datetime DEFAULT NULL COMMENT '客户资料审核时间' AFTER approval_user_id;
 ALTER TABLE customer_market ADD COLUMN `approval_notes` VARCHAR(255) DEFAULT NULL COMMENT '客户资料审核备注' AFTER approval_time;
+ALTER TABLE customer_market ADD COLUMN `business_region_tag` tinyint DEFAULT NULL COMMENT '客户区域标签' AFTER business_nature;
+
+ALTER TABLE customer_market drop COLUMN `operating_area`;
+ALTER TABLE customer_market drop COLUMN `operating_lng`;
+ALTER TABLE customer_market drop COLUMN `operating_lat`;
+ALTER TABLE customer_market drop COLUMN `other_title`;
 
 update customer_market set approval_status = 2;
 

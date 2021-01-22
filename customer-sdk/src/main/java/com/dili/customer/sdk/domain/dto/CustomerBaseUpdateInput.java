@@ -71,6 +71,7 @@ public class CustomerBaseUpdateInput {
      * 客户市场信息
      */
     @Valid
+    @NotNull(message = "市场信息不能为空")
     private CustomerMarket customerMarket;
 
     /**
