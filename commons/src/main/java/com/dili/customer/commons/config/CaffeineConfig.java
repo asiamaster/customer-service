@@ -14,8 +14,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Configuration
 public class CaffeineConfig {
+
     /**
-     * 本地缓存
+     * 本地缓存，默认10分钟
      */
     @Bean("caffeineTimedCache")
     public Cache<String, String> caffeineTimedCache() {

@@ -83,19 +83,19 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
         condition.setCustomerId(vehicleInfo.getCustomerId());
         condition.setRegistrationNumber(vehicleInfo.getRegistrationNumber());
         List<VehicleInfo> vehicleInfoList = list(condition);
+        vehicleInfo.setModifyTime(LocalDateTime.now());
         if (Objects.isNull(vehicleInfo.getId())) {
             if (CollectionUtil.isNotEmpty(vehicleInfoList)) {
                 return Optional.of("此车辆信息已被绑定,无需重复绑定");
             }
+            vehicleInfo.setCreateTime(vehicleInfo.getModifyTime());
+            vehicleInfo.setCreatorId(vehicleInfo.getModifierId());
         } else {
             long count = vehicleInfoList.stream().filter(t -> t.getRegistrationNumber().equalsIgnoreCase(vehicleInfo.getRegistrationNumber()) && !t.getId().equals(vehicleInfo.getId())).count();
             if (count > 0) {
                 return Optional.of("此车辆信息已被绑定,无需重复绑定");
             }
-            vehicleInfo.setCreateTime(LocalDateTime.now());
-            vehicleInfo.setCreatorId(vehicleInfo.getModifierId());
         }
-        vehicleInfo.setModifyTime(vehicleInfo.getCreateTime());
         this.saveOrUpdateSelective(vehicleInfo);
         return Optional.empty();
     }

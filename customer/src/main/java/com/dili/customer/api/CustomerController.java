@@ -23,6 +23,7 @@ import com.dili.ss.exception.AppException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +46,8 @@ public class CustomerController {
 
     private final CustomerService customerService;
     private final UserAccountService userAccountService;
-    private final MqService mqService;
+    @Autowired
+    private MqService mqService;
 
     /**
      * 分页查询客户数据集
