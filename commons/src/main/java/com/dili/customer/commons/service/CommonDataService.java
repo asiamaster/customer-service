@@ -101,6 +101,7 @@ public class CommonDataService {
      * @return
      */
     public List<CharacterTypeGroupDto> produceCharacterTypeGroup(List<CharacterType> characterTypeListData, Long marketId, Boolean enable) {
+        //把已存在的角色类型，转换为角色-List<子类型>数据
         Map<String, List<String>> dataMap = StreamEx.ofNullable(characterTypeListData).flatCollection(Function.identity()).nonNull()
                 .filter(t -> StrUtil.isNotBlank(t.getCharacterType())).mapToEntry(item -> item.getCharacterType(), item -> item.getSubType()).grouping();
         Integer state = enable ? 1 : null;
@@ -108,14 +109,14 @@ public class CommonDataService {
         for (CustomerEnum.CharacterType type : CustomerEnum.CharacterType.values()) {
             CharacterTypeGroupDto dto = new CharacterTypeGroupDto();
             dto.setCode(type.getCode()).setMultiple(type.getMultiple()).setValue(type.getValue());
+            Set<String> stringSet = Sets.newHashSet();
+            if (dataMap.containsKey(type.getCode())) {
+                dto.setSelected(Boolean.TRUE);
+                stringSet.addAll(StreamEx.of(dataMap.get(type.getCode())).toSet());
+            }
             List<DataDictionaryValue> dataDictionaryValueList = dataDictionaryRpcService.listByDdCode(type.getCode(), state, marketId);
             if (CollectionUtil.isNotEmpty(dataDictionaryValueList)) {
                 List<CharacterSubTypeDto> subTypeDtoList = new ArrayList<>();
-                Set<String> stringSet = Sets.newHashSet();
-                if (dataMap.containsKey(type.getCode())) {
-                    dto.setSelected(Boolean.TRUE);
-                    stringSet.addAll(StreamEx.of(dataMap.get(type.getCode())).toSet());
-                }
                 dataDictionaryValueList.forEach(t -> {
                     CharacterSubTypeDto subTypeDto = new CharacterSubTypeDto();
                     subTypeDto.setCode(t.getCode());
