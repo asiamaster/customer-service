@@ -16,7 +16,7 @@ public interface UserAccountEnum {
      enum AccountTerminalType {
 
         /**
-         * 待审核
+         * 微信
          */
         WE_CHAT(1, "微信"),
         ;
@@ -36,7 +36,7 @@ public interface UserAccountEnum {
          * @param code
          * @return
          */
-        public static AccountTerminalType getInstance(String code) {
+        public static AccountTerminalType getInstance(Integer code) {
             for (AccountTerminalType as : AccountTerminalType.values()) {
                 if (as.getCode().equals(code)) {
                     return as;
