@@ -82,21 +82,27 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
     public Optional<String> saveAddress(Address address) {
         String operationType = "edit";
         UserTicket userTicket = uapUserTicket.getUserTicket();
-        if (Objects.isNull(address.getModifierId())){
+        if (Objects.isNull(address.getModifierId())) {
             address.setModifierId(userTicket.getId());
         }
         address.setModifyTime(LocalDateTime.now());
+        StringBuilder content = new StringBuilder();
         if (Objects.isNull(address.getId())) {
             operationType = "add";
             address.setCreateTime(address.getModifyTime());
             address.setCreatorId(address.getModifierId());
+            this.insert(address);
+            content.append(produceLoggerContent(address, String.format("地址数据新增 %s :", address.getId())));
+        } else {
+            content.append(produceLoggerContent(this.get(address.getId()), String.format("地址数据ID %s 修改前:", address.getId())));
+            content.append(produceLoggerContent(address, "  修改后:"));
+            this.update(address);
         }
-        this.saveOrUpdate(address);
         if (YesOrNoEnum.YES.getCode().equals(address.getIsCurrent())) {
             updateDefaultFlag(address.getCustomerId(), address.getMarketId(), address.getId());
         }
         Customer customer = customerService.get(address.getCustomerId());
-        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(address, "  修改后:"), "", operationType, userTicket, RequestUtils.getIpAddress(WebContent.getRequest()));
+        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), content.toString(), "", operationType, userTicket, RequestUtils.getIpAddress(WebContent.getRequest()));
         return Optional.empty();
     }
 
@@ -115,8 +121,9 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
         if (Objects.isNull(address)) {
             return Optional.of("数据不存在");
         }
+        this.delete(id);
         Customer customer = customerService.get(address.getCustomerId());
-        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(address, ""), "操作渠道:APP", "del", uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
+        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(address, String.format("地址数据ID %s :", id)), "操作渠道:APP", "del", uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
         return Optional.empty();
     }
 
@@ -128,10 +135,10 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
      */
     private String produceLoggerContent(Address address, String prefix) {
         StringBuffer str = new StringBuffer(prefix);
-        str.append("地址信息:").append(address.getCityName()).append(address.getAddress());
+        str.append(" 地址信息：").append(address.getCityName()).append(address.getAddress());
         YesOrNoEnum yesOrNoEnum = YesOrNoEnum.getYesOrNoEnum(address.getIsCurrent());
         if (Objects.nonNull(yesOrNoEnum)) {
-            str.append("是否当前:").append(yesOrNoEnum.getName());
+            str.append(" 是否当前地址：").append(yesOrNoEnum.getName());
         }
         return str.toString();
     }

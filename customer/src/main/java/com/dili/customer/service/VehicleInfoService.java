@@ -52,4 +52,11 @@ public interface VehicleInfoService extends BaseService<VehicleInfo, Long> {
      * @return
      */
     List<VehicleInfo> listByCustomerAndMarket(Long customerId, Long marketId);
+
+    /**
+     * 根据ID删除车辆信息并记录删除日志
+     * @param id 数据ID
+     * @return
+     */
+    Optional<String> deleteWithLogger(Long id);
 }

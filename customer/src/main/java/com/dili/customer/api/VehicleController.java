@@ -1,5 +1,6 @@
 package com.dili.customer.api;
 
+import com.dili.customer.annotation.UapToken;
 import com.dili.customer.domain.VehicleInfo;
 import com.dili.customer.service.VehicleInfoService;
 import com.dili.ss.domain.BaseOutput;
@@ -42,6 +43,7 @@ public class VehicleController {
      * @param vehicleInfo 客户ID
      * @return 客户地址信息数据
      */
+    @UapToken
     @PostMapping(value = "/bindingVehicle")
     public BaseOutput<Boolean> bindingVehicle(@Validated @RequestBody VehicleInfo vehicleInfo, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -59,9 +61,10 @@ public class VehicleController {
      * @param id 数据ID
      * @return
      */
+    @UapToken
     @PostMapping(value = "/delete")
     public BaseOutput delete(@RequestParam("id") Long id) {
-        vehicleInfoService.delete(id);
+        vehicleInfoService.deleteWithLogger(id);
         return BaseOutput.success("删除成功");
     }
 }

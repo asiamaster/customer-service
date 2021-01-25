@@ -44,7 +44,7 @@ public interface ContactsService extends BaseService<Contacts, Long> {
     void updateDefaultFlag(Long customerId, Long marketId, Long id);
 
     /**
-     * 根据ID删除客户联系人信息
+     * 根据ID删除客户联系人信息并记录删除日志
      * @param id 数据ID
      * @return
      */

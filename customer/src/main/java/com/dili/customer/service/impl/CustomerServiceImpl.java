@@ -79,7 +79,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final BusinessCategoryService businessCategoryService;
     private final CustomerConfig customerConfig;
     private final CharacterTypeService characterTypeService;
-    private final VehicleInfoService vehicleInfoService;
     private final UidRpcService uidRpcService;
     private final CommonDataService commonDataService;
     private final CustomerCommonConfig customerCommonConfig;
@@ -99,6 +98,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private AddressService addressService;
     @Autowired
     private AttachmentService attachmentService;
+    @Autowired
+    private VehicleInfoService vehicleInfoService;
 
 
     @Override
