@@ -44,7 +44,8 @@ import java.util.Optional;
 @Slf4j
 public class CustomerController {
 
-    private final CustomerService customerService;
+    @Autowired
+    private CustomerService customerService;
     private final UserAccountService userAccountService;
     @Autowired
     private MqService mqService;
