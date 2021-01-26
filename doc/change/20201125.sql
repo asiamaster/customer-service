@@ -159,13 +159,15 @@ create unique index idx_user_account_code on user_account
 (
    account_code
 );
+## 迁移原始账号信息到新系统中
+INSERT INTO `dili-customer`.`user_account` (`customer_id`, `certificate_number`, `customer_code`, `cellphone`, `account_name`, `account_code`, `password`, `cellphone_valid`, `is_enable`, `notes`, `changed_pwd_time`, `deleted`, `new_account_id`, `operator_id`, `create_time`, `modify_time`)
+SELECT customer_id,certificate_number,customer_code,cellphone,account_name,account_code,`password`,1,is_enable,notes,modify_time,0,null,operator_id,create_time, modify_time FROM dili_user.user_account;
+
 ## 更改附件类型为营业执照
 update attachment set file_type=1;
 
 INSERT INTO `uap`.`biz_number_rule` (`name`, `type`, `prefix`, `date_format`, `length`, `range`, `create_time`, `update_time`, `is_enable`, `step`) VALUES ('客户编号', 'customerCode', NULL, NULL, 8, '1', '2020-12-21 16:28:15', '2020-12-21 16:28:15', 1, 1);
 INSERT INTO `uap`.`biz_number` (`type`, `value`, `memo`, `version`, `modified`, `created`) VALUES ('customerCode', 1, '客户编号', '176928', '2020-12-21 16:29:53', '2020-12-21 16:28:15');
-
-
 
 /*==============================================================*/
 /* Table: account_terminal    用户账号绑定的终端类型                                  */

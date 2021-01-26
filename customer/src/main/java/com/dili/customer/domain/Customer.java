@@ -242,7 +242,7 @@ public class Customer extends BaseDomain {
     private Integer isDelete;
 
     /**
-     * 客户状态 0注销，1生效，2禁用，
+     * 客户状态 1生效，2禁用，
      * {@link com.dili.customer.sdk.enums.CustomerEnum.State}
      */
     @Column(name = "`state`")
