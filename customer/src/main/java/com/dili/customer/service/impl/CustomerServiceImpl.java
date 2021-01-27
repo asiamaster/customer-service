@@ -418,7 +418,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     @Transactional(rollbackFor = Exception.class)
     public BaseOutput update(CustomerUpdateInput updateInput) {
         BaseOutput baseOutput = this.updateBaseInfo(updateInput);
-        if (!baseOutput.isSuccess()){
+        if (!baseOutput.isSuccess()) {
             return BaseOutput.failure(baseOutput.getMessage());
         }
         if (Objects.nonNull(updateInput.getCustomerCertificate())) {
@@ -897,6 +897,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     public Optional<String> updateCertificateInfo(CustomerCertificateInput customerCertificate, Boolean isLogger) {
         if (Objects.isNull(customerCertificate.getId())) {
             return Optional.of("数据ID不能为空");
+        }
+        //如果法人证件号不为空，且证件号不是有效的人身份证，则认为证件号是错误的
+        if (StrUtil.isNotBlank(customerCertificate.getCorporationCertificateNumber()) && IdcardUtil.isValidCard(customerCertificate.getCorporationCertificateNumber())) {
+            return Optional.of("法人证件号码不正确");
         }
         Customer customer = this.get(customerCertificate.getId());
         BeanValidationResult beanValidationResult = null;

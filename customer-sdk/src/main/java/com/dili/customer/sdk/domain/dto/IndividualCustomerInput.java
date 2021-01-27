@@ -42,6 +42,7 @@ public class IndividualCustomerInput implements Serializable {
      */
     @NotBlank(message = "证件号码不能为空", groups = {AddView.class, CompleteView.class})
     @Size(min = 1, max = 40, message = "证件号码请保持在40个字以内", groups = {AddView.class, CompleteView.class})
+    @Pattern(regexp = "^[()a-z0-9A-Z\\u4e00-\\u9fa5]+$", message = "请输入正确的证件号码", groups = {AddView.class,CompleteView.class})
     private String certificateNumber;
 
     /**
@@ -74,7 +75,6 @@ public class IndividualCustomerInput implements Serializable {
      */
     @NotBlank(message = "客户来源渠道不能为空", groups = {AddView.class})
     private String sourceChannel;
-
 
     /**
      * 联系电话
