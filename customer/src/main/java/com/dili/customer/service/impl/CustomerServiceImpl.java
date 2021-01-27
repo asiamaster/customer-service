@@ -207,6 +207,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             if (Objects.isNull(marketInfo.getGrade())) {
                 marketInfo.setGrade(customerCommonConfig.getDefaultGrade(marketInfo.getMarketId()).getCode());
             }
+            //后台创建的，默认审核通过，且审核人为当前人
+            marketInfo.setApprovalStatus(CustomerEnum.ApprovalStatus.PASSED.getCode());
+            marketInfo.setApprovalTime(LocalDateTime.now());
+            marketInfo.setApprovalUserId(baseInfo.getOperatorId());
             marketInfo.setCreatorId(baseInfo.getOperatorId());
             marketInfo.setModifyTime(LocalDateTime.now());
             marketInfo.setCreateTime(marketInfo.getModifyTime());
