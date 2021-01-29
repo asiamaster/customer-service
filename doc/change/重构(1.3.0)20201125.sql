@@ -37,7 +37,6 @@ create index idx_ct_market_id on character_type
 (
    market_id
 );
-
 /*==============================================================*/
 /* Table: vehicle_info    客户车型信息                            */
 /*==============================================================*/
@@ -161,7 +160,7 @@ create unique index idx_user_account_code on user_account
 );
 ## 迁移原始账号信息到新系统中
 INSERT INTO `dili-customer`.`user_account` (`customer_id`, `certificate_number`, `customer_code`, `cellphone`, `account_name`, `account_code`, `password`, `cellphone_valid`, `is_enable`, `notes`, `changed_pwd_time`, `deleted`, `new_account_id`, `operator_id`, `create_time`, `modify_time`)
-SELECT customer_id,certificate_number,customer_code,cellphone,account_name,account_code,`password`,1,is_enable,notes,modify_time,0,null,operator_id,create_time, modify_time FROM dili_user.user_account;
+SELECT customer_id,certificate_number,customer_code,account_code,account_name,account_code,`password`,1,is_enable,notes,modify_time,0,null,operator_id,create_time, modify_time FROM dili_user.user_account;
 
 ## 更改附件类型为营业执照
 update attachment set file_type=1;
@@ -187,3 +186,35 @@ create table account_terminal
     primary key (id)
 );
 alter table account_terminal comment '用户账号绑定的终端信息';
+
+/*==============================================================*/
+/* Table: applet_info                                           */
+/*==============================================================*/
+drop table if exists applet_info;
+create table applet_info
+(
+    id                   bigint not null auto_increment comment '主键ID',
+    applet_name          varchar(32) comment '小程序名称',
+    system_code          varchar(20) comment '所属系统',
+    applet_code          varchar(50) comment '内部编码',
+    app_id               varchar(32) comment '小程序应用ID',
+    secret               varchar(64) comment '小程序访问密钥',
+    applet_type          tinyint comment '小程序类型(微信?支付宝?)',
+    create_time          datetime default CURRENT_TIMESTAMP comment '创建时间',
+    modify_time          datetime default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '修改时间',
+    primary key (id)
+);
+alter table applet_info comment '小程序资料信息';
+drop index uni_app_id_app_type on applet_info;
+
+/*==============================================================*/
+/* Index: uni_app_id_app_type                                   */
+/*==============================================================*/
+create unique index uni_app_id_app_type on applet_info
+(
+   app_id,
+   applet_type
+);
+
+INSERT INTO `dili-customer`.`applet_info` (`applet_name`, `system_code`, `applet_code`, `app_id`, `secret`, `applet_type`, `create_time`, `modify_time`) VALUES ('溯源司机端', 'TRACE', 'DRIVER', 'wxdd7397bf57ef8ade', '412a53c4782395dc5273c728e659e240', 1, now(), now());
+INSERT INTO `dili-customer`.`applet_info` (`applet_name`, `system_code`, `applet_code`, `app_id`, `secret`, `applet_type`, `create_time`, `modify_time`) VALUES ('溯源买卖家', 'TRACE', 'BuyerAndSeller', 'wxe08c9b2b40546ebd', 'e0ff4f7ee31a5bb1d88ea213ab30bf5e', 1, now(), now());

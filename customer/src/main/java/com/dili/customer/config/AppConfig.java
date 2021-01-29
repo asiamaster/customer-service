@@ -1,7 +1,7 @@
 package com.dili.customer.config;
 
 import com.dili.customer.domain.dto.UapUserTicket;
-import com.dili.customer.domain.wechat.AppletSystemInfo;
+import com.dili.customer.domain.wechat.AppletRequestInfo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -18,8 +18,8 @@ public class AppConfig {
 
     @Bean
     @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public AppletSystemInfo appletSystemInfo() {
-        return new AppletSystemInfo();
+    public AppletRequestInfo appletRequestInfo() {
+        return new AppletRequestInfo();
     }
 
     @Bean

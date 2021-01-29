@@ -1,14 +1,10 @@
 package com.dili.customer.config;
 
-import cn.hutool.json.JSONUtil;
-import com.dili.customer.domain.wechat.AppletSecret;
 import com.google.common.collect.Maps;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.Map;
 
 /**
@@ -20,20 +16,7 @@ import java.util.Map;
 public class AppletSecretConfig {
 
     @Value("#{${dili.wechat.applet}}")
-    private Map<String, Map<String, String>> wechatAppletSecret = Maps.newHashMap();
-
     @Getter
-    private Map<String, AppletSecret> initAppIdSecretMaps = Maps.newHashMap();
+    private Map<String, String> wechatAppletSecret = Maps.newHashMap();
 
-    @PostConstruct
-    public void init() {
-        wechatAppletSecret.forEach((t, v) -> {
-            initAppIdSecretMaps.put(t.toUpperCase(), JSONUtil.toBean(JSONUtil.toJsonStr(v), AppletSecret.class));
-        });
-    }
-
-    @PreDestroy
-    public void destroy() {
-        initAppIdSecretMaps = null;
-    }
 }

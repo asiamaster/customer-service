@@ -40,9 +40,9 @@ public class IndividualCustomerInput implements Serializable {
     /**
      * 证件号
      */
-    @NotBlank(message = "证件号码不能为空", groups = {AddView.class, CompleteView.class})
-    @Size(min = 1, max = 40, message = "证件号码请保持在40个字以内", groups = {AddView.class, CompleteView.class})
-    @Pattern(regexp = "^[()a-z0-9A-Z\\u4e00-\\u9fa5]+$", message = "请输入正确的证件号码", groups = {AddView.class,CompleteView.class})
+    @NotBlank(message = "(企业/个人)证件号码不能为空", groups = {AddView.class, CompleteView.class})
+    @Size(min = 1, max = 40, message = "(企业/个人)证件号码请保持在40个字以内", groups = {AddView.class, CompleteView.class})
+    @Pattern(regexp = "^[()a-z0-9A-Z\\u4e00-\\u9fa5]+$", message = "请输入正确的(企业/个人)证件号码", groups = {AddView.class,CompleteView.class})
     private String certificateNumber;
 
     /**

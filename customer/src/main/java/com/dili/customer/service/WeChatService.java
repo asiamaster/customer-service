@@ -9,9 +9,10 @@ import com.dili.customer.domain.AccountTerminal;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.UserAccount;
 import com.dili.customer.domain.wechat.AppletPhone;
+import com.dili.customer.domain.wechat.AppletRequestInfo;
 import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.domain.wechat.WeChatRegisterDto;
-import com.dili.customer.enums.UserAccountEnum;
+import com.dili.customer.enums.AppletTerminalType;
 import com.dili.customer.utils.LoginUtil;
 import com.dili.customer.utils.WeChatAppletAesUtil;
 import com.dili.ss.constant.ResultCode;
@@ -38,16 +39,21 @@ public class WeChatService {
     private final UserAccountService userAccountService;
     private final AccountTerminalService accountTerminalService;
     private final CustomerService customerService;
+    private final AppletRequestInfo appletRequestInfo;
+
+    /**
+     * 本类适用于的小程序类型
+     */
+    private static final AppletTerminalType appletTerminalType = AppletTerminalType.WE_CHAT;
 
     /**
      * 微信一键注册
      * @param dto 微信注册信息
-     * @param system 来源系统
      * @param login 注册后是否登录
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public BaseOutput weChatRegister(WeChatRegisterDto dto, String system, Boolean login) {
+    public BaseOutput weChatRegister(WeChatRegisterDto dto, Boolean login) {
         if (Objects.isNull(dto)) {
             return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
         }
@@ -58,7 +64,7 @@ public class WeChatService {
         /**
          * 根据微信openId获取微信绑定账号
          */
-        Optional<AccountTerminal> byAppAndTerminalCode = accountTerminalService.getByAppAndTerminalCode(dto.getAppId(), UserAccountEnum.AccountTerminalType.WE_CHAT, dto.getOpenId());
+        Optional<AccountTerminal> byAppAndTerminalCode = accountTerminalService.getByAppAndTerminalCode(dto.getAppId(), appletTerminalType, dto.getOpenId());
         if (byAppAndTerminalCode.isPresent()) {
             AccountTerminal accountTerminal = byAppAndTerminalCode.get();
             UserAccount userAccount = userAccountService.get(accountTerminal.getAccountId());
@@ -89,7 +95,7 @@ public class WeChatService {
             Customer customer = new Customer();
             customer.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
             customer.setContactsPhone(dto.getCellphone());
-            customer.setSourceSystem(system);
+            customer.setSourceSystem(appletRequestInfo.getAppletInfo().getSystemCode());
             customer.setName(dto.getNickName());
             customerService.defaultRegister(customer);
             userAccount = new UserAccount();
@@ -107,7 +113,7 @@ public class WeChatService {
         accountTerminal.setAvatarUrl(dto.getAvatarUrl());
         accountTerminal.setTerminalCode(dto.getOpenId());
         accountTerminal.setAppId(dto.getAppId());
-        accountTerminal.setTerminalType(UserAccountEnum.AccountTerminalType.WE_CHAT.getCode());
+        accountTerminal.setTerminalType(appletTerminalType.getCode());
         accountTerminal.setCreateTime(LocalDateTime.now());
         accountTerminal.setAccountId(userAccount.getId());
         accountTerminal.setModifyTime(LocalDateTime.now());
@@ -131,7 +137,7 @@ public class WeChatService {
      * @return
      */
     public BaseOutput bindingWechat(String terminalCode, String cellphone, String wechatAvatarUrl, String appId,String nickName) {
-        Optional<AccountTerminal> byWechat = accountTerminalService.getByAppAndTerminalCode(appId, UserAccountEnum.AccountTerminalType.WE_CHAT, terminalCode);
+        Optional<AccountTerminal> byWechat = accountTerminalService.getByAppAndTerminalCode(appId, appletTerminalType, terminalCode);
         if (byWechat.isPresent()) {
             AccountTerminal accountTerminal = byWechat.get();
             UserAccount userAccount = userAccountService.get(accountTerminal.getAccountId());
@@ -152,7 +158,7 @@ public class WeChatService {
         accountTerminal.setAvatarUrl(wechatAvatarUrl);
         accountTerminal.setTerminalCode(terminalCode);
         accountTerminal.setAppId(appId);
-        accountTerminal.setTerminalType(UserAccountEnum.AccountTerminalType.WE_CHAT.getCode());
+        accountTerminal.setTerminalType(appletTerminalType.getCode());
         accountTerminal.setCreateTime(LocalDateTime.now());
         accountTerminal.setAccountId(userAccount.getId());
         accountTerminal.setModifyTime(LocalDateTime.now());
@@ -167,7 +173,7 @@ public class WeChatService {
      * @return
      */
     public BaseOutput<LoginSuccessData> loginByWechat(String terminalCode, String appId) {
-        Optional<AccountTerminal> byWechat = accountTerminalService.getByAppAndTerminalCode(appId, UserAccountEnum.AccountTerminalType.WE_CHAT, terminalCode);
+        Optional<AccountTerminal> byWechat = accountTerminalService.getByAppAndTerminalCode(appId, appletTerminalType, terminalCode);
         if (byWechat.isPresent()) {
             AccountTerminal accountTerminal = byWechat.get();
             UserAccount userAccount = userAccountService.get(accountTerminal.getAccountId());

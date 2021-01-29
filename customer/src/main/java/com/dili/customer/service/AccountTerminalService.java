@@ -1,7 +1,7 @@
 package com.dili.customer.service;
 
 import com.dili.customer.domain.AccountTerminal;
-import com.dili.customer.enums.UserAccountEnum;
+import com.dili.customer.enums.AppletTerminalType;
 import com.dili.ss.base.BaseService;
 
 import java.util.Optional;
@@ -20,7 +20,7 @@ public interface AccountTerminalService extends BaseService<AccountTerminal, Lon
      * @param terminalCode 终端号
      * @return
      */
-    Optional<AccountTerminal> getByAppAndTerminalCode(String appId, UserAccountEnum.AccountTerminalType terminalType, String terminalCode);
+    Optional<AccountTerminal> getByAppAndTerminalCode(String appId, AppletTerminalType terminalType, String terminalCode);
 
     /**
      * 更新绑定的终端对应的新旧账号

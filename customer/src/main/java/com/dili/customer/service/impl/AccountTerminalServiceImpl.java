@@ -1,7 +1,7 @@
 package com.dili.customer.service.impl;
 
 import com.dili.customer.domain.AccountTerminal;
-import com.dili.customer.enums.UserAccountEnum;
+import com.dili.customer.enums.AppletTerminalType;
 import com.dili.customer.mapper.AccountTerminalMapper;
 import com.dili.customer.service.AccountTerminalService;
 import com.dili.ss.base.BaseServiceImpl;
@@ -25,7 +25,7 @@ public class AccountTerminalServiceImpl extends BaseServiceImpl<AccountTerminal,
     private final AccountTerminalMapper accountTerminalMapper;
 
     @Override
-    public Optional<AccountTerminal> getByAppAndTerminalCode(String appId, UserAccountEnum.AccountTerminalType terminalType, String terminalCode) {
+    public Optional<AccountTerminal> getByAppAndTerminalCode(String appId, AppletTerminalType terminalType, String terminalCode) {
         AccountTerminal condition = new AccountTerminal();
         condition.setAppId(appId).setTerminalCode(terminalCode).setTerminalType(terminalType.getCode());
         return list(condition).stream().findFirst();

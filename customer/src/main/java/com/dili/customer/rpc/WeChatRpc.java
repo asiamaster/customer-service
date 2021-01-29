@@ -2,9 +2,9 @@ package com.dili.customer.rpc;
 
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
-import com.dili.customer.config.AppletSecretConfig;
-import com.dili.customer.domain.wechat.AppletSecret;
-import com.dili.customer.domain.wechat.AppletSystemInfo;
+import cn.hutool.json.JSONUtil;
+import com.dili.customer.domain.AppletInfo;
+import com.dili.customer.domain.wechat.AppletRequestInfo;
 import com.dili.customer.domain.wechat.JsCode2Session;
 import com.dili.ss.domain.BaseOutput;
 import com.google.common.collect.Maps;
@@ -27,8 +27,7 @@ import java.util.Objects;
 @Component
 public class WeChatRpc {
 
-    private final AppletSecretConfig appletSecretConfig;
-    private final AppletSystemInfo appletSystemInfo;
+    private final AppletRequestInfo appletRequestInfo;
 
     /**
      * 微信接口主地址
@@ -48,10 +47,10 @@ public class WeChatRpc {
             return BaseOutput.failure("code不能为空");
         }
         try {
-            AppletSecret appletSecret = appletSecretConfig.getInitAppIdSecretMaps().get(appletSystemInfo.getJoint());
+            AppletInfo appletInfo = appletRequestInfo.getAppletInfo();
             Map params = Maps.newHashMap();
-            params.put("appid", appletSecret.getAppId());
-            params.put("secret", appletSecret.getSecret());
+            params.put("appid", appletInfo.getAppId());
+            params.put("secret", appletInfo.getSecret());
             params.put("js_code", code);
             params.put("grant_type", "authorization_code");
             HttpResponse response = HttpUtil.createPost(wechatBaseUrl + "/sns/jscode2session").form(params).execute();
@@ -61,7 +60,8 @@ public class WeChatRpc {
                 log.info("code2session responseBody << " + responseBody);
                 JsCode2Session jsCode2Session = JsCode2Session.fromJson(responseBody);
                 if (Objects.isNull(jsCode2Session.getErrCode()) || jsCode2Session.getErrCode() == 0) {
-                    return BaseOutput.successData(jsCode2Session).setMetadata(appletSecret.getAppId());
+                    log.info(String.format("根据临时code:%s 微信返回的session 为: %s", code, JSONUtil.toJsonStr(jsCode2Session)));
+                    return BaseOutput.successData(jsCode2Session).setMetadata(appletInfo.getAppId());
                 }
                 return BaseOutput.failure(jsCode2Session.getErrMsg()).setCode(String.valueOf(jsCode2Session.getErrCode()));
             } else {

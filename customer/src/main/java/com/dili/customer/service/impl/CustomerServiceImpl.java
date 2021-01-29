@@ -201,6 +201,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             }
             this.update(customer);
         }
+        marketInfo.setAlias(baseInfo.getName());
         marketInfo.setCustomerId(customer.getId());
         marketInfo.setModifierId(baseInfo.getOperatorId());
         if (Objects.isNull(marketInfo.getId())) {
@@ -628,7 +629,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                     return BaseOutput.failure("个人证件号码错误");
                 }
             }
-            customer.setName(input.getName());
             customer.setOrganizationType(input.getOrganizationType());
             customer.setCertificateNumber(input.getCertificateNumber());
             customer.setCertificateType(input.getCertificateType());
@@ -654,6 +654,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                     customer.setCorporationCertificateType(customerCertificate.getCorporationCertificateType());
                 }
             }
+        }
+        if (Objects.isNull(customer.getIsCertification()) || !YesOrNoEnum.YES.getCode().equals(customer.getIsCertification())){
+            customer.setName(input.getName());
         }
         this.update(customer);
         CustomerMarket oldCustomerMarket = customerMarketService.queryByMarketAndCustomerId(input.getCustomerMarket().getMarketId(), customer.getId());
@@ -825,7 +828,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             }
             customer.setContactsPhone(updateInput.getContactsPhone());
         }
-        customer.setName(updateInput.getName());
+        if (Objects.isNull(customer.getIsCertification()) || !YesOrNoEnum.YES.getCode().equals(customer.getIsCertification())){
+            customer.setName(updateInput.getName());
+        }
         customer.setState(updateInput.getState());
         //更改市场归属信息
         CustomerMarket customerMarket = customerMarketService.queryByMarketAndCustomerId(updateInput.getCustomerMarket().getMarketId(), updateInput.getId());
@@ -835,6 +840,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         BeanUtils.copyProperties(updateInput.getCustomerMarket(), customerMarket, "grade", "modifyTime", "approvalStatus", "approvalUserId", "approvalTime", "approvalNotes");
         customerMarket.setCustomerId(updateInput.getId());
         customerMarket.setModifierId(updateInput.getOperatorId());
+        customerMarket.setAlias(updateInput.getName());
         if (Objects.isNull(customerMarket.getId())) {
             customerMarket.setCreatorId(updateInput.getOperatorId());
             customerMarket.setCreateTime(LocalDateTime.now());
