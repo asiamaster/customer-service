@@ -570,6 +570,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (s.isPresent()) {
             return BaseOutput.failure(s.get());
         }
+        /**
+         * 验证手机号对应的客户是否已存在
+         */
         List<Customer> validatedCellphoneCustomer = this.getValidatedCellphoneCustomer(input.getContactsPhone());
         if (CollectionUtil.isNotEmpty(validatedCellphoneCustomer)) {
             if (validatedCellphoneCustomer.size() > 1) {
@@ -597,6 +600,12 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (Objects.nonNull(baseInfoByCertificateNumber)) {
             if (!StrUtil.equalsIgnoreCase(baseInfoByCertificateNumber.getOrganizationType(),input.getOrganizationType())){
                 return BaseOutput.failure("已存在证件号相同，组织类型不同的客户信息");
+            }
+            /**
+             * 验证客户证件号是否已存在实名验证手机号的客户
+             */
+            if (baseInfoByCertificateNumber.getIsCellphoneValid().equals(YesOrNoEnum.YES.getCode()) && !Objects.equals(baseInfoByCertificateNumber.getContactsPhone(),input.getContactsPhone())){
+                return BaseOutput.failure("该[企业/个人]证件号已认证绑定的其它手机号");
             }
             //复制数据库已有值到客户对象中
             BeanUtil.copyProperties(baseInfoByCertificateNumber, customer);
@@ -641,7 +650,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (StrUtil.isBlank(accountData.getAccountName())) {
             accountData.setAccountName(customer.getName());
         }
-
         userAccountService.insertOrUpdate(accountData);
         CustomerCertificateInput customerCertificate = input.getCustomerCertificate();
         if (Objects.nonNull(customerCertificate)) {
