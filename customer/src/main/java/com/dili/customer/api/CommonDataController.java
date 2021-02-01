@@ -143,4 +143,13 @@ public class CommonDataController {
         return BaseOutput.successData(EnumUtil.toObject(NationEnum.class));
     }
 
+    /**
+     * 获取客户组织类型
+     * @return
+     */
+    @PostMapping(value = "/listOrganizationType")
+    public BaseOutput listOrganizationType() {
+        return BaseOutput.successData(EnumUtil.toObject(CustomerEnum.OrganizationType.class));
+    }
+
 }

@@ -38,8 +38,8 @@ public class WeChatController {
      * 微信号登录校验
      * @param code 微信小程序获取的临时code
      */
-    @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
     @PostMapping(value = "/appletLogin")
+    @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
     public BaseOutput<LoginSuccessData> login(@RequestParam("code") String code) {
         if (StrUtil.isBlank(code)) {
             return BaseOutput.failure("参数丢失").setCode(ResultCode.INVALID_REQUEST);
@@ -59,8 +59,8 @@ public class WeChatController {
      *                   wechatAvatarUrl 头像图片地址
      * @param
      */
-    @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
     @PostMapping(value = "/binding")
+    @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
     public BaseOutput binding(@RequestBody JSONObject jsonObject) {
         String code = jsonObject.getStr("code");
         String cellphone = jsonObject.getStr("cellphone");
@@ -81,8 +81,8 @@ public class WeChatController {
      * @param wxInfo
      * @return
      */
-    @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
     @PostMapping(value = "/decodePhone")
+    @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
     public BaseOutput decodePhone(@RequestBody Map<String, String> wxInfo) {
         String sessionKey = wxInfo.get("sessionKey");
         String encryptedData = wxInfo.get("encryptedData");
@@ -94,8 +94,8 @@ public class WeChatController {
      * 登录凭证校验
      * @param code 微信小程序获取的code
      */
-    @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
     @PostMapping(value = "/code2session")
+    @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
     public BaseOutput<JsCode2Session> code2session(@RequestParam("code") String code) {
         return weChatRpc.code2session(code);
     }
@@ -106,8 +106,8 @@ public class WeChatController {
      * @param dto 注册信息
      * @return 注册成功后的信息
      */
-    @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
     @PostMapping(value = "/weChatRegister")
+    @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
     public BaseOutput weChatRegister(@RequestBody WeChatRegisterDto dto) {
         log.info(String.format("微信一键注册参数:%s", JSONUtil.toJsonStr(dto)));
         return weChatService.weChatRegister(dto, false);
@@ -118,8 +118,8 @@ public class WeChatController {
      * @param dto 注册信息
      * @return 注册成功后的信息
      */
-    @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
     @PostMapping(value = "/registerAndLogin")
+    @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
     public BaseOutput registerAndLogin(@RequestBody WeChatRegisterDto dto) {
         log.info(String.format("微信一键注册登录参数:%s", JSONUtil.toJsonStr(dto)));
         return weChatService.weChatRegister(dto, true);

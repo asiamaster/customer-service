@@ -3,6 +3,17 @@ INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `level`, `system_code`, `des
 INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `level`, `system_code`, `description`) VALUES ('buyer_character_type', '客户买家角色身份', NULL, 'CUSTOMER', '客户买家角色身份');
 INSERT INTO `uap`.`data_dictionary`(`code`, `name`, `level`, `system_code`, `description`) VALUES ('business_user_character_type', '客户经营户角色身份', NULL, 'CUSTOMER', '经营户角色身份类型');
 
+INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('other_character_type', 4, '司机', 'driver', NULL, '2020-09-23 13:52:47', '2020-09-23 13:52:47', 8, 'sg', 1);
+INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('buyer_character_type', 1, '买家', 'inside_buyer', NULL, '2020-09-22 14:05:57', '2020-09-22 14:05:57', 11, 'hzsc', 1);
+INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('business_user_character_type', 2, '卖家', 'inside_seller', NULL, '2020-09-22 14:05:36', '2020-09-22 14:05:36', 11, 'hzsc', 1);
+INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('business_user_character_type', 2, '卖家', 'inside_seller', NULL, '2020-09-22 15:40:57', '2020-09-22 15:40:57', 17, 'gx', 1);
+INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('business_user_character_type', 7, '卖家', 'inside_seller', NULL, '2020-11-05 19:10:08', '2020-11-05 19:10:08', 10, 'dlk', 1);
+INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('buyer_character_type', 5, '省内客户', 'in_province', NULL, '2020-09-24 13:05:38', '2020-09-24 13:05:38', 8, 'sg', 1);
+INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('buyer_character_type', 6, '本地客户', 'native', NULL, '2020-09-24 13:06:06', '2020-09-24 13:06:06', 8, 'sg', 1);
+INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('buyer_character_type', 2, '理货区客户', 'operation_area', NULL, '2020-09-23 13:52:02', '2020-09-23 13:52:02', 8, 'sg', 1);
+INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('buyer_character_type', 3, '园外买方', 'outside_buyer', NULL, '2020-09-23 13:54:25', '2020-09-23 13:54:25', 8, 'sg', 1);
+INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('business_user_character_type', 1, '卖方客户', 'seller', NULL, '2020-09-23 13:51:47', '2020-09-23 13:51:47', 8, 'sg', 1);
+
 use dili-customer;
 ##删除客户表中的字段
 ALTER TABLE customer drop COLUMN `cellphone`;
