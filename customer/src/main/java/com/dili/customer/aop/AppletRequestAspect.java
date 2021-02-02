@@ -45,11 +45,9 @@ public class AppletRequestAspect {
      * @return
      * @throws Throwable
      */
-    @Around("@annotation(com.dili.customer.annotation.AppletRequest)")
-    public Object appletRequestAround(ProceedingJoinPoint point) throws Throwable {
+    @Around("@within(com.dili.customer.annotation.AppletRequest)&&@within(appletRequest)")
+    public Object appletRequestAround(ProceedingJoinPoint point, AppletRequest appletRequest) throws Throwable {
         Method method = ((MethodSignature) point.getSignature()).getMethod();
-        //获取注解中的信息
-        AppletRequest appletRequest = method.getAnnotation(AppletRequest.class);
         AppletTerminalType appletTerminalType = appletRequest.appletType();
         HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
         String systemCode = request.getHeader("systemCode");
@@ -63,7 +61,7 @@ public class AppletRequestAspect {
         if (StrUtil.isNotBlank(appId)) {
             Optional<AppletInfo> byAppletTypeAndAppId = appletInfoService.getByAppletTypeAndAppId(appletTerminalType, appId);
             if (byAppletTypeAndAppId.isEmpty()) {
-                log.warn(String.format("appId:%s,系统:%s,小程序编码:%s 无法识别", appId, systemCode, appletCode));
+                log.warn(String.format("%s 小程序 appId:%s,系统:%s,小程序编码:%s 无法识别", appletTerminalType.getValue(), appId, systemCode, appletCode));
                 return BaseOutput.failure("无法识别的请求程序");
             }
             AppletInfo appletInfo = byAppletTypeAndAppId.get();
@@ -73,8 +71,8 @@ public class AppletRequestAspect {
             Object retValue = point.proceed();
             return retValue;
         } else {
-            log.warn(String.format("未知的请求程序,appId:%s,系统:%s,小程序编码:%s ", appId, systemCode, appletCode));
-            return BaseOutput.failure("来源系统或程序识别码为空");
+            log.warn(String.format("未知的【%s】请求程序,appId:%s,系统:%s,小程序编码:%s ", appletTerminalType.getValue(), appId, systemCode, appletCode));
+            return BaseOutput.failure("小程序识别码为空");
         }
     }
 }

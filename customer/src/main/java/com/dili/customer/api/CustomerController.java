@@ -400,6 +400,29 @@ public class CustomerController {
     }
 
     /**
+     * 批量完善企业客户信息
+     * 由于可能会有账号合并的情况，所以会自动重新登录并返回登录信息
+     * @param inputList 待完善的信息
+     * @return
+     */
+    @PostMapping(value = "/batchCompleteEnterprise")
+    public BaseOutput<LoginSuccessData> batchCompleteEnterprise(@RequestBody List<CustomerUpdateInput> inputList) {
+        log.info(String.format("企业客户信息批量完善:%s", JSONUtil.toJsonStr(inputList)));
+        if (CollectionUtil.isEmpty(inputList)) {
+            return BaseOutput.failure("参数丢失");
+        }
+        try {
+            customerService.batchCompleteEnterprise(inputList);
+            return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccountService.getByCellphone(inputList.get(0).getContactsPhone()).get(), null));
+        } catch (AppException appException) {
+            return BaseOutput.failure(appException.getMessage());
+        } catch (Exception e) {
+            log.error(String.format("企业客户信息批量完善: %s 发生异常:%s", JSONUtil.toJsonStr(inputList), e.getMessage()), e);
+            return BaseOutput.failure("系统异常");
+        }
+    }
+
+    /**
      * 完善个人客户信息
      * 由于可能会有账号合并的情况，所以会自动重新登录并返回登录信息
      * @param input 待完善的信息
@@ -416,6 +439,29 @@ public class CustomerController {
         }
         input.setOrganizationType(CustomerEnum.OrganizationType.INDIVIDUAL.getCode());
         return completeInfo(input);
+    }
+
+    /**
+     * 批量完善个人客户信息
+     * 由于可能会有账号合并的情况，所以会自动重新登录并返回登录信息
+     * @param inputList 待完善的信息
+     * @return
+     */
+    @PostMapping(value = "/batchCompleteIndividual")
+    public BaseOutput<LoginSuccessData> batchCompleteIndividual(@RequestBody List<CustomerUpdateInput> inputList) {
+        log.info(String.format("个人客户信息批量完善:%s", JSONUtil.toJsonStr(inputList)));
+        if (CollectionUtil.isEmpty(inputList)) {
+            return BaseOutput.failure("参数丢失");
+        }
+        try {
+            customerService.batchCompleteIndividual(inputList);
+            return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccountService.getByCellphone(inputList.get(0).getContactsPhone()).get(), null));
+        } catch (AppException appException) {
+            return BaseOutput.failure(appException.getMessage());
+        } catch (Exception e) {
+            log.error(String.format("个人客户信息批量完善: %s 发生异常:%s", JSONUtil.toJsonStr(inputList), e.getMessage()), e);
+            return BaseOutput.failure("系统异常");
+        }
     }
 
     /**

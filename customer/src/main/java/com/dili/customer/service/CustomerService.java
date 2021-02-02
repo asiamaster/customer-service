@@ -5,7 +5,6 @@ import com.dili.customer.sdk.domain.dto.*;
 import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
@@ -91,6 +90,20 @@ public interface CustomerService extends BaseService<Customer, Long> {
     BaseOutput<Customer> completeInfo(CustomerUpdateInput input);
 
     /**
+     * 批量完善个人客户信息
+     * @param inputList
+     * @return
+     */
+    BaseOutput<Customer> batchCompleteIndividual(List<CustomerUpdateInput> inputList);
+
+    /**
+     * 批量完善企业客户信息
+     * @param inputList
+     * @return
+     */
+    BaseOutput<Customer> batchCompleteEnterprise(List<CustomerUpdateInput> inputList);
+
+    /**
      * 根据联系电话自动注册，此方法只会创建客户，不会创建对应的账号
      * @param contactsPhone 联系电话
      * @param sourceSystem 来源系统
@@ -150,5 +163,11 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @param state 客户状态
      */
     void updateState(Long customerId, Integer state);
+
+    /**
+     * 根据客户ID逻辑删除客户数据
+     * @param customerId 客户ID
+     */
+    void logicDelete(Long customerId);
 
 }

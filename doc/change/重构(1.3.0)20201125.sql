@@ -14,7 +14,7 @@ INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `c
 INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('buyer_character_type', 3, '园外买方', 'outside_buyer', NULL, '2020-09-23 13:54:25', '2020-09-23 13:54:25', 8, 'sg', 1);
 INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('business_user_character_type', 1, '卖方客户', 'seller', NULL, '2020-09-23 13:51:47', '2020-09-23 13:51:47', 8, 'sg', 1);
 
-use dili-customer;
+use `dili-customer`;
 ##删除客户表中的字段
 ALTER TABLE customer drop COLUMN `cellphone`;
 
@@ -216,8 +216,6 @@ create table applet_info
     primary key (id)
 );
 alter table applet_info comment '小程序资料信息';
-drop index uni_app_id_app_type on applet_info;
-
 /*==============================================================*/
 /* Index: uni_app_id_app_type                                   */
 /*==============================================================*/

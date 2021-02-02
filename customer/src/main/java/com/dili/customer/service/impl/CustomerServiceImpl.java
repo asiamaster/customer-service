@@ -583,8 +583,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 return BaseOutput.failure("该手机号已认证绑定的其它证件客户");
             }
         }
+        Long oldDelId = null;
         Customer customer = this.get(input.getId());
-        if (Objects.isNull(customer)) {
+        if (Objects.isNull(customer) || YesOrNoEnum.YES.getCode().equals(customer.getIsDelete())) {
             return BaseOutput.failure("客户信息不存在");
         }
         //获取当前登录可以对应的账号信息
@@ -598,14 +599,17 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
          */
         Customer baseInfoByCertificateNumber = getBaseInfoByCertificateNumber(input.getCertificateNumber());
         if (Objects.nonNull(baseInfoByCertificateNumber)) {
-            if (!StrUtil.equalsIgnoreCase(baseInfoByCertificateNumber.getOrganizationType(),input.getOrganizationType())){
+            if (!StrUtil.equalsIgnoreCase(baseInfoByCertificateNumber.getOrganizationType(), input.getOrganizationType())) {
                 return BaseOutput.failure("已存在证件号相同，组织类型不同的客户信息");
             }
             /**
              * 验证客户证件号是否已存在实名验证手机号的客户
              */
-            if (baseInfoByCertificateNumber.getIsCellphoneValid().equals(YesOrNoEnum.YES.getCode()) && !Objects.equals(baseInfoByCertificateNumber.getContactsPhone(),input.getContactsPhone())){
+            if (baseInfoByCertificateNumber.getIsCellphoneValid().equals(YesOrNoEnum.YES.getCode()) && !Objects.equals(baseInfoByCertificateNumber.getContactsPhone(), input.getContactsPhone())) {
                 return BaseOutput.failure("该[企业/个人]证件号已认证绑定的其它手机号");
+            }
+            if (!Objects.equals(customer.getId(), baseInfoByCertificateNumber.getId())) {
+                oldDelId = customer.getId();
             }
             //复制数据库已有值到客户对象中
             BeanUtil.copyProperties(baseInfoByCertificateNumber, customer);
@@ -615,20 +619,19 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
              * 如果不存在，则可直接用当前账号信息
              */
             Optional<UserAccount> byCustomerId = userAccountService.getByCustomerId(baseInfoByCertificateNumber.getId());
-            if (byCustomerId.isPresent()){
+            if (byCustomerId.isPresent()) {
                 customer.setContactsPhone(input.getContactsPhone());
                 customer.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
                 UserAccount userAccount = byCustomerId.get();
                 userAccount.setCertificateNumber(input.getCertificateNumber());
-                if (Objects.nonNull(accountData)){
-                    if (!Objects.equals(accountData.getId(),userAccount.getId())){
-                        userAccount.setChangedPwdTime(accountData.getChangedPwdTime());
-                        accountData.setNewAccountId(userAccount.getId());
-                        accountData.setDeleted(YesOrNoEnum.YES.getCode());
-                        userAccount.setPassword(accountData.getPassword());
-                        userAccount.setCellphone(input.getContactsPhone()).setCellphoneValid(YesOrNoEnum.YES.getCode());
-                        userAccountService.update(userAccount);
-                        accountTerminalService.updateAccountId(accountData.getId(), userAccount.getId());
+                if (Objects.nonNull(accountData)) {
+                    if (!Objects.equals(accountData.getId(), userAccount.getId())) {
+                        Long oldAccountId = accountData.getId();
+                        String oldPwd = accountData.getPassword();
+                        BeanUtil.copyProperties(userAccount, accountData);
+                        accountData.setPassword(oldPwd);
+                        userAccountService.delete(oldAccountId);
+                        accountTerminalService.updateAccountId(oldAccountId, userAccount.getId());
                     }
                 }
             }
@@ -642,7 +645,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             customer.setCertificateNumber(input.getCertificateNumber());
             customer.setCertificateType(input.getCertificateType());
         }
-        if (Objects.isNull(accountData)){
+        if (Objects.isNull(accountData)) {
             accountData = new UserAccount();
         }
         accountData.setCustomerId(customer.getId()).setCustomerCode(customer.getCode()).setCertificateNumber(customer.getCertificateNumber())
@@ -663,8 +666,11 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 }
             }
         }
-        if (Objects.isNull(customer.getIsCertification()) || !YesOrNoEnum.YES.getCode().equals(customer.getIsCertification())){
+        if (Objects.isNull(customer.getIsCertification()) || !YesOrNoEnum.YES.getCode().equals(customer.getIsCertification())) {
             customer.setName(input.getName());
+        }
+        if (Objects.nonNull(oldDelId)) {
+            this.logicDelete(oldDelId);
         }
         this.update(customer);
         CustomerMarket oldCustomerMarket = customerMarketService.queryByMarketAndCustomerId(input.getCustomerMarket().getMarketId(), customer.getId());
@@ -733,6 +739,46 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             attachmentService.batchSave(attachmentList, customer.getId(), marketId);
         }
         return BaseOutput.successData(customer);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public BaseOutput<Customer> batchCompleteIndividual(List<CustomerUpdateInput> inputList) {
+        String result = null;
+        for (CustomerUpdateInput input : inputList) {
+            if (!IdcardUtil.isValidCard(input.getCertificateNumber())) {
+                result = "个人证件号码错误";
+                break;
+            }
+            input.setOrganizationType(CustomerEnum.OrganizationType.INDIVIDUAL.getCode());
+            BaseOutput<Customer> customerBaseOutput = this.completeInfo(input);
+            if (!customerBaseOutput.isSuccess()) {
+                result = customerBaseOutput.getMessage();
+                break;
+            }
+        }
+        if (StrUtil.isBlank(result)) {
+            return BaseOutput.success();
+        }
+        throw new AppException(result);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public BaseOutput<Customer> batchCompleteEnterprise(List<CustomerUpdateInput> inputList) {
+        String result = null;
+        for (CustomerUpdateInput input : inputList) {
+            input.setOrganizationType(CustomerEnum.OrganizationType.ENTERPRISE.getCode());
+            BaseOutput<Customer> customerBaseOutput = this.completeInfo(input);
+            if (!customerBaseOutput.isSuccess()) {
+                result = customerBaseOutput.getMessage();
+                break;
+            }
+        }
+        if (StrUtil.isBlank(result)) {
+            return BaseOutput.success();
+        }
+        throw new AppException(result);
     }
 
     @Override
@@ -970,6 +1016,14 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             updateSelective(data);
             mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE,customerId, getOperatorUserTicket().getFirmId());
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void logicDelete(Long customerId) {
+        Customer customer = get(customerId);
+        customer.setIsDelete(YesOrNoEnum.YES.getCode());
+        this.update(customer);
     }
 
     /**

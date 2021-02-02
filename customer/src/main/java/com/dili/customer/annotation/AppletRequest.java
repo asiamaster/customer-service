@@ -2,8 +2,7 @@ package com.dili.customer.annotation;
 
 import com.dili.customer.enums.AppletTerminalType;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.*;
 
 /**
  * 小程序请求
@@ -11,7 +10,9 @@ import java.lang.annotation.RetentionPolicy;
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
  * @date 2020/12/12 14:23
  */
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 public @interface AppletRequest {
 
     /**

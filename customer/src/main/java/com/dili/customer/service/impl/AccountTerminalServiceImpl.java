@@ -2,7 +2,6 @@ package com.dili.customer.service.impl;
 
 import com.dili.customer.domain.AccountTerminal;
 import com.dili.customer.enums.AppletTerminalType;
-import com.dili.customer.mapper.AccountTerminalMapper;
 import com.dili.customer.service.AccountTerminalService;
 import com.dili.ss.base.BaseServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +20,6 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class AccountTerminalServiceImpl extends BaseServiceImpl<AccountTerminal, Long> implements AccountTerminalService {
-
-    private final AccountTerminalMapper accountTerminalMapper;
 
     @Override
     public Optional<AccountTerminal> getByAppAndTerminalCode(String appId, AppletTerminalType terminalType, String terminalCode) {

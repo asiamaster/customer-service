@@ -39,7 +39,7 @@ public class UserAccount extends BaseDomain implements Serializable {
     /**
      * 客户ID
      */
-    @Column(name = "customer_id", updatable = false)
+    @Column(name = "customer_id")
     @NotNull(message = "客户不能为空", groups = AddView.class)
     private Long customerId;
 
@@ -53,7 +53,7 @@ public class UserAccount extends BaseDomain implements Serializable {
     /**
      * 客户编码
      */
-    @Column(name = "customer_code", updatable = false)
+    @Column(name = "customer_code")
     @NotBlank(message = "客户编码不能为空", groups = AddView.class)
     private String customerCode;
 
