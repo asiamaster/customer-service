@@ -57,7 +57,7 @@ public class IndividualCustomerInput implements Serializable {
      */
     @NotBlank(message = "客户名称不能为空", groups = {AddView.class,UpdateView.class})
     @Size(min = 1, max = 40, message = "客户名称请保持在40个字以内", groups = {AddView.class,UpdateView.class})
-    @Pattern(regexp = ValidatedConstant.CUSTOMER_NAME_VALID_REGEXP, message = "请输入正确的客户姓名")
+    @Pattern(regexp = ValidatedConstant.CUSTOMER_NAME_VALID_REGEXP, message = "请输入正确的客户姓名", groups = {AddView.class, UpdateView.class})
     private String name;
 
     /**
