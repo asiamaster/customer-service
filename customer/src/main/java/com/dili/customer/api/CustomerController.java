@@ -9,7 +9,10 @@ import com.dili.customer.annotation.UapToken;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.sdk.constants.MqConstant;
+import com.dili.customer.sdk.domain.CustomerMarket;
 import com.dili.customer.sdk.domain.dto.*;
+import com.dili.customer.sdk.domain.query.CustomerBaseQueryInput;
+import com.dili.customer.sdk.domain.query.CustomerQueryInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.sdk.validator.*;
 import com.dili.customer.service.CustomerService;
@@ -20,6 +23,7 @@ import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import com.dili.ss.exception.AppException;
+import com.google.common.collect.Sets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +36,7 @@ import javax.validation.groups.Default;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * 客户基础信息
@@ -76,9 +81,10 @@ public class CustomerController {
         if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
-        if (Objects.isNull(customer.getState())) {
-            customer.setState(CustomerEnum.State.NORMAL.getCode());
+        if (Objects.isNull(customer.getCustomerMarket())){
+            customer.setCustomerMarket(new CustomerMarket());
         }
+        customer.getCustomerMarket().setState(CustomerEnum.State.NORMAL.getCode());
         customer.setIsDelete(YesOrNoEnum.NO.getCode());
         return customerService.listForPage(customer);
     }
@@ -113,9 +119,10 @@ public class CustomerController {
         if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
-        if (Objects.isNull(customer.getState())) {
-            customer.setState(CustomerEnum.State.NORMAL.getCode());
+        if (Objects.isNull(customer.getCustomerMarket())){
+            customer.setCustomerMarket(new CustomerMarket());
         }
+        customer.getCustomerMarket().setState(CustomerEnum.State.NORMAL.getCode());
         customer.setIsDelete(YesOrNoEnum.NO.getCode());
         return customerService.listSimpleForPage(customer);
     }
@@ -201,25 +208,12 @@ public class CustomerController {
     }
 
     /**
-     * 更新用户状态
-     * @param customerId 客户ID
-     * @param state      状态值
-     * @return
-     */
-    @UapToken
-    @PostMapping(value = "/updateState")
-    public BaseOutput<Customer> updateState(@RequestParam("customerId") Long customerId, @RequestParam("state") Integer state) {
-        customerService.updateState(customerId, state);
-        return BaseOutput.success();
-    }
-
-    /**
      * 查询客户数据集
      * @param customer
      * @return
      */
     @PostMapping(value="/list")
-    public BaseOutput<List<Customer>> list(@RequestBody(required = false) CustomerQueryInput customer) {
+    public BaseOutput<List<Customer>> list(@RequestBody CustomerQueryInput customer) {
         if (Objects.isNull(customer.getMarketId())) {
             return BaseOutput.failure("客户所属市场不能为空");
         }
@@ -412,7 +406,9 @@ public class CustomerController {
             return BaseOutput.failure("参数丢失");
         }
         try {
-            customerService.batchCompleteEnterprise(inputList);
+            BaseOutput<Long> longBaseOutput = customerService.batchCompleteEnterprise(inputList);
+            Set<Long> marketIds = (Set<Long>) (longBaseOutput.getMetadata());
+            mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE,longBaseOutput.getData(),marketIds);
             return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccountService.getByCellphone(inputList.get(0).getContactsPhone()).get(), null));
         } catch (AppException appException) {
             return BaseOutput.failure(appException.getMessage());
@@ -454,7 +450,9 @@ public class CustomerController {
             return BaseOutput.failure("参数丢失");
         }
         try {
-            customerService.batchCompleteIndividual(inputList);
+            BaseOutput<Long> longBaseOutput = customerService.batchCompleteIndividual(inputList);
+            Set<Long> marketIds = (Set<Long>) (longBaseOutput.getMetadata());
+            mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE,longBaseOutput.getData(),marketIds);
             return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccountService.getByCellphone(inputList.get(0).getContactsPhone()).get(), null));
         } catch (AppException appException) {
             return BaseOutput.failure(appException.getMessage());
@@ -518,6 +516,7 @@ public class CustomerController {
         try {
             BaseOutput<Customer> customerBaseOutput = customerService.completeInfo(input);
             if (customerBaseOutput.isSuccess()) {
+                mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, customerBaseOutput.getData().getId(), input.getCustomerMarket().getMarketId());
                 return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccountService.getByCellphone(input.getContactsPhone()).get(), null));
             }
             return BaseOutput.failure(customerBaseOutput.getMessage());

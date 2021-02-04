@@ -188,22 +188,4 @@ public class Customer extends BaseDomain {
      */
     private Integer isDelete;
 
-    /**
-     * 客户状态 1生效，2禁用..
-     * {@link com.dili.customer.sdk.enums.CustomerEnum.State}
-     */
-    @NotNull(message = "客户状态不能为空")
-    private Integer state;
-
-    /**
-     * 获取客户状态显示值
-     * @return
-     */
-    public String getStateValue(){
-        CustomerEnum.State instance = CustomerEnum.State.getInstance(this.getState());
-        if (Objects.nonNull(instance)){
-            return instance.getValue();
-        }
-        return "";
-    }
 }

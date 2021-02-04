@@ -86,7 +86,6 @@ public class CustomerMarket extends BaseDomain {
     @Column(name = "`business_region_tag`")
     private Integer businessRegionTag;
 
-
     /**
      * 销售市场
      */
@@ -98,6 +97,13 @@ public class CustomerMarket extends BaseDomain {
      */
     @Column(name = "`alias`")
     private String alias;
+
+    /**
+     * 客户状态 1生效，2禁用，
+     * {@link com.dili.customer.sdk.enums.CustomerEnum.State}
+     */
+    @Column(name = "`state`")
+    private Integer state;
 
     /**
      * 客户资料审核状态

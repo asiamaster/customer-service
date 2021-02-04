@@ -52,4 +52,12 @@ public interface CustomerMarketService extends BaseService<CustomerMarket, Long>
      * @param input
      */
     Optional<String> approval(MarketApprovalResultInput input);
+
+    /**
+     * 更改客户状态
+     * @param customerId 客户ID
+     * @param marketId 客户市场
+     * @param state 客户状态
+     */
+    Optional<String> updateState(Long customerId, Long marketId, Integer state);
 }

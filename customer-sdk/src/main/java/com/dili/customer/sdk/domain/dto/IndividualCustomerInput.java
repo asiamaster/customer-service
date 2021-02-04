@@ -1,6 +1,7 @@
 package com.dili.customer.sdk.domain.dto;
 
 
+import com.dili.customer.sdk.constants.ValidatedConstant;
 import com.dili.customer.sdk.domain.BusinessCategory;
 import com.dili.customer.sdk.domain.CharacterType;
 import com.dili.customer.sdk.domain.CustomerMarket;
@@ -42,7 +43,7 @@ public class IndividualCustomerInput implements Serializable {
      */
     @NotBlank(message = "(企业/个人)证件号码不能为空", groups = {AddView.class, CompleteView.class})
     @Size(min = 1, max = 40, message = "(企业/个人)证件号码请保持在40个字以内", groups = {AddView.class, CompleteView.class})
-    @Pattern(regexp = "^[()a-z0-9A-Z\\u4e00-\\u9fa5]+$", message = "请输入正确的(企业/个人)证件号码", groups = {AddView.class,CompleteView.class})
+    @Pattern(regexp = ValidatedConstant.CUSTOMER_CERTIFICATE_NUMBER_VALID_REGEXP, message = "请输入正确的(企业/个人)证件号码", groups = {AddView.class,CompleteView.class})
     private String certificateNumber;
 
     /**
@@ -56,6 +57,7 @@ public class IndividualCustomerInput implements Serializable {
      */
     @NotBlank(message = "客户名称不能为空", groups = {AddView.class,UpdateView.class})
     @Size(min = 1, max = 40, message = "客户名称请保持在40个字以内", groups = {AddView.class,UpdateView.class})
+    @Pattern(regexp = ValidatedConstant.CUSTOMER_NAME_VALID_REGEXP, message = "请输入正确的客户姓名")
     private String name;
 
     /**
@@ -80,7 +82,7 @@ public class IndividualCustomerInput implements Serializable {
      * 联系电话
      */
     @NotBlank(message = "联系电话不能为空", groups = {AddView.class,UpdateView.class})
-    @Pattern(regexp = "^(1[3456789]\\d{9})$", message = "请输入正确的联系方式", groups = {AddView.class,UpdateView.class})
+    @Pattern(regexp = ValidatedConstant.CUSTOMER_CELLPHONE_VALID_REGEXP, message = "请输入正确的联系方式", groups = {AddView.class, UpdateView.class})
     private String contactsPhone;
 
     /**

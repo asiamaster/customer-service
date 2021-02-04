@@ -3,6 +3,8 @@ package com.dili.customer.sdk.rpc;
 import com.dili.customer.sdk.constants.SecurityConstant;
 import com.dili.customer.sdk.domain.Customer;
 import com.dili.customer.sdk.domain.dto.*;
+import com.dili.customer.sdk.domain.query.CustomerBaseQueryInput;
+import com.dili.customer.sdk.domain.query.CustomerQueryInput;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -112,15 +114,6 @@ public interface CustomerRpc {
      */
     @PostMapping(value = "/api/customer/update")
     BaseOutput<CustomerExtendDto> update(CustomerUpdateInput updateInput, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
-
-    /**
-     * 更新用户状态
-     * @param customerId 客户ID
-     * @param state      状态值
-     * @return
-     */
-    @PostMapping(value = "/api/customer/updateState")
-    BaseOutput<Customer> updateState(@RequestParam("customerId") Long customerId, @RequestParam("state") Integer state, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 
     /**
      * 根据证件号检测某个客户在某市场是否已存在

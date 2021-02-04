@@ -2,6 +2,8 @@ package com.dili.customer.service;
 
 import com.dili.customer.domain.Customer;
 import com.dili.customer.sdk.domain.dto.*;
+import com.dili.customer.sdk.domain.query.CustomerBaseQueryInput;
+import com.dili.customer.sdk.domain.query.CustomerQueryInput;
 import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
@@ -94,14 +96,14 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @param inputList
      * @return
      */
-    BaseOutput<Customer> batchCompleteIndividual(List<CustomerUpdateInput> inputList);
+    BaseOutput<Long> batchCompleteIndividual(List<CustomerUpdateInput> inputList);
 
     /**
      * 批量完善企业客户信息
      * @param inputList
      * @return
      */
-    BaseOutput<Customer> batchCompleteEnterprise(List<CustomerUpdateInput> inputList);
+    BaseOutput<Long> batchCompleteEnterprise(List<CustomerUpdateInput> inputList);
 
     /**
      * 根据联系电话自动注册，此方法只会创建客户，不会创建对应的账号
@@ -156,13 +158,6 @@ public interface CustomerService extends BaseService<Customer, Long> {
      * @return
      */
     Customer get(Long id, Long marketId);
-
-    /**
-     * 更改客户状态
-     * @param customerId 客户ID
-     * @param state 客户状态
-     */
-    void updateState(Long customerId, Integer state);
 
     /**
      * 根据客户ID逻辑删除客户数据

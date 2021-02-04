@@ -33,7 +33,6 @@
         <result column="create_time" property="createTime"/>
         <result column="modify_time" property="modifyTime"/>
         <result column="is_delete" property="isDelete"/>
-        <result column="state" property="state"/>
     </resultMap>
 
     <!-- list列表查询返回结果集 -->
@@ -49,11 +48,11 @@
         <result column="business_nature" property="customerMarket.businessNature" />
         <result column="business_region_tag" property="customerMarket.businessRegionTag" />
         <result column="sales_market" property="customerMarket.salesMarket"/>
+        <result column="marketState" property="customerMarket.state"/>
         <result column="approval_status" property="customerMarket.approvalStatus" />
         <result column="approval_time" property="customerMarket.approvalTime" />
         <result column="approval_user_id" property="customerMarket.approvalUserId" />
         <result column="owner_id" property="customerMarket.ownerId" />
-
     </resultMap>
 
     <!-- 公共查询customer 单表 条件 -->
@@ -100,9 +99,6 @@
         <if test="sourceChannel != null and '' != sourceChannel">
             and c.source_channel = #{sourceChannel}
         </if>
-        <if test="state != null">
-            and c.state = #{state}
-        </if>
         <if test="certificateAddr !=null and certificateAddr !=''">
             and c.certificate_addr LIKE CONCAT('%',#{certificateAddr},'%')
         </if>
@@ -125,12 +121,12 @@
     </sql>
 
     <!--- 联合查询分页信息 -->
-    <select id="listForPage" parameterType="com.dili.customer.sdk.domain.dto.CustomerQueryInput" resultMap="listResultMap">
+    <select id="listForPage" parameterType="com.dili.customer.sdk.domain.query.CustomerQueryInput" resultMap="listResultMap">
         SELECT
         c.*,
         cm.id as customerMarketId, cm.market_id,cm.create_time as marketCreateTime,cm.creator_id AS marketCreatorId,
         cm.grade,cm.department_id,cm.profession,cm.profession_name,cm.sales_market,cm.business_nature,cm.approval_status,
-        cm.approval_user_id,cm.approval_time,cm.owner_id,cm.business_region_tag
+        cm.approval_user_id,cm.approval_time,cm.owner_id,cm.business_region_tag,cm.state AS marketState
         FROM
         customer c,customer_market cm
         where c.id = cm.customer_id
@@ -192,6 +188,9 @@
             <if test="customerMarket.approvalStatus != null">
                 and cm.approval_status = #{customerMarket.approvalStatus}
             </if>
+            <if test="customerMarket.state != null">
+                and cm.state = #{customerMarket.state}
+            </if>
         </if>
         <!-- 如果客户身份类型参数不为空 -->
         <if test="null != characterType">
@@ -214,7 +213,7 @@
     </select>
 
     <!--- 联合查询分页信息 -->
-    <select id="listBasePage" parameterType="com.dili.customer.sdk.domain.dto.CustomerBaseQueryInput"
+    <select id="listBasePage" parameterType="com.dili.customer.sdk.domain.query.CustomerBaseQueryInput"
             resultMap="BaseResultMap">
         SELECT c.* FROM customer c WHERE 1=1
         <include refid="Base_Where_Clause"/>

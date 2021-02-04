@@ -92,6 +92,13 @@ public class CustomerMarket extends BaseDomain {
     private String alias;
 
     /**
+     * 客户状态 1生效，2禁用..
+     * {@link com.dili.customer.sdk.enums.CustomerEnum.State}
+     */
+    @NotNull(message = "客户状态不能为空", groups = {UpdateView.class})
+    private Integer state;
+
+    /**
      * 客户资料审核状态
      * {@link com.dili.customer.sdk.enums.CustomerEnum.ApprovalStatus}
      */
@@ -165,5 +172,17 @@ public class CustomerMarket extends BaseDomain {
      */
     public String getApprovalStatusValue() {
         return CustomerEnum.ApprovalStatus.getValueByCode(this.getGrade());
+    }
+
+    /**
+     * 获取客户状态显示值
+     * @return
+     */
+    public String getStateValue(){
+        CustomerEnum.State instance = CustomerEnum.State.getInstance(this.getState());
+        if (Objects.nonNull(instance)){
+            return instance.getValue();
+        }
+        return "";
     }
 }

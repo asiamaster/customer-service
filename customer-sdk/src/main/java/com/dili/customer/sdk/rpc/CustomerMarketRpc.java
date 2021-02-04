@@ -1,9 +1,11 @@
 package com.dili.customer.sdk.rpc;
 
+import com.dili.customer.sdk.constants.SecurityConstant;
 import com.dili.customer.sdk.domain.CustomerMarket;
 import com.dili.ss.domain.BaseOutput;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
@@ -31,7 +33,18 @@ public interface CustomerMarketRpc {
      * @param customerId 客户ID
      * @param marketId 所属市场ID
      * @param nextGrade 想要更新成的等级
+     * @param uapToken uapToken
      */
     @PostMapping("/api/customerMarket/changeGrade")
-    BaseOutput changeGrade(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam("grade") Integer nextGrade);
+    BaseOutput changeGrade(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam("grade") Integer nextGrade, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
+
+    /**
+     * 更新用户状态,将获取当前登录人所在的市场为客户所属市场
+     * @param customerId 客户ID
+     * @param state      状态值
+     * @param uapToken uapToken
+     * @return
+     */
+    @PostMapping(value = "/api/customerMarket/updateState")
+    BaseOutput updateState(@RequestParam("customerId") Long customerId, @RequestParam("state") Integer state, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 }

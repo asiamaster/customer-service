@@ -15,9 +15,6 @@ INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `c
 INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `firm_id`, `firm_code`, `state`) VALUES ('business_user_character_type', 1, '卖方客户', 'seller', NULL, '2020-09-23 13:51:47', '2020-09-23 13:51:47', 8, 'sg', 1);
 
 use `dili-customer`;
-##删除客户表中的字段
-ALTER TABLE customer drop COLUMN `cellphone`;
-
 /*==============================================================*/
 /* Table: character_type          客户角色身份                    */
 /*==============================================================*/
@@ -92,12 +89,9 @@ ALTER TABLE customer_market ADD COLUMN `approval_user_id` bigint DEFAULT NULL CO
 ALTER TABLE customer_market ADD COLUMN `approval_time` datetime DEFAULT NULL COMMENT '客户资料审核时间' AFTER approval_user_id;
 ALTER TABLE customer_market ADD COLUMN `approval_notes` VARCHAR(255) DEFAULT NULL COMMENT '客户资料审核备注' AFTER approval_time;
 ALTER TABLE customer_market ADD COLUMN `business_region_tag` tinyint DEFAULT NULL COMMENT '客户区域标签' AFTER business_nature;
+ALTER TABLE customer_market ADD COLUMN `state` int DEFAULT NULL COMMENT '客户主状态(启用?禁用)' AFTER alias;
 
-ALTER TABLE customer_market drop COLUMN `operating_area`;
-ALTER TABLE customer_market drop COLUMN `operating_lng`;
-ALTER TABLE customer_market drop COLUMN `operating_lat`;
-ALTER TABLE customer_market drop COLUMN `other_title`;
-
+update customer_market set state = 1;
 update customer_market set approval_status = 2;
 
 INSERT INTO character_type(id,customer_id,market_id,sub_type) SELECT cm.id,cm.customer_id,cm.market_id,type FROM customer_market cm;
@@ -227,3 +221,12 @@ create unique index uni_app_id_app_type on applet_info
 
 INSERT INTO `dili-customer`.`applet_info` (`applet_name`, `system_code`, `applet_code`, `app_id`, `secret`, `applet_type`, `create_time`, `modify_time`) VALUES ('溯源司机端', 'TRACE', 'DRIVER', 'wxdd7397bf57ef8ade', '412a53c4782395dc5273c728e659e240', 1, now(), now());
 INSERT INTO `dili-customer`.`applet_info` (`applet_name`, `system_code`, `applet_code`, `app_id`, `secret`, `applet_type`, `create_time`, `modify_time`) VALUES ('溯源买卖家', 'TRACE', 'BuyerAndSeller', 'wxe08c9b2b40546ebd', 'e0ff4f7ee31a5bb1d88ea213ab30bf5e', 1, now(), now());
+
+##删除客户表中的字段
+ALTER TABLE customer drop COLUMN `cellphone`;
+ALTER TABLE customer drop COLUMN `state`;
+
+ALTER TABLE customer_market drop COLUMN `operating_area`;
+ALTER TABLE customer_market drop COLUMN `operating_lng`;
+ALTER TABLE customer_market drop COLUMN `operating_lat`;
+ALTER TABLE customer_market drop COLUMN `other_title`;

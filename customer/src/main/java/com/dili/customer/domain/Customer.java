@@ -242,13 +242,6 @@ public class Customer extends BaseDomain {
     private Integer isDelete;
 
     /**
-     * 客户状态 1生效，2禁用，
-     * {@link com.dili.customer.sdk.enums.CustomerEnum.State}
-     */
-    @Column(name = "`state`")
-    private Integer state;
-
-    /**
      * 客户市场服务信息
      * 客户市场本身是一对多的关系，而此处使用单个对象，是按一个客户一个市场信息的单一关系返回
      */

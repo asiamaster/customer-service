@@ -19,8 +19,9 @@ import com.dili.customer.config.CustomerConfig;
 import com.dili.customer.domain.*;
 import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.mapper.CustomerMapper;
-import com.dili.customer.sdk.constants.MqConstant;
 import com.dili.customer.sdk.domain.dto.*;
+import com.dili.customer.sdk.domain.query.CustomerBaseQueryInput;
+import com.dili.customer.sdk.domain.query.CustomerQueryInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.sdk.validator.CompleteView;
 import com.dili.customer.sdk.validator.EnterpriseView;
@@ -89,8 +90,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     private final BusinessLogRpcService businessLogRpcService;
     private final UapUserTicket uapUserTicket;
     @Autowired
-    private MqService mqService;
-    @Autowired
     private CustomerMarketService customerMarketService;
     @Autowired
     private ContactsService contactsService;
@@ -125,6 +124,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         //客户归属市场信息
         CustomerMarket marketInfo = new CustomerMarket();
         BeanUtils.copyProperties(baseInfo.getCustomerMarket(),marketInfo);
+        marketInfo.setState(CustomerEnum.State.NORMAL.getCode());
         //客户基本信息对象
         Customer customer = null;
         /**
@@ -159,8 +159,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customer.setCreatorId(baseInfo.getOperatorId());
                 customer.setCreateTime(LocalDateTime.now());
                 customer.setModifyTime(customer.getCreateTime());
-                customer.setState(CustomerEnum.State.NORMAL.getCode());
                 customer.setIsDelete(0);
+                customer.setIsCertification(YesOrNoEnum.NO.getCode());
                 super.insertSelective(customer);
 
             } else {
@@ -188,9 +188,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 BeanUtils.copyProperties(temp, marketInfo);
             }
             //如果数据库中已存在的客户未实名，而本次传入的数据为已实名，则需要更新实名认证标识
-            if (YesOrNoEnum.NO.getCode().equals(customer.getIsCertification()) && YesOrNoEnum.YES.getCode().equals(baseInfo.getIsCertification())){
-                customer.setIsCertification(baseInfo.getIsCertification());
-            }
+//            if (YesOrNoEnum.NO.getCode().equals(customer.getIsCertification()) && YesOrNoEnum.YES.getCode().equals(baseInfo.getIsCertification())){
+//                customer.setIsCertification(baseInfo.getIsCertification());
+//            }
             /**
              * 如果在此次创建中，增加了现地址信息
              */
@@ -645,6 +645,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             customer.setCertificateNumber(input.getCertificateNumber());
             customer.setCertificateType(input.getCertificateType());
         }
+        customer.setName(input.getName());
         if (Objects.isNull(accountData)) {
             accountData = new UserAccount();
         }
@@ -666,12 +667,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 }
             }
         }
-        if (Objects.isNull(customer.getIsCertification()) || !YesOrNoEnum.YES.getCode().equals(customer.getIsCertification())) {
-            customer.setName(input.getName());
-        }
         if (Objects.nonNull(oldDelId)) {
             this.logicDelete(oldDelId);
         }
+        customer.setIsCellphoneValid(accountData.getCellphoneValid());
         this.update(customer);
         CustomerMarket oldCustomerMarket = customerMarketService.queryByMarketAndCustomerId(input.getCustomerMarket().getMarketId(), customer.getId());
         if (Objects.nonNull(oldCustomerMarket)) {
@@ -680,6 +679,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             oldCustomerMarket.setBusinessNature(input.getCustomerMarket().getBusinessNature());
             oldCustomerMarket.setApprovalUserId(null);
             oldCustomerMarket.setApprovalTime(null);
+            oldCustomerMarket.setState(CustomerEnum.State.USELESS.getCode());
             customerMarketService.update(oldCustomerMarket);
         } else {
             Boolean saveMarketInfo = true;
@@ -691,6 +691,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                     old.setBusinessNature(input.getCustomerMarket().getBusinessNature());
                     old.setApprovalUserId(null);
                     old.setApprovalTime(null);
+                    old.setState(CustomerEnum.State.USELESS.getCode());
                     customerMarketService.update(old);
                     saveMarketInfo = false;
                 }
@@ -703,6 +704,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customerMarket.setCreateTime(LocalDateTime.now());
                 customerMarket.setModifyTime(LocalDateTime.now());
                 customerMarket.setAlias(input.getName());
+                customerMarket.setState(CustomerEnum.State.USELESS.getCode());
                 customerMarketService.insert(customerMarket);
             }
         }
@@ -743,8 +745,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BaseOutput<Customer> batchCompleteIndividual(List<CustomerUpdateInput> inputList) {
+    public BaseOutput<Long> batchCompleteIndividual(List<CustomerUpdateInput> inputList) {
         String result = null;
+        Long customerId = null;
+        Set<Long> marketIds = new HashSet<>();
         for (CustomerUpdateInput input : inputList) {
             if (!IdcardUtil.isValidCard(input.getCertificateNumber())) {
                 result = "个人证件号码错误";
@@ -756,17 +760,21 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 result = customerBaseOutput.getMessage();
                 break;
             }
+            customerId = customerBaseOutput.getData().getId();
+            marketIds.add(input.getCustomerMarket().getMarketId());
         }
         if (StrUtil.isBlank(result)) {
-            return BaseOutput.success();
+            return BaseOutput.successData(customerId).setMetadata(marketIds);
         }
         throw new AppException(result);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BaseOutput<Customer> batchCompleteEnterprise(List<CustomerUpdateInput> inputList) {
+    public BaseOutput<Long> batchCompleteEnterprise(List<CustomerUpdateInput> inputList) {
         String result = null;
+        Long customerId = null;
+        Set<Long> marketIds = new HashSet<>();
         for (CustomerUpdateInput input : inputList) {
             input.setOrganizationType(CustomerEnum.OrganizationType.ENTERPRISE.getCode());
             BaseOutput<Customer> customerBaseOutput = this.completeInfo(input);
@@ -774,9 +782,12 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 result = customerBaseOutput.getMessage();
                 break;
             }
+            marketIds.add(input.getCustomerMarket().getMarketId());
+            customerId = customerBaseOutput.getData().getId();
         }
+
         if (StrUtil.isBlank(result)) {
-            return BaseOutput.success();
+            return BaseOutput.successData(customerId).setMetadata(marketIds);
         }
         throw new AppException(result);
     }
@@ -846,7 +857,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (Objects.nonNull(customer)) {
             customer.setIsDelete(YesOrNoEnum.NO.getCode());
             customer.setCode(getCustomerCode());
-            customer.setState(CustomerEnum.State.USELESS.getCode());
             customer.setCreateTime(LocalDateTime.now());
             customer.setModifyTime(customer.getCreateTime());
             customer.setSourceChannel("auto_register");
@@ -882,10 +892,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             }
             customer.setContactsPhone(updateInput.getContactsPhone());
         }
-        if (Objects.isNull(customer.getIsCertification()) || !YesOrNoEnum.YES.getCode().equals(customer.getIsCertification())){
-            customer.setName(updateInput.getName());
-        }
-        customer.setState(updateInput.getState());
         //更改市场归属信息
         CustomerMarket customerMarket = customerMarketService.queryByMarketAndCustomerId(updateInput.getCustomerMarket().getMarketId(), updateInput.getId());
         if (Objects.isNull(customerMarket)) {
@@ -924,6 +930,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             characterTypeService.saveInfo(characterTypeList, customer.getId(), marketId);
             customer.setCharacterTypeList(characterTypeList);
         }
+        customer.setName(updateInput.getName());
         int update = super.update(customer);
         if (update == 0) {
             return BaseOutput.failure("数据已变更，更新失败");
@@ -945,8 +952,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 }
             });
             content.append("客户名称").append(customer.getName()).append(characterType)
-                    .append("手机号:").append(customer.getContactsPhone())
-                    .append("客户状态:").append(CustomerEnum.State.getInstance(customer.getState()).getValue());
+                    .append("手机号:").append(customer.getContactsPhone());
             saveBusinessLogger(customer.getId(), customer.getCode(), content.toString(), "修改渠道:APP", "edit");
         }
         return BaseOutput.success();
@@ -1005,17 +1011,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         condition.setMarketId(marketId);
         PageOutput<List<Customer>> pageOutput = this.listForPage(condition);
         return pageOutput.getData().stream().findFirst().orElse(null);
-    }
-
-    @Override
-    public void updateState(Long customerId, Integer state) {
-        Customer data = get(customerId);
-        if (Objects.nonNull(data)){
-            data.setId(customerId);
-            data.setState(state);
-            updateSelective(data);
-            mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE,customerId, getOperatorUserTicket().getFirmId());
-        }
     }
 
     @Override

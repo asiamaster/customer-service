@@ -1,13 +1,23 @@
 package com.dili.customer.api;
 
 import cn.hutool.json.JSONUtil;
+import com.dili.customer.annotation.UapToken;
+import com.dili.customer.commons.service.BusinessLogRpcService;
+import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.CustomerMarket;
 import com.dili.customer.domain.dto.CustomerMarketDto;
+import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.CustomerMarketService;
+import com.dili.customer.service.CustomerService;
+import com.dili.logger.sdk.annotation.BusinessLogger;
+import com.dili.logger.sdk.base.LoggerContext;
+import com.dili.logger.sdk.glossary.LoggerConstant;
+import com.dili.logger.sdk.util.LoggerUtil;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.uap.sdk.domain.UserTicket;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -29,6 +39,9 @@ import java.util.Optional;
 public class CustomerMarketController {
 
     private final CustomerMarketService customerMarketService;
+    private final BusinessLogRpcService businessLogRpcService;
+    private final UapUserTicket uapUserTicket;
+    private final CustomerService customerService;
 
     /**
      * 获取客户在某个市场的信息
@@ -47,6 +60,7 @@ public class CustomerMarketController {
      * @param marketId 所属市场ID
      * @param nextGrade 想要更新成的等级
      */
+    @UapToken
     @PostMapping("/changeGrade")
     public BaseOutput changeGrade(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam("grade") Integer nextGrade) {
         try {
@@ -60,6 +74,36 @@ public class CustomerMarketController {
         } catch (Exception e) {
             log.error(String.format("更改市场[%d]客户[%d]等级[%s]异常[%s]", marketId, customerId, nextGrade, e.getMessage()), e);
             return BaseOutput.failure();
+        }
+    }
+
+    /**
+     * 更新用户状态,将获取当前登录人所在的市场为客户所属市场
+     * @param customerId 客户ID
+     * @param state      状态值
+     * @return
+     */
+    @UapToken
+    @PostMapping(value = "/updateState")
+    @BusinessLogger(businessType = "customer", operationType = "edit", systemCode = "CUSTOMER")
+    public BaseOutput updateState(@RequestParam("customerId") Long customerId, @RequestParam("state") Integer state) {
+        CustomerEnum.State instance = CustomerEnum.State.getInstance(state);
+        if (Objects.isNull(instance)) {
+            return BaseOutput.failure("目标状态不支持");
+        }
+        UserTicket userTicket = uapUserTicket.getUserTicket();
+        try {
+            Optional<String> s = customerMarketService.updateState(customerId, userTicket.getFirmId(), state);
+            if (s.isPresent()) {
+                return BaseOutput.failure(s.get());
+            }
+            Customer customer = customerService.get(customerId);
+
+            LoggerUtil.buildBusinessLoggerContext(customer.getId(), customer.getCode(), userTicket.getId(), userTicket.getRealName(), userTicket.getFirmId(), String.format("更改客户状态为:%s", instance.getValue()));
+            return BaseOutput.success();
+        } catch (Exception e) {
+            log.error(String.format("更新市场[%s] 客户[%d] 状态为[%s]时异常[%s]", userTicket.getFirmId(), customerId, state, e.getMessage()), e);
+            return BaseOutput.failure("操作异常");
         }
     }
 

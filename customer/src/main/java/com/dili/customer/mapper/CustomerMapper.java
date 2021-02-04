@@ -1,8 +1,8 @@
 package com.dili.customer.mapper;
 
 import com.dili.customer.domain.Customer;
-import com.dili.customer.sdk.domain.dto.CustomerBaseQueryInput;
-import com.dili.customer.sdk.domain.dto.CustomerQueryInput;
+import com.dili.customer.sdk.domain.query.CustomerBaseQueryInput;
+import com.dili.customer.sdk.domain.query.CustomerQueryInput;
 import com.dili.ss.base.MyMapper;
 
 import java.util.List;

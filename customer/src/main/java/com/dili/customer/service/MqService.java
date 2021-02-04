@@ -1,14 +1,19 @@
 package com.dili.customer.service;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.commons.rabbitmq.RabbitMQMessageService;
 import com.dili.customer.domain.Customer;
+import com.dili.customer.sdk.domain.query.CustomerQueryInput;
+import com.dili.ss.domain.PageOutput;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * MQ消息发送辅助类
@@ -36,6 +41,19 @@ public class MqService {
         if (Objects.nonNull(customer)) {
             rabbitMQMessageService.send(exchange, null, JSONObject.toJSONString(customer));
         }
+    }
+
+    /**
+     * 批量异步数据发送MQ
+     * @param exchange
+     * @param customerId
+     * @param marketIds
+     */
+    @Async
+    public void asyncSendCustomerToMq(String exchange, Long customerId, Set<Long> marketIds) {
+        marketIds.forEach(t -> {
+            this.asyncSendCustomerToMq(exchange, customerId, t);
+        });
     }
 
 }
