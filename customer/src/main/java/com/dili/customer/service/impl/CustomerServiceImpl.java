@@ -121,6 +121,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         if (Objects.isNull(baseInfo.getOperatorId())) {
             baseInfo.setOperatorId(getOperatorUserTicket().getId());
         }
+        Optional<String> checkCertificateType = checkCertificateType(baseInfo.getOrganizationType(), baseInfo.getCertificateType());
+        if (checkCertificateType.isPresent()) {
+            return BaseOutput.failure(checkCertificateType.get());
+        }
         //客户归属市场信息
         CustomerMarket marketInfo = new CustomerMarket();
         BeanUtils.copyProperties(baseInfo.getCustomerMarket(),marketInfo);
@@ -530,6 +534,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         Customer condition = new Customer();
         condition.setContactsPhone(cellphone);
         condition.setIsCellphoneValid(YesOrNoEnum.YES.getCode());
+        condition.setIsDelete(YesOrNoEnum.NO.getCode());
         return list(condition);
     }
 
@@ -587,6 +592,10 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         Customer customer = this.get(input.getId());
         if (Objects.isNull(customer) || YesOrNoEnum.YES.getCode().equals(customer.getIsDelete())) {
             return BaseOutput.failure("客户信息不存在");
+        }
+        Optional<String> checkCertificateType = checkCertificateType(input.getOrganizationType(), input.getCertificateType());
+        if (checkCertificateType.isPresent()) {
+            return BaseOutput.failure(checkCertificateType.get());
         }
         //获取当前登录可以对应的账号信息
         Optional<UserAccount> accountCustomer = userAccountService.getByCustomerId(input.getId());
@@ -754,6 +763,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 result = "个人证件号码错误";
                 break;
             }
+            if (Objects.nonNull(customerId)) {
+                input.setId(customerId);
+            }
             input.setOrganizationType(CustomerEnum.OrganizationType.INDIVIDUAL.getCode());
             BaseOutput<Customer> customerBaseOutput = this.completeInfo(input);
             if (!customerBaseOutput.isSuccess()) {
@@ -777,6 +789,9 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         Set<Long> marketIds = new HashSet<>();
         for (CustomerUpdateInput input : inputList) {
             input.setOrganizationType(CustomerEnum.OrganizationType.ENTERPRISE.getCode());
+            if (Objects.nonNull(customerId)) {
+                input.setId(customerId);
+            }
             BaseOutput<Customer> customerBaseOutput = this.completeInfo(input);
             if (!customerBaseOutput.isSuccess()) {
                 result = customerBaseOutput.getMessage();
@@ -785,7 +800,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             marketIds.add(input.getCustomerMarket().getMarketId());
             customerId = customerBaseOutput.getData().getId();
         }
-
         if (StrUtil.isBlank(result)) {
             return BaseOutput.successData(customerId).setMetadata(marketIds);
         }
@@ -1177,6 +1191,29 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
      */
     private void saveBusinessLogger(Long businessId, String businessCode, String content, String notes, String operationType) {
         businessLogRpcService.asyncSave(businessId, businessCode, content, notes, operationType, getOperatorUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
+    }
+
+    /**
+     * 根据组织类型验证证件类型是否合法
+     * @param organizationType 组织类型
+     * @param certificateType 证件类型
+     * @return
+     */
+    private Optional<String> checkCertificateType(String organizationType, String certificateType) {
+        if (StrUtil.isBlank(organizationType) || StrUtil.isBlank(certificateType)) {
+            return Optional.of("证件类型校验参数丢失");
+        }
+        List<DataDictionaryValue> dataDictionaryValueList = null;
+        if (CustomerEnum.OrganizationType.ENTERPRISE.equalsToCode(organizationType)) {
+            dataDictionaryValueList = commonDataService.queryEnterpriseCertificate(null);
+        } else if (CustomerEnum.OrganizationType.INDIVIDUAL.equalsToCode(organizationType)) {
+            dataDictionaryValueList = commonDataService.queryIndividualCertificate(null);
+        }
+        if (CollectionUtil.isEmpty(dataDictionaryValueList)) {
+            return Optional.of("证件类型数据为空");
+        }
+        boolean b = dataDictionaryValueList.stream().anyMatch(t -> Objects.equals(t.getCode().toLowerCase(), certificateType.toLowerCase()));
+        return b ? Optional.empty() : Optional.of("证件类型错误");
     }
 
 }

@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 公共数据获取服务类
@@ -58,7 +60,22 @@ public class CommonDataService {
      * @return
      */
     public List<DataDictionaryValue> queryIndustry(Integer state) {
-        return dataDictionaryRpcService.listByDdCode(DdCodeEnum.customer_business.name(), state, null);
+        return queryIndustry(state, null);
+    }
+
+    /**
+     * 获取经营行业
+     * @param state 状态
+     * @param likeName 名称模糊匹配(由于数据字典不支持模糊查询，所以目前只能在本地循环，字符匹配)
+     * @return
+     */
+    public List<DataDictionaryValue> queryIndustry(Integer state, String likeName) {
+        List<DataDictionaryValue> dataDictionaryValueList = dataDictionaryRpcService.listByDdCode(DdCodeEnum.customer_business.name(), state, null);
+        if (StrUtil.isNotBlank(likeName)) {
+            Pattern p = Pattern.compile(likeName);
+            dataDictionaryValueList = dataDictionaryValueList.stream().filter(t -> p.matcher(t.getName()).find()).collect(Collectors.toList());
+        }
+        return dataDictionaryValueList;
     }
 
     /**

@@ -8,14 +8,14 @@ package com.dili.customer.sdk.constants;
 public interface SecurityConstant {
 
     /**
+     * 客户登录的token发布者
+     */
+    String CUSTOMER_TOKEN_ISSUER = "CUSTOMER_AUTH_TOKEN";
+
+    /**
      * token参数头
      */
     String HEADER = "accessToken";
-
-    /**
-     * JWT签名加密key
-     */
-    String JWT_SIGN_KEY = "userCenter";
 
     /**
      * 登录时，存的用户密码

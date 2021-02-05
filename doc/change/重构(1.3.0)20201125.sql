@@ -166,6 +166,7 @@ create unique index idx_user_account_code on user_account
 ## 迁移原始账号信息到新系统中
 INSERT INTO `dili-customer`.`user_account` (`customer_id`, `certificate_number`, `customer_code`, `cellphone`, `account_name`, `account_code`, `password`, `cellphone_valid`, `is_enable`, `notes`, `changed_pwd_time`, `deleted`, `new_account_id`, `operator_id`, `create_time`, `modify_time`)
 SELECT customer_id,certificate_number,customer_code,account_code,account_name,account_code,`password`,1,is_enable,notes,modify_time,0,null,operator_id,create_time, modify_time FROM dili_user.user_account;
+update `dili-customer`.`customer` set is_cellphone_valid = 1 where id in (select customer_id FROM `dili_user`.`user_account`);
 
 ## 更改附件类型为营业执照
 update attachment set file_type=1;
