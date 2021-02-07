@@ -2,7 +2,6 @@ package com.dili.customer.api;
 
 import cn.hutool.json.JSONUtil;
 import com.dili.customer.annotation.UapToken;
-import com.dili.customer.commons.service.BusinessLogRpcService;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.CustomerMarket;
 import com.dili.customer.domain.dto.CustomerMarketDto;
@@ -12,8 +11,6 @@ import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.CustomerMarketService;
 import com.dili.customer.service.CustomerService;
 import com.dili.logger.sdk.annotation.BusinessLogger;
-import com.dili.logger.sdk.base.LoggerContext;
-import com.dili.logger.sdk.glossary.LoggerConstant;
 import com.dili.logger.sdk.util.LoggerUtil;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
@@ -39,7 +36,6 @@ import java.util.Optional;
 public class CustomerMarketController {
 
     private final CustomerMarketService customerMarketService;
-    private final BusinessLogRpcService businessLogRpcService;
     private final UapUserTicket uapUserTicket;
     private final CustomerService customerService;
 
@@ -55,30 +51,36 @@ public class CustomerMarketController {
     }
 
     /**
-     * 更改客户所在市场的客户等级
+     * 更改客户所在市场的客户等级,将通过当前登录人所在的市场为指定为客户所属市场
      * @param customerId 客户ID
-     * @param marketId 所属市场ID
      * @param nextGrade 想要更新成的等级
      */
     @UapToken
     @PostMapping("/changeGrade")
-    public BaseOutput changeGrade(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam("grade") Integer nextGrade) {
+    @BusinessLogger(businessType = "customer", operationType = "edit", systemCode = "CUSTOMER")
+    public BaseOutput changeGrade(@RequestParam("customerId") Long customerId, @RequestParam("grade") Integer nextGrade) {
+        UserTicket userTicket = uapUserTicket.getUserTicket();
         try {
             CustomerEnum.Grade instance = CustomerEnum.Grade.getInstance(nextGrade);
             if (Objects.nonNull(instance)) {
-                customerMarketService.changeGrade(customerId, marketId, instance);
+                Boolean aBoolean = customerMarketService.changeGrade(customerId, userTicket.getFirmId(), instance);
+                if (aBoolean) {
+                    Customer customer = customerService.get(customerId);
+                    LoggerUtil.buildBusinessLoggerContext(customer.getId(), customer.getCode(), userTicket.getId(), userTicket.getRealName(), userTicket.getFirmId(), String.format("更改客户等级为:%s", instance.getValue()));
+                }
                 return BaseOutput.success();
             } else {
-                return BaseOutput.failure("目标等级不明确").setCode(ResultCode.PARAMS_ERROR);
+                log.warn(String.format("更改市场[%d]客户[%d]的目标等级[%s]不支持", userTicket.getFirmId(), customerId, nextGrade, nextGrade));
+                return BaseOutput.failure("不支持的客户等级").setCode(ResultCode.PARAMS_ERROR);
             }
         } catch (Exception e) {
-            log.error(String.format("更改市场[%d]客户[%d]等级[%s]异常[%s]", marketId, customerId, nextGrade, e.getMessage()), e);
+            log.error(String.format("更改市场[%d]客户[%d]等级[%s]异常[%s]", userTicket.getFirmId(), customerId, nextGrade, e.getMessage()), e);
             return BaseOutput.failure();
         }
     }
 
     /**
-     * 更新用户状态,将获取当前登录人所在的市场为客户所属市场
+     * 更新用户状态,将通过当前登录人所在的市场为指定为客户所属市场
      * @param customerId 客户ID
      * @param state      状态值
      * @return

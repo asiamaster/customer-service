@@ -31,7 +31,7 @@ public interface CustomerMarketService extends BaseService<CustomerMarket, Long>
      * @param marketId 所属市场ID
      * @param nextGrade 想要更新成的等级
      */
-    void changeGrade(Long customerId, Long marketId, CustomerEnum.Grade nextGrade);
+    Boolean changeGrade(Long customerId, Long marketId, CustomerEnum.Grade nextGrade);
 
     /**
      * 根据客户ID查询客户市场归类信息

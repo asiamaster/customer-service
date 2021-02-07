@@ -29,14 +29,13 @@ public interface CustomerMarketRpc {
     BaseOutput<CustomerMarket> getByCustomerAndMarket(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
 
     /**
-     * 更改客户所在市场的客户等级
+     * 更改客户所在市场的客户等级,将通过当前登录人所在的市场为指定为客户所属市场
      * @param customerId 客户ID
-     * @param marketId 所属市场ID
      * @param nextGrade 想要更新成的等级
      * @param uapToken uapToken
      */
     @PostMapping("/api/customerMarket/changeGrade")
-    BaseOutput changeGrade(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId, @RequestParam("grade") Integer nextGrade, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
+    BaseOutput changeGrade(@RequestParam("customerId") Long customerId, @RequestParam("grade") Integer nextGrade, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 
     /**
      * 更新用户状态,将获取当前登录人所在的市场为客户所属市场

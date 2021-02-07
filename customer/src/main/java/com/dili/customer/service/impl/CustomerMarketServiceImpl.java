@@ -48,16 +48,17 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void changeGrade(Long customerId, Long marketId, CustomerEnum.Grade nextGrade) {
+    public Boolean changeGrade(Long customerId, Long marketId, CustomerEnum.Grade nextGrade) {
         CustomerMarket customerMarket = this.queryByMarketAndCustomerId(marketId, customerId);
         if (Objects.nonNull(customerMarket)) {
             Integer gradeCode = customerMarket.getGrade();
             CustomerEnum.Grade grade = CustomerEnum.Grade.getInstance(gradeCode);
             if (Objects.isNull(grade) || grade.next().contains(nextGrade)) {
                 customerMarket.setGrade(nextGrade.getCode());
-                this.update(customerMarket);
+                return this.update(customerMarket) == 1;
             }
         }
+        return false;
     }
 
     @Override
