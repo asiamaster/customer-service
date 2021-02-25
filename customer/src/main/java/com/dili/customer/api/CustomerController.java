@@ -23,7 +23,6 @@ import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import com.dili.ss.exception.AppException;
-import com.google.common.collect.Sets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -269,7 +268,7 @@ public class CustomerController {
     @PostMapping(value="/registerEnterprise")
     public BaseOutput<Customer> registerEnterprise(@Validated({AddView.class, EnterpriseView.class}) @RequestBody EnterpriseCustomerInput customer, BindingResult bindingResult) {
         log.info(String.format("企业客户注册:%s", JSONUtil.toJsonStr(customer)));
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
         try {
@@ -278,11 +277,13 @@ public class CustomerController {
                 mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_ADD_MQ_FANOUT_EXCHANGE, baseOutput.getData().getId(), customer.getCustomerMarket().getMarketId());
             }
             return baseOutput;
+        } catch (AppException e) {
+            log.error(String.format("企业客户注册:%s 异常:%s", JSONUtil.toJsonStr(customer), e.getMessage()), e);
+            return BaseOutput.failure(e.getMessage());
         } catch (Exception e) {
             log.error(String.format("企业客户注册:%s 异常:%s", JSONUtil.toJsonStr(customer), e.getMessage()), e);
             return BaseOutput.failure("系统异常");
         }
-
     }
 
     /**
@@ -305,6 +306,9 @@ public class CustomerController {
                 mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_ADD_MQ_FANOUT_EXCHANGE, baseOutput.getData().getId(), input.getCustomerMarket().getMarketId());
             }
             return baseOutput;
+        } catch (AppException e) {
+            log.error(String.format("个人客户注册:%s 异常:%s", JSONUtil.toJsonStr(customer), e.getMessage()), e);
+            return BaseOutput.failure(e.getMessage());
         } catch (Exception e) {
             log.error(String.format("个人客户注册:%s 异常:%s", JSONUtil.toJsonStr(customer), e.getMessage()), e);
             return BaseOutput.failure("系统异常");

@@ -159,7 +159,11 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 }
                 customer = new Customer();
                 BeanUtils.copyProperties(baseInfo, customer);
-                customer.setCode(getCustomerCode());
+                String customerCode = getCustomerCode();
+                if (StrUtil.isBlank(customerCode)) {
+                    throw new AppException(ResultCode.APP_ERROR, "编号服务异常");
+                }
+                customer.setCode(customerCode);
                 customer.setCreatorId(baseInfo.getOperatorId());
                 customer.setCreateTime(LocalDateTime.now());
                 customer.setModifyTime(customer.getCreateTime());
@@ -870,7 +874,11 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     public void defaultRegister(Customer customer) {
         if (Objects.nonNull(customer)) {
             customer.setIsDelete(YesOrNoEnum.NO.getCode());
-            customer.setCode(getCustomerCode());
+            String customerCode = getCustomerCode();
+            if (StrUtil.isBlank(customerCode)) {
+                throw new AppException(ResultCode.APP_ERROR, "编号服务异常");
+            }
+            customer.setCode(customerCode);
             customer.setCreateTime(LocalDateTime.now());
             customer.setModifyTime(customer.getCreateTime());
             customer.setSourceChannel("auto_register");

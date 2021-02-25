@@ -12,6 +12,7 @@ import com.dili.customer.rpc.WeChatRpc;
 import com.dili.customer.service.WeChatService;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.exception.AppException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -106,7 +107,15 @@ public class WeChatController {
     @PostMapping(value = "/weChatRegister")
     public BaseOutput weChatRegister(@RequestBody WeChatRegisterDto dto) {
         log.info(String.format("微信一键注册参数:%s", JSONUtil.toJsonStr(dto)));
-        return weChatService.weChatRegister(dto, false);
+        try {
+            return weChatService.weChatRegister(dto, false);
+        } catch (AppException e) {
+            log.error(String.format("微信一键注册失败:%s 异常:%s", JSONUtil.toJsonStr(dto), e.getMessage()), e);
+            return BaseOutput.failure(e.getMessage());
+        } catch (Exception e) {
+            log.error(String.format("微信一键注册失败:%s 异常:%s", JSONUtil.toJsonStr(dto), e.getMessage()), e);
+            return BaseOutput.failure("系统异常");
+        }
     }
 
     /**
@@ -117,6 +126,14 @@ public class WeChatController {
     @PostMapping(value = "/registerAndLogin")
     public BaseOutput registerAndLogin(@RequestBody WeChatRegisterDto dto) {
         log.info(String.format("微信一键注册登录参数:%s", JSONUtil.toJsonStr(dto)));
-        return weChatService.weChatRegister(dto, true);
+        try {
+            return weChatService.weChatRegister(dto, true);
+        } catch (AppException e) {
+            log.error(String.format("微信一键注册登录失败:%s 异常:%s", JSONUtil.toJsonStr(dto), e.getMessage()), e);
+            return BaseOutput.failure(e.getMessage());
+        } catch (Exception e) {
+            log.error(String.format("微信一键注册登录失败:%s 异常:%s", JSONUtil.toJsonStr(dto), e.getMessage()), e);
+            return BaseOutput.failure("系统异常");
+        }
     }
 }
