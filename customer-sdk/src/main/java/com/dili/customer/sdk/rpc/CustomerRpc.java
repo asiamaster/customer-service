@@ -162,14 +162,15 @@ public interface CustomerRpc {
     BaseOutput<CustomerExtendDto> getByCertificateNumber(@RequestParam("certificateNumber") String certificateNumber, @RequestParam("marketId") Long marketId);
 
     /**
-     * 更新用户手机验证结果
+     * 验证客户手机验证码
+     * 如果验证通过，则更改是已认证
      * @param customerId 客户ID
      * @param cellphone  手机号
-     * @param valid 是否认证有效-true:是
+     * @param verificationCode 验证码
      * @return
      */
-    @PostMapping(value = "/api/customer/updateCellphoneValid")
-    BaseOutput<Boolean> updateCellphoneValid(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone, @RequestParam("valid") Boolean valid, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
+    @PostMapping(value = "/api/customer/verificationCellPhone")
+    BaseOutput<Boolean> verificationCellPhone(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone, @RequestParam("verificationCode") String verificationCode, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 
     /**
      * 获取被某手机号验证的客户

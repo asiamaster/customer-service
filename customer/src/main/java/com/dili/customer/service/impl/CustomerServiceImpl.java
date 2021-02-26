@@ -1043,6 +1043,40 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         this.update(customer);
     }
 
+    @Override
+    public BaseOutput<Customer> getSingleValidatedCellphoneCustomer(String cellphone) {
+        List<Customer> customerList = this.getValidatedCellphoneCustomer(cellphone);
+        if (CollectionUtil.isNotEmpty(customerList)) {
+            if (customerList.size() > 1) {
+                return BaseOutput.failure("数据有误,手机号已被多个客户实名");
+            }
+            return BaseOutput.successData(customerList.get(0));
+        }
+        return BaseOutput.success();
+    }
+
+    @Override
+    public Optional<String> verificationCellPhone(String cellphone, Long customerId, String verificationCode) {
+        BaseOutput<Customer> validatedCellphoneCustomer = this.getSingleValidatedCellphoneCustomer(cellphone);
+        if (validatedCellphoneCustomer.isSuccess()) {
+            if (Objects.nonNull(validatedCellphoneCustomer.getData())) {
+                if (validatedCellphoneCustomer.getData().getId().equals(customerId)) {
+                    return Optional.of("此手机号已被该客户认证");
+                } else {
+                    return Optional.of("您的联系电话系统已存在，请更换其他号码，谢谢！");
+                }
+            }
+            Optional<String> result = commonDataService.checkVerificationCode(cellphone, CustomerConstant.COMMON_SCENE_CODE, verificationCode);
+            if (result.isEmpty()) {
+                return Optional.of(updateCellphoneValid(customerId, cellphone));
+            } else {
+                return Optional.of(result.get());
+            }
+        } else {
+            return Optional.of(validatedCellphoneCustomer.getMessage());
+        }
+    }
+
     /**
      * 生成客户经营品类数据
      * @param customer 客户信息对象

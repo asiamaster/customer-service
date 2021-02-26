@@ -328,26 +328,29 @@ public class CustomerController {
     }
 
     /**
-     * 更新用户手机验证结果
+     * 验证客户手机验证码
+     * 如果验证通过，则更改是已认证
      * @param customerId 客户ID
      * @param cellphone  手机号
+     * @param verificationCode 验证码
      * @return
      */
     @UapToken
-    @PostMapping(value = "/updateCellphoneValid")
-    public BaseOutput<Boolean> updateCellphoneValid(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone) {
-        log.info(String.format("客户【%s】手机号【%s】认证", customerId, cellphone));
+    @PostMapping(value = "/verificationCellPhone")
+    public BaseOutput<Boolean> verificationCellPhone(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone, @RequestParam("verificationCode") String verificationCode) {
+        log.info(String.format("客户【%s】手机号【%s】认证 验证码 【%s】", customerId, cellphone, verificationCode));
         try {
-            String result = customerService.updateCellphoneValid(customerId, cellphone);
-            if (StrUtil.isNotBlank(result)) {
-                return BaseOutput.failure(result).setData(false);
+            Optional<String> s = customerService.verificationCellPhone(cellphone, customerId, verificationCode);
+            if (s.isPresent()) {
+                return BaseOutput.failure(s.get()).setData(false);
             }
             return BaseOutput.successData(true);
         } catch (Exception e) {
-            log.error(String.format("客户【%s】手机号【%s】认证异常:%s", customerId, cellphone, e.getMessage()), e);
+            log.error(String.format("客户【%s】手机号【%s】验证码【%s】认证异常:%s", customerId, cellphone, verificationCode, e.getMessage()), e);
             return BaseOutput.failure("系统异常");
         }
     }
+
 
     /**
      * 获取被某手机号验证的客户
@@ -357,14 +360,7 @@ public class CustomerController {
     @PostMapping(value = "/getValidatedCellphoneCustomer")
     public BaseOutput<Customer> getValidatedCellphoneCustomer(@RequestParam("cellphone") String cellphone) {
         log.info(String.format("获取被手机号【%s】验证的客户", cellphone));
-        List<Customer> customerList = customerService.getValidatedCellphoneCustomer(cellphone);
-        if (CollectionUtil.isNotEmpty(customerList)) {
-            if (customerList.size() > 1) {
-                return BaseOutput.failure("数据有误,手机号已被多个客户实名");
-            }
-            return BaseOutput.successData(customerList.get(0));
-        }
-        return BaseOutput.success();
+        return customerService.getSingleValidatedCellphoneCustomer(cellphone);
     }
 
     /**

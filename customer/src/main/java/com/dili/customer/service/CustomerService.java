@@ -165,4 +165,20 @@ public interface CustomerService extends BaseService<Customer, Long> {
      */
     void logicDelete(Long customerId);
 
+    /**
+     * 根据手机获取单个已验证该手机号的客户
+     * @param cellphone 手机号
+     * @return
+     */
+    BaseOutput<Customer> getSingleValidatedCellphoneCustomer(String cellphone);
+
+    /**
+     * 验证客户手机号
+     * @param cellphone 手机号
+     * @param customerId  客户ID
+     * @param verificationCode 验证码
+     * @return
+     */
+    Optional<String> verificationCellPhone(String cellphone, Long customerId, String verificationCode);
+
 }
