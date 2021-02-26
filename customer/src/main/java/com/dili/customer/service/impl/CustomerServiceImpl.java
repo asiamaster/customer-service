@@ -1068,7 +1068,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             }
             Optional<String> result = commonDataService.checkVerificationCode(cellphone, CustomerConstant.COMMON_SCENE_CODE, verificationCode);
             if (result.isEmpty()) {
-                return Optional.of(updateCellphoneValid(customerId, cellphone));
+                return Optional.ofNullable(updateCellphoneValid(customerId, cellphone));
             } else {
                 return Optional.of(result.get());
             }

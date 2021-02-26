@@ -1,5 +1,6 @@
 package com.dili.customer.service.remote;
 
+import cn.hutool.json.JSONUtil;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.uid.sdk.rpc.feign.UidFeignRpc;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +29,12 @@ public class UidRpcService {
             BaseOutput<String> stringBaseOutput = uidFeignRpc.getBizNumber(type);
             if (stringBaseOutput.isSuccess()) {
                 return stringBaseOutput.getData();
+            } else {
+                log.warn(String.format("根据类型【%s】获取编号失败:%s", JSONUtil.toJsonStr(stringBaseOutput)));
             }
         } catch (Exception e) {
             log.error(String.format("根据类型【%s】获取编号异常:%s", type, e.getMessage()), e);
         }
         return null;
     }
-
 }
