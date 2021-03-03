@@ -41,7 +41,7 @@
     </sql>
     <select id="selectByQuery" parameterType="com.dili.customer.sdk.dto.RelatedQuery" resultMap="BaseResultMap">
         SELECT parent, count(customer_id) as customer_count,
-        (SELECT department_id FROM customer_market WHERE customer_id = r.parent and market_id = #{marketId}) as department_id, modify_time
+        (SELECT department_id FROM customer_market WHERE customer_id = r.parent and market_id = #{marketId}) as department_id, max(modify_time) modify_time
         FROM related r
         WHERE market_id = #{marketId}
         <if test="null != ids and ids.size()>0">
@@ -65,6 +65,5 @@
             </foreach>
         </if>
         GROUP BY parent
-        ORDER BY modify_time desc
     </select>
 </mapper>
