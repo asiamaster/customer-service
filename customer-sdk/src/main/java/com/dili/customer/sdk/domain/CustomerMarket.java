@@ -50,7 +50,6 @@ public class CustomerMarket extends BaseDomain {
     /**
      * 所有者
      */
-    @NotNull(message = "客户所属人不能为空", groups = {UpdateView.class})
     private Long ownerId;
 
     /**

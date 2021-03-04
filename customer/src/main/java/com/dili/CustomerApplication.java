@@ -25,6 +25,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 public class CustomerApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
+        System.setProperty("druid.mysql.usePingMethod","false");
         SpringApplication.run(CustomerApplication.class, args);
     }
 
