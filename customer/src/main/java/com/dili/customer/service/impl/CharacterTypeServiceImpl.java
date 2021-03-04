@@ -3,6 +3,7 @@ package com.dili.customer.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import com.dili.customer.domain.CharacterType;
+import com.dili.customer.domain.query.CharacterTypeQuery;
 import com.dili.customer.mapper.CharacterTypeMapper;
 import com.dili.customer.service.CharacterTypeService;
 import com.dili.ss.base.BaseServiceImpl;
@@ -30,7 +31,7 @@ public class CharacterTypeServiceImpl extends BaseServiceImpl<CharacterType, Lon
     @Override
     public List<CharacterType> listByCustomerAndMarket(Set<Long> customerSets, Long marketId) {
         if (CollectionUtil.isNotEmpty(customerSets) && Objects.nonNull(marketId)) {
-            CharacterType characterType = new CharacterType();
+            CharacterTypeQuery characterType = new CharacterTypeQuery();
             characterType.setCustomerIdSet(customerSets);
             characterType.setMarketId(marketId);
             return this.listByExample(characterType);

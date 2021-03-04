@@ -68,11 +68,4 @@ public class CharacterType extends BaseDomain {
     @DateTimeFormat(pattern = "yyyy-MM-dd HHm:m:ss")
     private LocalDateTime modifyTime;
 
-    /**
-     * 客户数据群
-     */
-    @Transient
-    @Column(name = "customer_id")
-    @Operator(Operator.IN)
-    private Set<Long> customerIdSet;
 }
