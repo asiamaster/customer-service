@@ -109,14 +109,12 @@ public class DepartmentRpcService {
      * @return 部门信息结果集
      */
     public List<Department> getByIds(Set<Long> idSet) {
-        if (CollectionUtil.isNotEmpty(idSet)) {
+        if (CollectionUtil.isEmpty(idSet)) {
             return Collections.emptyList();
         }
         try {
             DepartmentDto departmentDto = DTOUtils.newInstance(DepartmentDto.class);
             departmentDto.setIds(idSet.stream().map(t -> String.valueOf(t)).collect(Collectors.toList()));
-            departmentRpc.listByExample(departmentDto);
-
             BaseOutput<List<Department>> baseOutput = departmentRpc.listByExample(departmentDto);
             if (baseOutput.isSuccess()) {
                 return baseOutput.getData();
