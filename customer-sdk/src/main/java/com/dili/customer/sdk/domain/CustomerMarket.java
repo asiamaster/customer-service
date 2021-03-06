@@ -38,9 +38,9 @@ public class CustomerMarket extends BaseDomain {
     private Long marketId;
 
     /**
-     * 归属部门##内部创建归属到创建员工的部门
+     * 归属部门##内部创建归属到创建员工的部门，多个以逗号隔开
      */
-    private Long departmentId;
+    private String departmentId;
 
     /**
      * 客户id
@@ -48,9 +48,9 @@ public class CustomerMarket extends BaseDomain {
     private Long customerId;
 
     /**
-     * 所有者
+     * 客户所有者,多个以逗号分隔
      */
-    private Long ownerId;
+    private String ownerId;
 
     /**
      * 客户等级

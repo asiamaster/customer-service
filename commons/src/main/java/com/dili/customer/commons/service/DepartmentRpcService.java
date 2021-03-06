@@ -16,10 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author yuehongbo
@@ -104,5 +102,31 @@ public class DepartmentRpcService {
         return Optional.empty();
     }
 
+
+    /**
+     * 根据部门ID信息
+     * @param idSet 部门ID集
+     * @return 部门信息结果集
+     */
+    public List<Department> getByIds(Set<Long> idSet) {
+        if (CollectionUtil.isNotEmpty(idSet)) {
+            return Collections.emptyList();
+        }
+        try {
+            DepartmentDto departmentDto = DTOUtils.newInstance(DepartmentDto.class);
+            departmentDto.setIds(idSet.stream().map(t -> String.valueOf(t)).collect(Collectors.toList()));
+            departmentRpc.listByExample(departmentDto);
+
+            BaseOutput<List<Department>> baseOutput = departmentRpc.listByExample(departmentDto);
+            if (baseOutput.isSuccess()) {
+                return baseOutput.getData();
+            } else {
+                log.error(String.format("根据id集【%s】查询部门失败:%s", StrUtil.join(",", idSet), baseOutput.getMessage()));
+            }
+        } catch (Exception e) {
+            log.error(String.format("根据id集【%s】查询部门异常:%s", StrUtil.join(",", idSet), e.getMessage()), e);
+        }
+        return Collections.emptyList();
+    }
 
 }

@@ -32,4 +32,14 @@ public interface CustomerConstant {
      * 本地缓存前缀
      */
     String CACHE_KEY = "customer_cache";
+
+    /**
+     * 客户按归属部门权限隔离
+     */
+    String customer_department_auth = "customer_department_auth";
+
+    /**
+     * 客户按归属人权限隔离
+     */
+    String customer_owner_auth = "customer_owner_auth";
 }

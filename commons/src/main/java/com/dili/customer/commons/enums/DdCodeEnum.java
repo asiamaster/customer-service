@@ -29,6 +29,10 @@ public enum DdCodeEnum {
      * 客户行业
      */
     customer_business,
+    /**
+     * 客户数据权限隔离配置
+     */
+    customer_data_auth,
     ;
 
 }

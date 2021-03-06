@@ -1198,16 +1198,18 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customerMarket.setMetadata("businessNatureValue", first.get().getName());
             }
         }
-        if (Objects.nonNull(customerMarket.getOwnerId())) {
-            Optional<User> userById = uapUserRpcService.getUserById(customerMarket.getOwnerId());
-            if (userById.isPresent()) {
-                customerMarket.setMetadata("userRealName", userById.get().getRealName());
+        if (StrUtil.isNotBlank(customerMarket.getOwnerId())) {
+            List<String> collect = Arrays.stream(customerMarket.getOwnerId().split(",")).map(String::toString).collect(Collectors.toList());
+            List<User> userList = uapUserRpcService.listUserByIds(collect);
+            if (CollectionUtil.isNotEmpty(userList)) {
+                customerMarket.setMetadata("userRealName", userList.stream().map(User::getRealName).collect(Collectors.joining(",")));
             }
         }
-        if (Objects.nonNull(customerMarket.getDepartmentId())) {
-            Optional<Department> departmentById = departmentRpcService.getById(customerMarket.getDepartmentId());
-            if (departmentById.isPresent()) {
-                customerMarket.setMetadata("departmentName", departmentById.get().getName());
+        if (StrUtil.isNotBlank(customerMarket.getDepartmentId())) {
+            Set<Long> collect = Arrays.stream(customerMarket.getDepartmentId().split(",")).map(Long::parseLong).collect(Collectors.toSet());
+            List<Department> departmentList = departmentRpcService.getByIds(collect);
+            if (CollectionUtil.isNotEmpty(departmentList)) {
+                customerMarket.setMetadata("departmentName", departmentList.stream().map(Department::getName).collect(Collectors.joining(",")));
             }
         }
         if (Objects.nonNull(customerMarket.getBusinessRegionTag())) {

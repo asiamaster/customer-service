@@ -16,9 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author yuehongbo
@@ -86,5 +84,46 @@ public class DataDictionaryRpcService {
             log.error(String.format("根据ddCode【%s】及状态【%s】以及市场【%d】查询数据字典异常:%s", ddCode, state, marketId, e.getMessage()), e);
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * 根据条件查询数据字典信息
+     * @param ddCode 数据字典值
+     * @param state  字典值状态 1-启用
+     * @param marketId 数据字典值是否按市场隔离，如果为空，则不按市场隔离，否则按传入的具体市场id进行数据查询
+     * @return
+     */
+    public Optional<DataDictionaryValue> getByDdCodeAndCode(String ddCode, String code, Integer state, Long marketId) {
+        try {
+            StringJoiner keyJoiner = new StringJoiner("_");
+            keyJoiner.add(CustomerConstant.CACHE_KEY);
+            keyJoiner.add(ddCode);
+            keyJoiner.add(code);
+            DataDictionaryValue dataDictionaryValue = DTOUtils.newInstance(DataDictionaryValue.class);
+            dataDictionaryValue.setDdCode(ddCode);
+            dataDictionaryValue.setCode(code);
+            if (Objects.nonNull(state)) {
+                dataDictionaryValue.setState(state);
+                keyJoiner.add(String.valueOf(state));
+            }
+            if (Objects.nonNull(marketId)) {
+                dataDictionaryValue.setFirmId(marketId);
+                keyJoiner.add(String.valueOf(marketId));
+            }
+            String str = caffeineTimedCache.get(keyJoiner.toString(), t -> {
+                BaseOutput<List<DataDictionaryValue>> listBaseOutput = dataDictionaryRpc.listDataDictionaryValue(dataDictionaryValue);
+                if (listBaseOutput.isSuccess() && CollectionUtil.isNotEmpty(listBaseOutput.getData())) {
+                    return JSONObject.toJSONString(listBaseOutput.getData().get(0));
+                }
+                return null;
+            });
+            if (StrUtil.isNotBlank(str)) {
+                DataDictionaryValue dto = JSONObject.parseObject(str, DataDictionaryValue.class);
+                return Optional.ofNullable(dto);
+            }
+        } catch (Exception e) {
+            log.error(String.format("根据ddCode【%s】及状态【%s】以及市场【%d】查询数据字典异常:%s", ddCode, state, marketId, e.getMessage()), e);
+        }
+        return Optional.empty();
     }
 }

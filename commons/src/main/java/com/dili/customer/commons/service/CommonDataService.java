@@ -2,6 +2,7 @@ package com.dili.customer.commons.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import com.dili.commons.glossary.EnabledStateEnum;
 import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.customer.commons.enums.DdCodeEnum;
 import com.dili.customer.sdk.domain.CharacterType;
@@ -94,6 +95,26 @@ public class CommonDataService {
      */
     public List<DataDictionaryValue> queryEnterpriseCertificate(Integer state) {
         return dataDictionaryRpcService.listByDdCode(DdCodeEnum.enterprise_certificate.name(), state, null);
+    }
+
+    /**
+     * 根据市场id，获取并返回当前市场的客户查询，是否按归属部门过滤
+     * @param marketId 市场ID
+     * @return true-按部门隔离
+     */
+    public Boolean checkCustomerDepartmentAuth(Long marketId) {
+        Optional<DataDictionaryValue> byDdCodeAndCode = dataDictionaryRpcService.getByDdCodeAndCode(DdCodeEnum.customer_data_auth.name(), CustomerConstant.customer_department_auth, EnabledStateEnum.ENABLED.getCode(), marketId);
+        return byDdCodeAndCode.isPresent();
+    }
+
+    /**
+     * 根据市场id，获取并返回当前市场的客户查询，是否按归属人过滤
+     * @param marketId 市场ID
+     * @return true-按归属人隔离
+     */
+    public Boolean checkCustomerOwnerAuth(Long marketId) {
+        Optional<DataDictionaryValue> byDdCodeAndCode = dataDictionaryRpcService.getByDdCodeAndCode(DdCodeEnum.customer_data_auth.name(), CustomerConstant.customer_owner_auth, EnabledStateEnum.ENABLED.getCode(), marketId);
+        return byDdCodeAndCode.isPresent();
     }
 
     /**
