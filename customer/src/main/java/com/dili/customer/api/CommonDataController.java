@@ -1,22 +1,27 @@
 package com.dili.customer.api;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.dili.customer.annotation.UapToken;
 import com.dili.customer.commons.service.CommonDataService;
 import com.dili.customer.commons.service.DataDictionaryRpcService;
+import com.dili.customer.commons.service.DepartmentRpcService;
+import com.dili.customer.commons.service.UapUserRpcService;
 import com.dili.customer.commons.util.EnumUtil;
+import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.sdk.domain.dto.CharacterTypeGroupDto;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.sdk.enums.NationEnum;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.dto.DTOUtils;
 import com.dili.uap.sdk.domain.DataDictionaryValue;
+import com.dili.uap.sdk.domain.Department;
+import com.dili.uap.sdk.domain.UserTicket;
+import com.dili.uap.sdk.domain.dto.UserQuery;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -36,6 +41,9 @@ public class CommonDataController {
 
     private final CommonDataService commonDataService;
     private final DataDictionaryRpcService dataDictionaryRpcService;
+    private final DepartmentRpcService departmentRpcService;
+    private final UapUserTicket uapUserTicket;
+    private final UapUserRpcService uapUserRpcService;
 
     /**
      * 查询经营性质(用户类型)
@@ -150,6 +158,47 @@ public class CommonDataController {
     @PostMapping(value = "/listOrganizationType")
     public BaseOutput listOrganizationType() {
         return BaseOutput.successData(EnumUtil.toObject(CustomerEnum.OrganizationType.class));
+    }
+
+    /**
+     * 获取有权限的部门信息
+     * @return
+     */
+    @UapToken
+    @RequestMapping(value = "/listAuthDepartment", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public BaseOutput<List<Department>> listAuthDepartment() {
+        try {
+            UserTicket userTicket = uapUserTicket.getUserTicket();
+            Boolean aBoolean = commonDataService.checkCustomerDepartmentAuth(userTicket.getFirmId());
+            List<Department> departmentList = departmentRpcService.listData(aBoolean, userTicket.getId(), userTicket.getFirmId());
+            return BaseOutput.successData(departmentList);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return BaseOutput.failure();
+        }
+    }
+
+    /**
+     * 根据部门获取对应的uap用户信息
+     * @return
+     */
+    @UapToken
+    @RequestMapping(value = "/listUapUserByDepIds", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public BaseOutput listUapUserByDepIds(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("departmentIds")) {
+            return BaseOutput.failure("部门参数不能为空");
+        }
+        List<Long> departmentIdList = (List<Long>) params.get("departmentIds");
+        if (CollectionUtil.isEmpty(departmentIdList)) {
+            return BaseOutput.success();
+        }
+        UserTicket userTicket = uapUserTicket.getUserTicket();
+        UserQuery userQuery = DTOUtils.newInstance(UserQuery.class);
+        userQuery.setFirmCode(userTicket.getFirmCode());
+        userQuery.setDepartmentIds(departmentIdList);
+        return BaseOutput.successData(uapUserRpcService.listByExample(userQuery));
     }
 
 }
