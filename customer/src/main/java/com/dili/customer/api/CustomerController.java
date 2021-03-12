@@ -69,6 +69,21 @@ public class CustomerController {
     }
 
     /**
+     * 分页查询客户数据集,此方法需要传入uap登录后的token
+     * @param customer 查询条件
+     * @return
+     */
+    @UapToken
+    @PostMapping(value="/listPageWithAuth")
+    public PageOutput<List<Customer>> listPageWithAuth(@RequestBody CustomerQueryInput customer) {
+        log.info(String.format("客户listPageWithAuth查询:%s", JSONUtil.toJsonStr(customer)));
+        if (Objects.isNull(customer.getMarketId())) {
+            return PageOutput.failure("客户所属市场不能为空");
+        }
+        return customerService.listForPage(customer);
+    }
+
+    /**
      * 分页查询正常的客户数据集
      * 用户未删除切状态为生效的
      * @param customer
@@ -102,6 +117,23 @@ public class CustomerController {
             return PageOutput.failure("客户所属市场不能为空");
         }
         return customerService.listSimpleForPage(customer);
+    }
+
+    /**
+     * 分页查询简单客户数据集
+     * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * 如不关心客户的理货区、车辆、图片等附加数据，建议用此接口
+     * @param customer
+     * @return
+     */
+    @UapToken
+    @PostMapping(value="/listSimplePageWithAuth")
+    public PageOutput<List<Customer>> listSimplePageWithAuth(@RequestBody CustomerQueryInput customer) {
+        log.info(String.format("listSimplePageWithAuth:%s", JSONUtil.toJsonStr(customer)));
+        if (Objects.isNull(customer.getMarketId())) {
+            return PageOutput.failure("客户所属市场不能为空");
+        }
+        return customerService.listSimpleForPageWithAuth(customer);
     }
 
     /**
@@ -322,6 +354,7 @@ public class CustomerController {
      * @param marketId 市场ID
      * @return 如果客户在当前市场已存在，则返回错误(false)信息，如果不存在，则返回客户信息(若客户信息存在)
      */
+    @UapToken
     @PostMapping(value="/checkExistByNoAndMarket")
     public BaseOutput<Customer> checkExistByNoAndMarket(@RequestParam(value = "certificateNumber") String certificateNumber,@RequestParam(value = "marketId") Long marketId) {
         return customerService.checkExistByNoAndMarket(certificateNumber,marketId);

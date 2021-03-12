@@ -42,7 +42,7 @@
         <result column="marketCreateTime" property="customerMarket.createTime"/>
         <result column="marketCreatorId" property="customerMarket.creatorId"/>
         <result column="grade" property="customerMarket.grade"/>
-        <result column="department_id" property="customerMarket.departmentId"/>
+        <result column="department_ids" property="customerMarket.departmentIds"/>
         <result column="profession" property="customerMarket.profession"/>
         <result column="profession_name" property="customerMarket.professionName" />
         <result column="business_nature" property="customerMarket.businessNature" />
@@ -52,7 +52,7 @@
         <result column="approval_status" property="customerMarket.approvalStatus" />
         <result column="approval_time" property="customerMarket.approvalTime" />
         <result column="approval_user_id" property="customerMarket.approvalUserId" />
-        <result column="owner_id" property="customerMarket.ownerId" />
+        <result column="owner_ids" property="customerMarket.ownerIds" />
     </resultMap>
 
     <!-- 公共查询customer 单表 条件 -->
@@ -125,8 +125,8 @@
         SELECT
         c.*,
         cm.id as customerMarketId, cm.market_id,cm.create_time as marketCreateTime,cm.creator_id AS marketCreatorId,
-        cm.grade,cm.department_id,cm.profession,cm.profession_name,cm.sales_market,cm.business_nature,cm.approval_status,
-        cm.approval_user_id,cm.approval_time,cm.owner_id,cm.business_region_tag,cm.state AS marketState
+        cm.grade,cm.department_ids,cm.profession,cm.profession_name,cm.sales_market,cm.business_nature,cm.approval_status,
+        cm.approval_user_id,cm.approval_time,cm.owner_ids,cm.business_region_tag,cm.state AS marketState
         FROM
         customer c,customer_market cm
         where c.id = cm.customer_id
@@ -173,11 +173,18 @@
             )
         </if>
         <if test="null != customerMarket">
+            <if test="null != customerMarket.departmentIdSet and customerMarket.departmentIdSet.size() >0 ">
+                <!-- 按照部门权限过滤，需要比对传入的权限部门id 与 已存在的客户归属部门，需要存在交集，则此条数据才能被检索到 -->
+                and (concat(',',cm.department_ids,',') regexp concat(',',replace(#{customerMarket.metadata.departmentIdsStr},',',',|,'),',') = 1 or cm.department_ids is null)
+            </if>
             <if test="null != customerMarket.salesMarket and ''!=customerMarket.salesMarket">
                 and cm.sales_market = #{customerMarket.salesMarket}
             </if>
-            <if test="customerMarket.departmentId != null and customerMarket.departmentId !=''">
-                and FIND_IN_SET(#{customerMarket.departmentId}, cm.department_id)
+            <if test="customerMarket.departmentIds != null and customerMarket.departmentIds !=''">
+                and FIND_IN_SET(#{customerMarket.departmentIds}, cm.department_ids)
+            </if>
+            <if test="customerMarket.ownerIds != null and customerMarket.ownerIds !=''">
+                and (FIND_IN_SET(#{customerMarket.ownerIds}, cm.owner_id) or cm.owner_ids is null)
             </if>
             <if test="customerMarket.grade != null">
                 and cm.grade = #{customerMarket.grade}

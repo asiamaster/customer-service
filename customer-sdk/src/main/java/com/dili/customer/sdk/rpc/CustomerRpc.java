@@ -47,6 +47,17 @@ public interface CustomerRpc {
      * 分页查询客户数据集
      * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
      * 如不关心客户的理货区、车辆、图片等附加数据，建议用此接口
+     * @param customer 客户信息查询条件
+     * @param uapToken uap登录后的token
+     * @return
+     */
+    @PostMapping(value = "/api/customer/listSimplePageWithAuth")
+    PageOutput<List<CustomerSimpleExtendDto>> listSimplePageWithAuth(@RequestBody CustomerQueryInput customer, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
+
+    /**
+     * 分页查询客户数据集
+     * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * 如不关心客户的理货区、车辆、图片等附加数据，建议用此接口
      * @param customer
      * @return
      */
@@ -81,6 +92,17 @@ public interface CustomerRpc {
      */
     @PostMapping(value = "/api/customer/listSimple")
     BaseOutput<List<CustomerSimpleExtendDto>> listSimple(CustomerQueryInput customer);
+
+    /**
+     * 获取客户列表信息
+     * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * 如不关心客户的理货区、车辆、图片等附加数据，建议用此接口
+     * @param customer 查询条件
+     * @param uapToken uap登录后的token
+     * @return
+     */
+    @PostMapping(value = "/api/customer/listSimpleWithAuth")
+    BaseOutput<List<CustomerSimpleExtendDto>> listSimpleWithAuth(CustomerQueryInput customer,@RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 
     /**
      * 获取客户列表信息
@@ -122,7 +144,7 @@ public interface CustomerRpc {
      * @return 如果客户在当前市场已存在，则返回错误(false)信息，如果不存在，则返回客户信息(若客户信息存在)
      */
     @PostMapping(value = "/api/customer/checkExistByNoAndMarket")
-    BaseOutput<Customer> checkExistByNoAndMarket(@RequestParam(value = "certificateNumber") String certificateNumber,@RequestParam(value = "marketId") Long marketId);
+    BaseOutput<CustomerSimpleExtendDto> checkExistByNoAndMarket(@RequestParam(value = "certificateNumber") String certificateNumber, @RequestParam(value = "marketId") Long marketId, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 
     /**
      * 根据id及市场，查询客户的信息

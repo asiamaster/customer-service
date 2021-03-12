@@ -40,8 +40,8 @@ public class CustomerMarket extends BaseDomain {
     /**
      * 归属部门##内部创建归属到创建员工的部门，多个以逗号隔开
      */
-    @Column(name = "`department_id`")
-    private String departmentId;
+    @Column(name = "`department_ids`")
+    private String departmentIds;
 
     /**
      * 客户id
@@ -52,8 +52,8 @@ public class CustomerMarket extends BaseDomain {
     /**
      * 客户所有者,多个以逗号分隔
      */
-    @Column(name = "`owner_id`")
-    private String ownerId;
+    @Column(name = "`owner_ids`")
+    private String ownerIds;
 
     /**
      * 客户等级

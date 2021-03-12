@@ -2,6 +2,7 @@ package com.dili.customer.commons.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.ss.domain.BaseOutput;
@@ -46,8 +47,13 @@ public class UapUserRpcService {
      * @return
      */
     public List<User> listByExample(UserQuery userQuery) {
-        BaseOutput<List<User>> baseOutput = userRpc.listByExample(userQuery);
-        return baseOutput.isSuccess() ? baseOutput.getData() : Collections.emptyList();
+        try {
+            BaseOutput<List<User>> baseOutput = userRpc.listByExample(userQuery);
+            return baseOutput.isSuccess() ? baseOutput.getData() : Collections.EMPTY_LIST;
+        } catch (Exception e) {
+            log.error(String.format("根据条件:%s 查询UAP用户信息异常:%s", JSONUtil.toJsonStr(userQuery), e.getMessage()), e);
+            return Collections.EMPTY_LIST;
+        }
     }
 
     /**

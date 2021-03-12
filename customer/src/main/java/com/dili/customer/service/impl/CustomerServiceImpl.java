@@ -46,6 +46,7 @@ import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,7 @@ import java.util.stream.Collectors;
  *
  * @author yuehongbo
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> implements CustomerService {
@@ -115,6 +117,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     @Transactional(rollbackFor = Exception.class)
     @BusinessLogger(businessType = "customer", systemCode = "CUSTOMER",operationType = "add")
     public BaseOutput<Customer> register(EnterpriseCustomerInput baseInfo) {
+        UserTicket userTicket = getOperatorUserTicket();
         if (Objects.isNull(baseInfo.getCustomerMarket())){
             return BaseOutput.failure("客户所属市场信息丢失");
         }
@@ -170,7 +173,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customer.setIsDelete(0);
                 customer.setIsCertification(YesOrNoEnum.NO.getCode());
                 super.insertSelective(customer);
-
             } else {
                 if (!customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())) {
                     return BaseOutput.failure("已存在相同证件号的客户").setCode(ResultCode.DATA_ERROR);
@@ -178,6 +180,62 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 //查询客户在当前传入市场的信息
                 CustomerMarket temp = customerMarketService.queryByMarketAndCustomerId(marketInfo.getMarketId(), customer.getId());
                 if (Objects.nonNull(temp)) {
+                    Boolean departmentAuth = commonDataService.checkCustomerDepartmentAuth(marketInfo.getMarketId());
+                    Boolean ownerAuth = commonDataService.checkCustomerOwnerAuth(marketInfo.getMarketId());
+                    if (departmentAuth || ownerAuth) {
+                        if (Objects.isNull(userTicket.getDepartmentId())) {
+                            return BaseOutput.failure("当前市场客户数据已启用部门、归属人权限，您归属部门为空").setCode(ResultCode.NOT_AUTH_ERROR);
+                        }
+                        if (StrUtil.isBlank(temp.getDepartmentIds()) && StrUtil.isBlank(temp.getOwnerIds())) {
+                            return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR);
+                        }
+                        Boolean updateFlag = false;
+                        Set<String> departmentIdSet = Arrays.stream(temp.getDepartmentIds().split(",")).collect(Collectors.toSet());
+                        //查询客户有权限的部门
+                        List<Department> departmentList = departmentRpcService.listUserAuthDepartmentByFirmId(userTicket.getId(), userTicket.getFirmId());
+                        Set<String> departmentIdAuth = departmentList.stream().map(t -> String.valueOf(t.getId())).collect(Collectors.toSet());
+                        if (ownerAuth) {
+                            if (StrUtil.isNotBlank(temp.getOwnerIds())) {
+                                if (!departmentIdAuth.contains(String.valueOf(userTicket))) {
+                                    return BaseOutput.failure("您暂无归属部门的数据权限，不能新增客户");
+                                }
+                                if (!departmentIdSet.contains(String.valueOf(userTicket.getDepartmentId()))) {
+                                    departmentIdSet.add(String.valueOf(userTicket.getDepartmentId()));
+                                }
+                                Set<String> ownerIdSet = Arrays.stream(temp.getOwnerIds().split(",")).collect(Collectors.toSet());
+                                ownerIdSet.add(String.valueOf(userTicket.getId()));
+                                temp.setOwnerIds(ownerIdSet.stream().collect(Collectors.joining(",")));
+                                updateFlag = true;
+                            }
+                        }
+                        if (departmentAuth) {
+                            if (StrUtil.isNotBlank(temp.getDepartmentIds())) {
+                                Set<String> departmentIdTemp = new HashSet<>();
+                                departmentIdTemp.addAll(departmentIdSet);
+                                departmentIdTemp.retainAll(departmentIdAuth);
+                                //已有归属部门与部门权限不存在
+                                if (CollectionUtil.isEmpty(departmentIdTemp) && departmentIdAuth.contains(String.valueOf(userTicket.getDepartmentId()))) {
+                                    departmentIdSet.add(String.valueOf(userTicket.getDepartmentId()));
+                                    updateFlag = true;
+                                } else if (CollectionUtil.isNotEmpty(departmentIdTemp) && departmentIdTemp.contains(String.valueOf(userTicket.getDepartmentId()))) {
+                                    updateFlag = true;
+                                } else {
+                                    return BaseOutput.failure("您暂无归属部门的数据权限，不能新增客户");
+                                }
+                            }
+                        }
+                        if (updateFlag) {
+                            temp.setDepartmentIds(departmentIdSet.stream().collect(Collectors.joining(",")));
+                            customerMarketService.update(temp);
+                            StringBuffer str = new StringBuffer();
+                            str.append(getOperatorUserTicket().getRealName()).append("创建").append(CustomerEnum.OrganizationType.getInstance(customer.getOrganizationType()).getValue())
+                                    .append("客户[").append(customer.getName()).append("]成功");
+                            LoggerUtil.buildBusinessLoggerContext(customer.getId(), customer.getCode(), userTicket.getId(), userTicket.getRealName(), userTicket.getFirmId(), str.toString());
+                            return BaseOutput.success("客户资料维护成功");
+                        } else {
+                            return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR);
+                        }
+                    }
                     return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR);
                 } else {
                     marketInfo.setCreateTime(LocalDateTime.now());
@@ -265,7 +323,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         StringBuffer str = new StringBuffer();
         str.append(getOperatorUserTicket().getRealName()).append("创建").append(CustomerEnum.OrganizationType.getInstance(customer.getOrganizationType()).getValue())
                 .append("客户[").append(customer.getName()).append("]成功");
-        LoggerUtil.buildBusinessLoggerContext(customer.getId(), customer.getCode(), getOperatorUserTicket().getId(), getOperatorUserTicket().getRealName(), getOperatorUserTicket().getFirmId(), str.toString());
+        LoggerUtil.buildBusinessLoggerContext(customer.getId(), customer.getCode(), userTicket.getId(), userTicket.getRealName(), userTicket.getFirmId(), str.toString());
         return BaseOutput.success().setData(customer);
     }
 
@@ -302,6 +360,15 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         }
         output.setData(list).setPageNum(pageNum).setTotal(total).setPageSize(input.getRows()).setPages(totalPage);
         return output;
+    }
+
+    @Override
+    public PageOutput<List<Customer>> listSimpleForPageWithAuth(CustomerQueryInput input) {
+        Optional<CustomerQueryInput> customerQueryInput = produceQueryCondition(input);
+        if (customerQueryInput.isPresent()) {
+            return listSimpleForPage(input);
+        }
+        return PageOutput.success();
     }
 
 
@@ -378,6 +445,15 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     }
 
     @Override
+    public PageOutput<List<Customer>> listForPageWithAuth(CustomerQueryInput input) {
+        Optional<CustomerQueryInput> customerQueryInput = produceQueryCondition(input);
+        if (customerQueryInput.isPresent()) {
+            return listForPage(input);
+        }
+        return PageOutput.success();
+    }
+
+    @Override
     public PageOutput<List<Customer>> listBasePage(CustomerBaseQueryInput input) {
         if (input.getRows() != null && input.getRows() >= 1) {
             PageHelper.startPage(input.getPage(), input.getRows());
@@ -418,7 +494,8 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
         Customer customer = customerList.get(0);
         CustomerMarket customerFirm = customerMarketService.queryByMarketAndCustomerId(marketId, customer.getId());
         if (Objects.nonNull(customerFirm)) {
-            return BaseOutput.failure("该证件号对应的客户已存在").setCode(ResultCode.DATA_ERROR);
+            customer.setCustomerMarket(customerFirm);
+            return BaseOutput.failure("该证件号对应的客户已存在").setCode(ResultCode.DATA_ERROR).setData(customer);
         }
         return BaseOutput.success().setData(customer);
     }
@@ -1078,6 +1155,38 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
     }
 
     /**
+     * 构造按权限过滤的查询条件
+     * @param input
+     * @return
+     */
+    private Optional<CustomerQueryInput> produceQueryCondition(CustomerQueryInput input){
+        UserTicket userTicket = getOperatorUserTicket();
+        com.dili.customer.sdk.domain.CustomerMarket customerMarket = input.getCustomerMarket();
+        if (Objects.isNull(customerMarket)) {
+            customerMarket = new com.dili.customer.sdk.domain.CustomerMarket();
+        }
+        Boolean ownerAuth = commonDataService.checkCustomerOwnerAuth(userTicket.getFirmId());
+        Boolean departmentAuth = commonDataService.checkCustomerDepartmentAuth(userTicket.getFirmId());
+        /**
+         * 归属人权限，需依赖归属部门，人属于部门下
+         * 当要求按归属人隔离时，则需要验证归属部门
+         */
+        if (ownerAuth || departmentAuth) {
+            List<Department> departmentList = departmentRpcService.listUserAuthDepartmentByFirmId(userTicket.getId(), userTicket.getFirmId());
+            if (CollectionUtil.isEmpty(departmentList)) {
+                log.warn(String.format("市场【%s】设置了按部门权限隔离客户数据，用户【%s】没有任何部门权限"), userTicket.getFirmCode(), userTicket.getRealName());
+                return Optional.empty();
+            }
+            Set<Long> collect = departmentList.stream().filter(t -> Objects.nonNull(t.getId())).map(t -> t.getId()).collect(Collectors.toSet());
+            customerMarket.setDepartmentIdSet(collect);
+            if (ownerAuth) {
+                customerMarket.setOwnerIds(String.valueOf(userTicket.getId()));
+            }
+        }
+        return Optional.ofNullable(input);
+    }
+
+    /**
      * 生成客户经营品类数据
      * @param customer 客户信息对象
      */
@@ -1198,15 +1307,15 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customerMarket.setMetadata("businessNatureValue", first.get().getName());
             }
         }
-        if (StrUtil.isNotBlank(customerMarket.getOwnerId())) {
-            List<String> collect = Arrays.stream(customerMarket.getOwnerId().split(",")).map(String::toString).collect(Collectors.toList());
+        if (StrUtil.isNotBlank(customerMarket.getOwnerIds())) {
+            List<String> collect = Arrays.stream(customerMarket.getOwnerIds().split(",")).map(String::toString).collect(Collectors.toList());
             List<User> userList = uapUserRpcService.listUserByIds(collect);
             if (CollectionUtil.isNotEmpty(userList)) {
                 customerMarket.setMetadata("userRealName", userList.stream().map(User::getRealName).collect(Collectors.joining(",")));
             }
         }
-        if (StrUtil.isNotBlank(customerMarket.getDepartmentId())) {
-            Set<Long> collect = Arrays.stream(customerMarket.getDepartmentId().split(",")).map(Long::parseLong).collect(Collectors.toSet());
+        if (StrUtil.isNotBlank(customerMarket.getDepartmentIds())) {
+            Set<Long> collect = Arrays.stream(customerMarket.getDepartmentIds().split(",")).map(Long::parseLong).collect(Collectors.toSet());
             List<Department> departmentList = departmentRpcService.getByIds(collect);
             if (CollectionUtil.isNotEmpty(departmentList)) {
                 customerMarket.setMetadata("departmentName", departmentList.stream().map(Department::getName).collect(Collectors.joining(",")));

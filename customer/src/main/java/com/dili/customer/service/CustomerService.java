@@ -42,11 +42,27 @@ public interface CustomerService extends BaseService<Customer, Long> {
     PageOutput<List<Customer>> listSimpleForPage(CustomerQueryInput input);
 
     /**
+     * 分页查询客户信息，此方法会按照客户市场权限隔离判断
+     * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
+     * @param input 查询条件
+     * @return
+     */
+    PageOutput<List<Customer>> listSimpleForPageWithAuth(CustomerQueryInput input);
+
+    /**
      * 分页查询客户信息
      * @param input
      * @return
      */
     PageOutput<List<Customer>> listForPage(CustomerQueryInput input);
+
+    /**
+     * 分页查询客户信息
+     * 此方法会判断是否有设置部门及归属人等相关的数据权限
+     * @param input
+     * @return
+     */
+    PageOutput<List<Customer>> listForPageWithAuth(CustomerQueryInput input);
 
     /**
      * 分页查询客户基本信息，不带有任何市场属性数据

@@ -7,9 +7,9 @@
     -->
     <id column="id"  property="id" />
     <result column="market_id"  property="marketId" />
-    <result column="department_id"  property="departmentId" />
+    <result column="department_ids"  property="departmentIds" />
     <result column="customer_id"  property="customerId" />
-    <result column="owner_id"  property="ownerId" />
+    <result column="owner_ids"  property="ownerIds" />
     <result column="grade" property="grade" />
     <result column="profession"  property="profession" />
     <result column="profession_name"  property="professionName" />

@@ -2,6 +2,7 @@ package com.dili.customer.commons.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.customer.commons.constants.CustomerConstant;
@@ -40,8 +41,17 @@ public class DepartmentRpcService {
      * @return 部门信息结果集
      */
     public List<Department> listByExample(DepartmentDto departmentDto) {
-        BaseOutput<List<Department>> baseOutput = departmentRpc.listByExample(departmentDto);
-        return baseOutput.isSuccess() ? baseOutput.getData() : null;
+        try {
+            BaseOutput<List<Department>> baseOutput = departmentRpc.listByExample(departmentDto);
+            if (baseOutput.isSuccess()) {
+                return baseOutput.getData();
+            }
+            log.warn(String.format("根据条件【%s】查询部门信息返回失败:%s", JSONUtil.toJsonStr(departmentDto), JSONUtil.toJsonStr(baseOutput)));
+            return Collections.emptyList();
+        } catch (Exception e) {
+            log.error(String.format("根据条件【%s】查询部门异常:%s", JSONUtil.toJsonStr(departmentDto), e.getMessage()), e);
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -125,6 +135,60 @@ public class DepartmentRpcService {
             log.error(String.format("根据id集【%s】查询部门异常:%s", StrUtil.join(",", idSet), e.getMessage()), e);
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * 根据用户ID及市场ID，查询用户在某市场中有权限的部门
+     * @param userId 用户ID
+     * @param marketId 市场ID
+     * @return
+     */
+    public List<Department> listUserAuthDepartmentByFirmId(Long userId, Long marketId) {
+        if (Objects.isNull(marketId) || Objects.isNull(userId)) {
+            return Collections.emptyList();
+        }
+        try {
+            StringJoiner keyBuilder = new StringJoiner("_");
+            keyBuilder.add(CustomerConstant.CACHE_KEY);
+            keyBuilder.add("authDepartment");
+            keyBuilder.add(String.valueOf(userId));
+            keyBuilder.add(String.valueOf(marketId));
+            String str = caffeineTimedCache.get(keyBuilder.toString(), t -> {
+                BaseOutput<List<Department>> baseOutput = departmentRpc.listUserAuthDepartmentByFirmId(userId, marketId);
+                if (baseOutput.isSuccess() && CollectionUtil.isNotEmpty(baseOutput.getData())) {
+                    return JSONObject.toJSONString(baseOutput.getData());
+                }
+                return null;
+            });
+            if (StrUtil.isNotBlank(str)) {
+                List<Department> dto = JSONArray.parseArray(str, Department.class);
+                return dto;
+            }
+        } catch (Exception e) {
+            log.error(String.format("根据用户【%d】市场【%d】查询权限部门异常:%s", userId, marketId, e.getMessage()), e);
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * 查询部门信息，如果查询权限部门，userId为必须，如果查询市场所有部门，则userId 可不传
+     * @param auth 是否查询用户的权限部门，true-是
+     * @param userId 用户ID
+     * @param marketId 市场ID
+     * @return
+     */
+    public List<Department> listData(Boolean auth, Long userId, Long marketId) {
+        if (Objects.isNull(marketId)) {
+            return Collections.emptyList();
+        }
+        if (auth) {
+            if (Objects.isNull(userId)) {
+                return Collections.emptyList();
+            }
+            return listUserAuthDepartmentByFirmId(userId, marketId);
+        } else {
+            return listByMarketId(marketId);
+        }
     }
 
 }

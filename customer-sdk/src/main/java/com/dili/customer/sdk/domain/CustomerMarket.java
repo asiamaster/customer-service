@@ -8,12 +8,15 @@ import com.dili.ss.domain.BaseDomain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.CollectionUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <B></B>
@@ -38,9 +41,19 @@ public class CustomerMarket extends BaseDomain {
     private Long marketId;
 
     /**
-     * 归属部门##内部创建归属到创建员工的部门，多个以逗号隔开
+     * 客户所属部门
+     * 从1.3.5版本开始，由于现在调整为一对多的关系，所以此字段返回的数据废弃,也不会返回该字段值
+     * {@link #departmentIds}
+     * 后续版本中，此字段会被移除
      */
-    private String departmentId;
+    @Deprecated
+    private Long departmentId;
+
+    /**
+     * 归属部门##内部创建归属到创建员工的部门，多个以逗号隔开
+     * 作为查询条件时，按单个整体处理
+     */
+    private String departmentIds;
 
     /**
      * 客户id
@@ -48,9 +61,19 @@ public class CustomerMarket extends BaseDomain {
     private Long customerId;
 
     /**
-     * 客户所有者,多个以逗号分隔
+     * 客户所属人
+     * 从1.3.5版本开始，由于现在调整为一对多的关系，所以此字段返回的数据废弃,也不会返回该字段值
+     * {@link #ownerIds}
+     * 后续版本中，此字段会被移除
      */
-    private String ownerId;
+    @Deprecated
+    private Long ownerId;
+
+    /**
+     * 客户所有者,多个以逗号分隔
+     * 作为查询条件时，不会处理空格，按单个整体处理
+     */
+    private String ownerIds;
 
     /**
      * 客户等级
@@ -152,6 +175,10 @@ public class CustomerMarket extends BaseDomain {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyTime;
 
+    /**
+     * 用作查询时，按客户归属部门集进行过滤,多个以逗号隔开
+     */
+    private Set<Long> departmentIdSet;
 
     /**
      * 获取客户级别显示
@@ -183,5 +210,12 @@ public class CustomerMarket extends BaseDomain {
             return instance.getValue();
         }
         return "";
+    }
+
+    public void setDepartmentIdSet(Set<Long> departmentIdSet) {
+        this.departmentIdSet = departmentIdSet;
+        if (!CollectionUtils.isEmpty(departmentIdSet)) {
+            this.setMetadata("departmentIdsStr", departmentIdSet.stream().map(String::valueOf).collect(Collectors.joining(",")));
+        }
     }
 }
