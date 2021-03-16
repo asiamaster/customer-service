@@ -1,7 +1,7 @@
 ##调整字段类型,用于存储数据
 
 ALTER TABLE `dili-customer`.customer_market ADD COLUMN `department_ids` VARCHAR(200) DEFAULT NULL COMMENT '客户所属部门,多个以逗号隔开' AFTER department_id;
-ALTER TABLE `dili-customer`.customer_market ADD COLUMN `owner_ids` VARCHAR(200) VARCHAR(200) NULL COMMENT '客户所属人,多个以逗号隔开' AFTER owner_id;
+ALTER TABLE `dili-customer`.customer_market ADD COLUMN `owner_ids` VARCHAR(200) DEFAULT NULL COMMENT '客户所属人,多个以逗号隔开' AFTER owner_id;
 
 update `dili-customer`.customer_market set department_ids = department_id,owner_ids=owner_id;
 

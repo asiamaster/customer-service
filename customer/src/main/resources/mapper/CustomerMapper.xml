@@ -184,7 +184,7 @@
                 and FIND_IN_SET(#{customerMarket.departmentIds}, cm.department_ids)
             </if>
             <if test="customerMarket.ownerIds != null and customerMarket.ownerIds !=''">
-                and (FIND_IN_SET(#{customerMarket.ownerIds}, cm.owner_id) or cm.owner_ids is null)
+                and (FIND_IN_SET(#{customerMarket.ownerIds}, cm.owner_ids) or cm.owner_ids is null)
             </if>
             <if test="customerMarket.grade != null">
                 and cm.grade = #{customerMarket.grade}
