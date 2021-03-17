@@ -175,7 +175,7 @@
         <if test="null != customerMarket">
             <if test="null != customerMarket.departmentIdSet and customerMarket.departmentIdSet.size() >0 ">
                 <!-- 按照部门权限过滤，需要比对传入的权限部门id 与 已存在的客户归属部门，需要存在交集，则此条数据才能被检索到 -->
-                and (concat(',',cm.department_ids,',') regexp concat(',',replace(#{customerMarket.metadata.departmentIdsStr},',',',|,'),',') = 1 or cm.department_ids is null)
+                and (concat(',',cm.department_ids,',') regexp concat(',',replace(#{customerMarket.metadata.departmentIdsStr},',',',|,'),',') = 1 or cm.department_ids is null or cm.department_ids = '')
             </if>
             <if test="null != customerMarket.salesMarket and ''!=customerMarket.salesMarket">
                 and cm.sales_market = #{customerMarket.salesMarket}
@@ -184,7 +184,7 @@
                 and FIND_IN_SET(#{customerMarket.departmentIds}, cm.department_ids)
             </if>
             <if test="customerMarket.ownerIds != null and customerMarket.ownerIds !=''">
-                and (FIND_IN_SET(#{customerMarket.ownerIds}, cm.owner_ids) or cm.owner_ids is null)
+                and (FIND_IN_SET(#{customerMarket.ownerIds}, cm.owner_ids) or cm.owner_ids is null or cm.owner_ids = '')
             </if>
             <if test="customerMarket.grade != null">
                 and cm.grade = #{customerMarket.grade}
