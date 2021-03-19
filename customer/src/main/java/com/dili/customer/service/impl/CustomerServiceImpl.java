@@ -1183,6 +1183,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 customerMarket.setOwnerIds(String.valueOf(userTicket.getId()));
             }
         }
+        input.setCustomerMarket(customerMarket);
         return Optional.ofNullable(input);
     }
 
