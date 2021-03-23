@@ -30,7 +30,7 @@ public class UidRpcService {
             if (stringBaseOutput.isSuccess()) {
                 return stringBaseOutput.getData();
             } else {
-                log.warn(String.format("根据类型【%s】获取编号失败:%s", JSONUtil.toJsonStr(stringBaseOutput)));
+                log.warn(String.format("根据类型【%s】获取编号失败:%s", type, JSONUtil.toJsonStr(stringBaseOutput)));
             }
         } catch (Exception e) {
             log.error(String.format("根据类型【%s】获取编号异常:%s", type, e.getMessage()), e);

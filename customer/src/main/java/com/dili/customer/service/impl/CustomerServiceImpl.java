@@ -164,7 +164,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
                 BeanUtils.copyProperties(baseInfo, customer);
                 String customerCode = getCustomerCode();
                 if (StrUtil.isBlank(customerCode)) {
-                    throw new AppException(ResultCode.APP_ERROR, "编号服务异常");
+                    throw new AppException(ResultCode.APP_ERROR, "未获取到编号");
                 }
                 customer.setCode(customerCode);
                 customer.setCreatorId(baseInfo.getOperatorId());
@@ -953,7 +953,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<Customer, Long> impleme
             customer.setIsDelete(YesOrNoEnum.NO.getCode());
             String customerCode = getCustomerCode();
             if (StrUtil.isBlank(customerCode)) {
-                throw new AppException(ResultCode.APP_ERROR, "编号服务异常");
+                throw new AppException(ResultCode.APP_ERROR, "未获取到编号");
             }
             customer.setCode(customerCode);
             customer.setCreateTime(LocalDateTime.now());
