@@ -31,7 +31,7 @@ import java.util.List;
 * @author shaofan
 * @date 2020-08-24
 **/
-@FeignClient(name = "customer-service", contextId = "relatedRpc", url = "${customerService.url:}")
+@FeignClient(name = "customer-service", contextId = "relatedRpc", url = "${customerManageService.url:}")
 public interface RelatedRpc {
 
     /**

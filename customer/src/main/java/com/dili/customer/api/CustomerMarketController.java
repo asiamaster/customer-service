@@ -9,7 +9,7 @@ import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.CustomerMarketService;
-import com.dili.customer.service.CustomerService;
+import com.dili.customer.service.CustomerManageService;
 import com.dili.logger.sdk.annotation.BusinessLogger;
 import com.dili.logger.sdk.util.LoggerUtil;
 import com.dili.ss.constant.ResultCode;
@@ -37,7 +37,7 @@ public class CustomerMarketController {
 
     private final CustomerMarketService customerMarketService;
     private final UapUserTicket uapUserTicket;
-    private final CustomerService customerService;
+    private final CustomerManageService customerManageService;
 
     /**
      * 获取客户在某个市场的信息
@@ -65,7 +65,7 @@ public class CustomerMarketController {
             if (Objects.nonNull(instance)) {
                 Boolean aBoolean = customerMarketService.changeGrade(customerId, userTicket.getFirmId(), instance);
                 if (aBoolean) {
-                    Customer customer = customerService.get(customerId);
+                    Customer customer = customerManageService.get(customerId);
                     LoggerUtil.buildBusinessLoggerContext(customer.getId(), customer.getCode(), userTicket.getId(), userTicket.getRealName(), userTicket.getFirmId(), String.format("更改客户等级为:%s", instance.getValue()));
                 }
                 return BaseOutput.success();
@@ -99,7 +99,7 @@ public class CustomerMarketController {
             if (s.isPresent()) {
                 return BaseOutput.failure(s.get());
             }
-            Customer customer = customerService.get(customerId);
+            Customer customer = customerManageService.get(customerId);
 
             LoggerUtil.buildBusinessLoggerContext(customer.getId(), customer.getCode(), userTicket.getId(), userTicket.getRealName(), userTicket.getFirmId(), String.format("更改客户状态为:%s", instance.getValue()));
             return BaseOutput.success();

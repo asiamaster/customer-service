@@ -9,7 +9,8 @@ import com.dili.customer.domain.dto.ContactsDto;
 import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.mapper.ContactsMapper;
 import com.dili.customer.service.ContactsService;
-import com.dili.customer.service.CustomerService;
+import com.dili.customer.service.CustomerManageService;
+import com.dili.customer.service.CustomerQueryService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.mvc.util.RequestUtils;
@@ -38,7 +39,7 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
     }
 
     @Autowired
-    private CustomerService customerService;
+    private CustomerQueryService customerQueryService;
     private final BusinessLogRpcService businessLogRpcService;
     private final UapUserTicket uapUserTicket;
 
@@ -84,7 +85,7 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
         if (YesOrNoEnum.YES.getCode().equals(customerContacts.getIsDefault())) {
             updateDefaultFlag(customerContacts.getCustomerId(), customerContacts.getMarketId(), customerContacts.getId());
         }
-        Customer customer = customerService.get(customerContacts.getCustomerId());
+        Customer customer = customerQueryService.get(customerContacts.getCustomerId());
         businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), content.toString(), "操作渠道:APP", operationType, userTicket, RequestUtils.getIpAddress(WebContent.getRequest()));
         return BaseOutput.success();
     }
@@ -141,7 +142,7 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
             return Optional.of("数据不存在");
         }
         this.delete(id);
-        Customer customer = customerService.get(contacts.getCustomerId());
+        Customer customer = customerQueryService.get(contacts.getCustomerId());
         businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(contacts, String.format("联系人数据ID %s :", id)), "操作渠道:APP", "del", uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
         return Optional.empty();
     }

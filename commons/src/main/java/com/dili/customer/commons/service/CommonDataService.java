@@ -118,6 +118,17 @@ public class CommonDataService {
     }
 
     /**
+     * 根据市场id，获取并返回当前市场的客户自主完善资料后，是否不用人工审核
+     * 由于每个市场只有一个，现在只按市场区分，取其一个
+     * @param marketId 市场ID
+     * @return true-不需要审核
+     */
+    public Boolean checkCustomerNotApproval(Long marketId) {
+        Optional<DataDictionaryValue> byDdCodeAndCode = dataDictionaryRpcService.getByDdCodeAndCode(DdCodeEnum.customer_data_not_approval.name(), null, EnabledStateEnum.ENABLED.getCode(), marketId);
+        return byDdCodeAndCode.isPresent();
+    }
+
+    /**
      * 组装生成客户角色身份信息
      * @param characterTypeListData 已有角色分类数据对象
      * @param marketId 所属市场ID

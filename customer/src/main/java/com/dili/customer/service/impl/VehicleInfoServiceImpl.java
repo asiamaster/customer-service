@@ -9,7 +9,7 @@ import com.dili.customer.domain.VehicleInfo;
 import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.domain.dto.VehicleInfoDto;
 import com.dili.customer.mapper.VehicleInfoMapper;
-import com.dili.customer.service.CustomerService;
+import com.dili.customer.service.CustomerManageService;
 import com.dili.customer.service.VehicleInfoService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.mvc.util.RequestUtils;
@@ -38,7 +38,7 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
     }
 
     @Autowired
-    private CustomerService customerService;
+    private CustomerManageService customerManageService;
 
     private final BusinessLogRpcService businessLogRpcService;
     private final CarTypeRpcService carTypeRpcService;
@@ -125,7 +125,7 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
             content.append(produceLoggerContent(temp, String.format("车辆数据ID %s 修改前：", vehicleInfo.getId())));
             content.append(produceLoggerContent(vehicleInfo, "<br/>修改后："));
         }
-        Customer customer = customerService.get(vehicleInfo.getCustomerId());
+        Customer customer = customerManageService.get(vehicleInfo.getCustomerId());
         businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), content.toString(), "", operationType, userTicket, RequestUtils.getIpAddress(WebContent.getRequest()));
         return Optional.empty();
     }
@@ -154,7 +154,7 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
             return Optional.of("数据不存在");
         }
         this.delete(id);
-        Customer customer = customerService.get(vehicleInfo.getCustomerId());
+        Customer customer = customerManageService.get(vehicleInfo.getCustomerId());
         businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(vehicleInfo, String.format("车辆数据ID %s :", id)), "操作渠道:APP", "del", uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
         return Optional.empty();
     }

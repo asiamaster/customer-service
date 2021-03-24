@@ -38,7 +38,7 @@ public class WeChatService {
 
     private final UserAccountService userAccountService;
     private final AccountTerminalService accountTerminalService;
-    private final CustomerService customerService;
+    private final CustomerManageService customerManageService;
     private final AppletRequestInfo appletRequestInfo;
 
     /**
@@ -97,7 +97,7 @@ public class WeChatService {
             customer.setContactsPhone(dto.getCellphone());
             customer.setSourceSystem(appletRequestInfo.getAppletInfo().getSystemCode());
             customer.setName(dto.getNickName());
-            customerService.defaultRegister(customer);
+            customerManageService.defaultRegister(customer);
             userAccount = new UserAccount();
             userAccount.setCellphone(dto.getCellphone()).setCustomerId(customer.getId()).setCustomerCode(customer.getCode())
                     .setCertificateNumber(customer.getCertificateNumber()).setCellphoneValid(YesOrNoEnum.YES.getCode());

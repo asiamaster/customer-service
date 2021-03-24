@@ -15,7 +15,8 @@ import com.dili.customer.sdk.domain.query.CustomerBaseQueryInput;
 import com.dili.customer.sdk.domain.query.CustomerQueryInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.sdk.validator.*;
-import com.dili.customer.service.CustomerService;
+import com.dili.customer.service.CustomerManageService;
+import com.dili.customer.service.CustomerQueryService;
 import com.dili.customer.service.MqService;
 import com.dili.customer.service.UserAccountService;
 import com.dili.customer.utils.LoginUtil;
@@ -26,7 +27,6 @@ import com.dili.ss.exception.AppException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -48,11 +48,10 @@ import java.util.Set;
 @Slf4j
 public class CustomerController {
 
-    @Autowired
-    private CustomerService customerService;
+    private final CustomerManageService customerManageService;
+    private final CustomerQueryService customerQueryService;
     private final UserAccountService userAccountService;
-    @Autowired
-    private MqService mqService;
+    private final MqService mqService;
 
     /**
      * 分页查询客户数据集
@@ -65,7 +64,7 @@ public class CustomerController {
         if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
-        return customerService.listForPage(customer);
+        return customerQueryService.listForPage(customer);
     }
 
     /**
@@ -80,7 +79,7 @@ public class CustomerController {
         if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
-        return customerService.listForPage(customer);
+        return customerQueryService.listForPageWithAuth(customer);
     }
 
     /**
@@ -100,7 +99,7 @@ public class CustomerController {
         }
         customer.getCustomerMarket().setState(CustomerEnum.State.NORMAL.getCode());
         customer.setIsDelete(YesOrNoEnum.NO.getCode());
-        return customerService.listForPage(customer);
+        return customerQueryService.listForPage(customer);
     }
 
     /**
@@ -116,7 +115,7 @@ public class CustomerController {
         if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
-        return customerService.listSimpleForPage(customer);
+        return customerQueryService.listSimpleForPage(customer);
     }
 
     /**
@@ -133,7 +132,7 @@ public class CustomerController {
         if (Objects.isNull(customer.getMarketId())) {
             return PageOutput.failure("客户所属市场不能为空");
         }
-        return customerService.listSimpleForPageWithAuth(customer);
+        return customerQueryService.listSimpleForPageWithAuth(customer);
     }
 
     /**
@@ -155,7 +154,7 @@ public class CustomerController {
         }
         customer.getCustomerMarket().setState(CustomerEnum.State.NORMAL.getCode());
         customer.setIsDelete(YesOrNoEnum.NO.getCode());
-        return customerService.listSimpleForPage(customer);
+        return customerQueryService.listSimpleForPage(customer);
     }
 
     /**
@@ -167,7 +166,7 @@ public class CustomerController {
     @PostMapping(value = "/listBase")
     public BaseOutput<List<Customer>> listBase(@RequestBody CustomerBaseQueryInput customer) {
         log.info(String.format("客户listBase查询:%s", JSONUtil.toJsonStr(customer)));
-        PageOutput<List<Customer>> pageOutput = customerService.listBasePage(customer);
+        PageOutput<List<Customer>> pageOutput = customerQueryService.listBasePage(customer);
         return BaseOutput.success().setData(pageOutput.getData());
     }
 
@@ -182,7 +181,7 @@ public class CustomerController {
         if (Objects.isNull(id) || Objects.isNull(marketId)) {
             return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
         }
-        return BaseOutput.success().setData(customerService.get(id, marketId));
+        return BaseOutput.success().setData(customerQueryService.get(id, marketId));
     }
 
     /**
@@ -201,7 +200,7 @@ public class CustomerController {
         CustomerQueryInput condition = new CustomerQueryInput();
         condition.setId(id);
         condition.setMarketId(marketId);
-        PageOutput<List<Customer>> pageOutput = customerService.listSimpleForPage(condition);
+        PageOutput<List<Customer>> pageOutput = customerQueryService.listSimpleForPage(condition);
         Customer customer = pageOutput.getData().stream().findFirst().orElse(null);
         return BaseOutput.success().setData(customer);
     }
@@ -216,7 +215,7 @@ public class CustomerController {
         if (Objects.isNull(id)) {
             return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
         }
-        return BaseOutput.success().setData(customerService.get(id));
+        return BaseOutput.success().setData(customerManageService.get(id));
     }
 
     /**
@@ -233,7 +232,7 @@ public class CustomerController {
         CustomerQueryInput condition = new CustomerQueryInput();
         condition.setCertificateNumber(certificateNumber);
         condition.setMarketId(marketId);
-        PageOutput<List<Customer>> pageOutput = customerService.listForPage(condition);
+        PageOutput<List<Customer>> pageOutput = customerQueryService.listForPage(condition);
         Customer customer = pageOutput.getData().stream().findFirst().orElse(null);
         return BaseOutput.success().setData(customer);
     }
@@ -248,7 +247,7 @@ public class CustomerController {
         if (Objects.isNull(customer.getMarketId())) {
             return BaseOutput.failure("客户所属市场不能为空");
         }
-        PageOutput<List<Customer>> pageOutput = customerService.listForPage(customer);
+        PageOutput<List<Customer>> pageOutput = customerQueryService.listForPage(customer);
         return BaseOutput.success().setData(pageOutput.getData());
     }
 
@@ -262,7 +261,7 @@ public class CustomerController {
         if (Objects.isNull(customer.getMarketId())) {
             return BaseOutput.failure("客户所属市场不能为空");
         }
-        PageOutput<List<Customer>> pageOutput = customerService.listSimpleForPage(customer);
+        PageOutput<List<Customer>> pageOutput = customerQueryService.listSimpleForPage(customer);
         return BaseOutput.success().setData(pageOutput.getData());
     }
 
@@ -278,7 +277,7 @@ public class CustomerController {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
         try {
-            BaseOutput update = customerService.update(updateInput);
+            BaseOutput update = customerManageService.update(updateInput);
             if (update.isSuccess()) {
                 mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, updateInput.getId(), updateInput.getCustomerMarket().getMarketId());
             }
@@ -304,7 +303,7 @@ public class CustomerController {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
         try {
-            BaseOutput<Customer> baseOutput = customerService.register(customer);
+            BaseOutput<Customer> baseOutput = customerManageService.register(customer);
             if (baseOutput.isSuccess()) {
                 mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_ADD_MQ_FANOUT_EXCHANGE, baseOutput.getData().getId(), customer.getCustomerMarket().getMarketId());
             }
@@ -333,7 +332,7 @@ public class CustomerController {
         EnterpriseCustomerInput input = new EnterpriseCustomerInput();
         BeanUtils.copyProperties(customer, input);
         try {
-            BaseOutput<Customer> baseOutput = customerService.register(input);
+            BaseOutput<Customer> baseOutput = customerManageService.register(input);
             if (baseOutput.isSuccess()) {
                 mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_ADD_MQ_FANOUT_EXCHANGE, baseOutput.getData().getId(), input.getCustomerMarket().getMarketId());
             }
@@ -357,7 +356,7 @@ public class CustomerController {
     @UapToken
     @PostMapping(value="/checkExistByNoAndMarket")
     public BaseOutput<Customer> checkExistByNoAndMarket(@RequestParam(value = "certificateNumber") String certificateNumber,@RequestParam(value = "marketId") Long marketId) {
-        return customerService.checkExistByNoAndMarket(certificateNumber,marketId);
+        return customerQueryService.checkExistByNoAndMarket(certificateNumber,marketId);
     }
 
     /**
@@ -373,7 +372,7 @@ public class CustomerController {
     public BaseOutput<Boolean> verificationCellPhone(@RequestParam("customerId") Long customerId, @RequestParam("cellphone") String cellphone, @RequestParam("verificationCode") String verificationCode) {
         log.info(String.format("客户【%s】手机号【%s】认证 验证码 【%s】", customerId, cellphone, verificationCode));
         try {
-            Optional<String> s = customerService.verificationCellPhone(cellphone, customerId, verificationCode);
+            Optional<String> s = customerManageService.verificationCellPhone(cellphone, customerId, verificationCode);
             if (s.isPresent()) {
                 return BaseOutput.failure(s.get()).setData(false);
             }
@@ -393,7 +392,7 @@ public class CustomerController {
     @PostMapping(value = "/getValidatedCellphoneCustomer")
     public BaseOutput<Customer> getValidatedCellphoneCustomer(@RequestParam("cellphone") String cellphone) {
         log.info(String.format("获取被手机号【%s】验证的客户", cellphone));
-        return customerService.getSingleValidatedCellphoneCustomer(cellphone);
+        return customerQueryService.getSingleValidatedCellphoneCustomer(cellphone);
     }
 
     /**
@@ -407,7 +406,7 @@ public class CustomerController {
         if (bindingResult.hasErrors()) {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
-        return customerService.autoRegister(dto);
+        return customerManageService.autoRegister(dto);
     }
 
     /**
@@ -439,7 +438,7 @@ public class CustomerController {
             return BaseOutput.failure("参数丢失");
         }
         try {
-            BaseOutput<Long> longBaseOutput = customerService.batchCompleteEnterprise(inputList);
+            BaseOutput<Long> longBaseOutput = customerManageService.batchCompleteEnterprise(inputList);
             Set<Long> marketIds = (Set<Long>) (longBaseOutput.getMetadata());
             mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE,longBaseOutput.getData(),marketIds);
             return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccountService.getByCellphone(inputList.get(0).getContactsPhone()).get(), null));
@@ -483,7 +482,7 @@ public class CustomerController {
             return BaseOutput.failure("参数丢失");
         }
         try {
-            BaseOutput<Long> longBaseOutput = customerService.batchCompleteIndividual(inputList);
+            BaseOutput<Long> longBaseOutput = customerManageService.batchCompleteIndividual(inputList);
             Set<Long> marketIds = (Set<Long>) (longBaseOutput.getMetadata());
             mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE,longBaseOutput.getData(),marketIds);
             return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccountService.getByCellphone(inputList.get(0).getContactsPhone()).get(), null));
@@ -508,7 +507,7 @@ public class CustomerController {
             return BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
         try {
-            BaseOutput baseOutput = customerService.updateBaseInfo(input, true);
+            BaseOutput baseOutput = customerManageService.updateBaseInfo(input, true);
             if (baseOutput.isSuccess()) {
                 mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, input.getId(), input.getCustomerMarket().getMarketId());
             }
@@ -529,7 +528,7 @@ public class CustomerController {
     public BaseOutput updateCertificateInfo(@RequestBody CustomerCertificateInput input) {
         log.info(String.format("客户证件信息修改:%s", JSONUtil.toJsonStr(input)));
         try {
-            Optional<String> s = customerService.updateCertificateInfo(input,true);
+            Optional<String> s = customerManageService.updateCertificateInfo(input,true);
             if (s.isPresent()) {
                 return BaseOutput.failure(s.get());
             }
@@ -547,7 +546,7 @@ public class CustomerController {
      */
     private BaseOutput<LoginSuccessData> completeInfo(CustomerUpdateInput input) {
         try {
-            BaseOutput<Customer> customerBaseOutput = customerService.completeInfo(input);
+            BaseOutput<Customer> customerBaseOutput = customerManageService.completeInfo(input);
             if (customerBaseOutput.isSuccess()) {
                 mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, customerBaseOutput.getData().getId(), input.getCustomerMarket().getMarketId());
                 return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccountService.getByCellphone(input.getContactsPhone()).get(), null));

@@ -33,6 +33,9 @@ public enum DdCodeEnum {
      * 客户数据权限隔离配置
      */
     customer_data_auth,
+    /**
+     * 客户自主完善数据是否不需要审核
+     */
+    customer_data_not_approval,
     ;
-
 }

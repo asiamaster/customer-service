@@ -9,7 +9,7 @@ import com.dili.customer.domain.dto.AddressDto;
 import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.mapper.AddressMapper;
 import com.dili.customer.service.AddressService;
-import com.dili.customer.service.CustomerService;
+import com.dili.customer.service.CustomerManageService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.mvc.util.RequestUtils;
 import com.dili.uap.sdk.domain.UserTicket;
@@ -37,7 +37,7 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
     }
 
     @Autowired
-    private CustomerService customerService;
+    private CustomerManageService customerManageService;
     private final BusinessLogRpcService businessLogRpcService;
     private final UapUserTicket uapUserTicket;
 
@@ -101,7 +101,7 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
         if (YesOrNoEnum.YES.getCode().equals(address.getIsCurrent())) {
             updateDefaultFlag(address.getCustomerId(), address.getMarketId(), address.getId());
         }
-        Customer customer = customerService.get(address.getCustomerId());
+        Customer customer = customerManageService.get(address.getCustomerId());
         businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), content.toString(), "", operationType, userTicket, RequestUtils.getIpAddress(WebContent.getRequest()));
         return Optional.empty();
     }
@@ -122,7 +122,7 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
             return Optional.of("数据不存在");
         }
         this.delete(id);
-        Customer customer = customerService.get(address.getCustomerId());
+        Customer customer = customerManageService.get(address.getCustomerId());
         businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(address, String.format("地址数据ID %s :", id)), "操作渠道:APP", "del", uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
         return Optional.empty();
     }

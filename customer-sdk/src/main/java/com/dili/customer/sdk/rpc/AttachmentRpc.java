@@ -16,7 +16,7 @@ import java.util.List;
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
  * @date 2020/7/25 17:43
  */
-@FeignClient(name = "customer-service", contextId = "attachmentRpc", url = "${customerService.url:}")
+@FeignClient(name = "customer-service", contextId = "attachmentRpc", url = "${customerManageService.url:}")
 public interface AttachmentRpc {
 
     /**

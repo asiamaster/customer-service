@@ -12,7 +12,7 @@ import com.dili.customer.mapper.AttachmentMapper;
 import com.dili.customer.sdk.domain.dto.AttachmentGroupInfo;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.AttachmentService;
-import com.dili.customer.service.CustomerService;
+import com.dili.customer.service.CustomerManageService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.mvc.util.RequestUtils;
 import com.dili.uap.sdk.util.WebContent;
@@ -42,7 +42,7 @@ public class AttachmentServiceImpl extends BaseServiceImpl<Attachment, Long> imp
     }
 
     @Autowired
-    private CustomerService customerService;
+    private CustomerManageService customerManageService;
     private final BusinessLogRpcService businessLogRpcService;
     private final UapUserTicket uapUserTicket;
 
@@ -130,7 +130,7 @@ public class AttachmentServiceImpl extends BaseServiceImpl<Attachment, Long> imp
             condition.setCustomerId(customerId);
             condition.setMarketId(marketId);
             getActualMapper().delete(condition);
-            Customer customer = customerService.get(customerId);
+            Customer customer = customerManageService.get(customerId);
             businessLogRpcService.asyncSave(customerId, customer.getCode(), "删除所有附件", "", "del", uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
         }
     }

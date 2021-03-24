@@ -98,10 +98,12 @@ public class DataDictionaryRpcService {
             StringJoiner keyJoiner = new StringJoiner("_");
             keyJoiner.add(CustomerConstant.CACHE_KEY);
             keyJoiner.add(ddCode);
-            keyJoiner.add(code);
             DataDictionaryValue dataDictionaryValue = DTOUtils.newInstance(DataDictionaryValue.class);
             dataDictionaryValue.setDdCode(ddCode);
-            dataDictionaryValue.setCode(code);
+            if (StrUtil.isNotBlank(code)) {
+                keyJoiner.add(code);
+                dataDictionaryValue.setCode(code);
+            }
             if (Objects.nonNull(state)) {
                 dataDictionaryValue.setState(state);
                 keyJoiner.add(String.valueOf(state));

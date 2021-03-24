@@ -11,3 +11,6 @@ ALTER TABLE `dili-customer`.customer_market drop COLUMN `owner_id`;
 INSERT INTO `uap`.`data_dictionary` (`code`, `name`, `level`, `system_code`, `description`, `created`, `modified`) VALUES ('customer_data_auth', '客户数据权限隔离', NULL, 'CUSTOMER', '客户数据权限隔离相关配置', now(), now());
 INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `state`) VALUES ('customer_data_auth', 9, 'sy', 2, '按归属人权限隔离', 'customer_owner_auth', NULL, now(), now(), 1);
 INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `state`) VALUES ('customer_data_auth', 9, 'sy', 1, '按部门权限隔离', 'customer_department_auth', NULL, now(), now(), 1);
+
+INSERT INTO `uap`.`data_dictionary` (`code`, `name`, `level`, `system_code`, `description`, `created`, `modified`) VALUES ('customer_data_not_approval', '客户自主完善数据是否不需要审核', NULL, 'CUSTOMER', '客户自主完善数据是否不需要审核', now(), now());
+INSERT INTO `uap`.`data_dictionary_value` (`dd_code`, `firm_id`, `firm_code`, `order_number`, `name`, `code`, `description`, `created`, `modified`, `state`) VALUES ('customer_data_not_approval', 9, 'sy', 1, '客户自主完善数据是否不需要审核，配置该项且启用则不需要审核', 'customer_not_approval', NULL, now(), now(), 1);
