@@ -13,7 +13,6 @@ import com.dili.customer.service.CustomerMarketService;
 import com.dili.customer.service.MqService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.google.common.collect.Lists;
-import lombok.RequiredArgsConstructor;
 import one.util.streamex.StreamEx;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,6 @@ import java.util.*;
  * This file was generated on 2019-12-31 10:19:41.
  * @author yuehongbo
  */
-@RequiredArgsConstructor
 @Service
 public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, Long> implements CustomerMarketService {
 
@@ -35,7 +33,8 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
         return (CustomerMarketMapper)getDao();
     }
 
-    private final MarketRpcService marketRpcService;
+    @Autowired
+    private MarketRpcService marketRpcService;
     @Autowired
     private MqService mqService;
 
