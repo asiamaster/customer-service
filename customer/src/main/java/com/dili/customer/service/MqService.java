@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.dili.commons.rabbitmq.RabbitMQMessageService;
 import com.dili.customer.domain.Customer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,8 @@ import java.util.Set;
 @Service
 public class MqService {
 
-    private final CustomerQueryService customerQueryService;
+    @Autowired
+    private CustomerQueryService customerQueryService;
     private final RabbitMQMessageService rabbitMQMessageService;
 
     /**

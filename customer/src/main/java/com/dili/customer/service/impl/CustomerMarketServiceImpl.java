@@ -15,6 +15,7 @@ import com.dili.ss.base.BaseServiceImpl;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import one.util.streamex.StreamEx;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,8 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
     }
 
     private final MarketRpcService marketRpcService;
-    private final MqService mqService;
+    @Autowired
+    private MqService mqService;
 
     @Override
     public CustomerMarket queryByMarketAndCustomerId(Long marketId, Long customerId) {

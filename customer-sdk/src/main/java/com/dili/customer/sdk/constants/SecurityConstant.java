@@ -31,5 +31,5 @@ public interface SecurityConstant {
     /**
      * uap token key
      */
-    String UAP_TOKEN_KEY = "UAP_SessionId";
+    String UAP_TOKEN_KEY = "UAP_accessToken";
 }

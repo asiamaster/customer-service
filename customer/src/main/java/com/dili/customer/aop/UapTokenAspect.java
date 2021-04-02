@@ -1,8 +1,8 @@
 package com.dili.customer.aop;
 
-import cn.hutool.core.util.StrUtil;
 import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.domain.PageOutput;
 import com.dili.uap.sdk.domain.UserTicket;
 import com.dili.uap.sdk.session.SessionContext;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
@@ -47,7 +46,13 @@ public class UapTokenAspect {
             Object retValue = point.proceed();
             return retValue;
         } else {
-            return BaseOutput.failure("未获取到登录信息");
+            Method method = ((MethodSignature) point.getSignature()).getMethod();
+            Class<?> returnType = method.getReturnType();
+            if (returnType.isAssignableFrom(PageOutput.class)) {
+                return PageOutput.failure("未获取到登录信息");
+            } else {
+                return BaseOutput.failure("未获取到登录信息");
+            }
         }
     }
 }
