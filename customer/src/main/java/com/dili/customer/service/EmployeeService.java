@@ -50,4 +50,10 @@ public interface EmployeeService extends BaseService<Employee, Long> {
      * @param userName 员工账号(手机号或者园区卡号)
      */
     List<Customer> listCustomerByUserName(String userName);
+
+    /**
+     * 重置员工登录密码
+     * @param id
+     */
+    void resetPassword(Long id);
 }

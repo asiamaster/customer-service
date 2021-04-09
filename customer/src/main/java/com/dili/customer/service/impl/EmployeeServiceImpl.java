@@ -17,8 +17,6 @@ import com.dili.customer.service.EmployeeService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
-import com.google.common.collect.Lists;
-import one.util.streamex.StreamEx;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -132,6 +130,18 @@ public class EmployeeServiceImpl extends BaseServiceImpl<Employee, Long> impleme
             }
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public void resetPassword(Long id) {
+        if (Objects.nonNull(id)) {
+            Employee employee = this.get(id);
+            if (Objects.nonNull(employee)) {
+                employee.setPassword("");
+                setPassword(employee);
+                this.update(employee);
+            }
+        }
     }
 
     /**

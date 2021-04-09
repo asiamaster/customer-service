@@ -17,7 +17,7 @@ public class RelatedList {
     private String cardNo;
     private String code;
     private Integer customerCount;
-    private Long departmentId;
+    private String departmentIds;
     private String customerContactsPhone;
     private Long customerId;
     private Long marketId;

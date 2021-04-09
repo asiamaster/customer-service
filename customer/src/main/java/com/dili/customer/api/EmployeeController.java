@@ -1,13 +1,9 @@
 package com.dili.customer.api;
 
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.dto.EmployeeLoginDto;
-import com.dili.customer.domain.wechat.JsCode2Session;
-import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.service.EmployeeService;
-import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +13,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -67,6 +61,16 @@ public class EmployeeController {
             log.error(String.format("根据账号【%s】查询所属客户异常:%s", userName, e.getMessage()), e);
             return BaseOutput.failure("系统异常");
         }
+    }
+
+    /**
+     * 根据id重置员工的密码
+     * @param id
+     * @return
+     */
+    public BaseOutput resetPassword(@RequestParam("id") Long id){
+        employeeService.resetPassword(id);
+        return BaseOutput.success();
     }
 
 }

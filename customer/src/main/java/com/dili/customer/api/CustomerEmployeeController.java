@@ -1,6 +1,5 @@
 package com.dili.customer.api;
 
-import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.json.JSONUtil;
 import com.dili.customer.sdk.domain.dto.EmployeeCancelCardInput;
 import com.dili.customer.sdk.domain.dto.EmployeeChangeCardInput;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 

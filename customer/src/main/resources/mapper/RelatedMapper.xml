@@ -6,8 +6,8 @@
                 property="customerId"/>
         <result column="customer_count" jdbcType="BIGINT"
                 property="customerCount"/>
-        <result column="department_id" jdbcType="BIGINT"
-                property="departmentId"/>
+        <result column="department_ids" jdbcType="BIGINT"
+                property="departmentIds"/>
         <result column="modify_time" jdbcType="TIMESTAMP"
                 property="modifyTime"/>
     </resultMap>
@@ -41,7 +41,7 @@
     </sql>
     <select id="selectByQuery" parameterType="com.dili.customer.sdk.dto.RelatedQuery" resultMap="BaseResultMap">
         SELECT parent, count(customer_id) as customer_count,
-        (SELECT department_id FROM customer_market WHERE customer_id = r.parent and market_id = #{marketId}) as department_id, max(modify_time) modify_time
+        (SELECT department_ids FROM customer_market WHERE customer_id = r.parent and market_id = #{marketId}) as department_ids, max(modify_time) modify_time
         FROM related r
         WHERE market_id = #{marketId}
         <if test="null != ids and ids.size()>0">
