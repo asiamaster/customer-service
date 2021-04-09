@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dili.customer.mapper.EmployeeMapper">
+    <resultMap id="BaseResultMap" type="com.dili.customer.domain.Employee">
+        <result column="id" property="id"/>
+        <result column="name"  property="name"/>
+        <result column="cellphone" property="cellphone"/>
+        <result column="password" property="password"/>
+        <result column="changed_pwd_time" property="changedPwdTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modify_time" property="modifyTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        name,
+        cellphone,
+        password,
+        changed_pwd_time,
+        create_time,
+        modify_time
+    </sql>
+
+    <!-- 根据卡号及客户ID查询员工信息 -->
+    <select id="queryByCardNoAndCustomerId" parameterType="map" resultMap="BaseResultMap">
+        SELECT e.* FROM  employee e
+            LEFT JOIN customer_employee ce ON e.id = ce.employee_id AND ce.deleted = 0
+            LEFT JOIN employee_card ec ON ce.id = ec.customer_employee_id AND ec.deleted = 0
+        WHERE ce.customer_id=#{customerId} AND ec.card_no=#{cardNo}
+    </select>
+
+</mapper>

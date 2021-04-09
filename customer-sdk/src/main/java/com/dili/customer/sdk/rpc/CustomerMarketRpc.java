@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author yuehongbo
  * @date 2020/6/18 15:59
  */
-@FeignClient(name = "customer-service", contextId = "customerMarketRpc", url = "${customerManageService.url:}")
+@FeignClient(name = "customer-service", contextId = "customerMarketRpc", url = "${customerService.url:}")
 public interface CustomerMarketRpc {
 
     /**

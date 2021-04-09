@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 * @author shaofan
 * @date 2020-09-07
 **/
-@FeignClient(name = "customer-service", contextId = "relatedLogRpc", url = "${customerManageService.url:}")
+@FeignClient(name = "customer-service", contextId = "relatedLogRpc", url = "${customerService.url:}")
 public interface RelatedLogRpc {
 
     /**

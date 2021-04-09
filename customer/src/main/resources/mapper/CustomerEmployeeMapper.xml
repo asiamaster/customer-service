@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dili.customer.mapper.CustomerEmployeeMapper">
+    <resultMap id="BaseResultMap" type="com.dili.customer.domain.CustomerEmployee">
+        <result column="id" property="id"/>
+        <result column="customer_id" property="customerId"/>
+        <result column="employee_id" property="employeeId"/>
+        <result column="deleted" property="deleted"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modify_time" property="modifyTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        customer_id,
+        employee_id,
+        enabled,
+        deleted,
+        create_time,
+        modify_time
+    </sql>
+
+    <!-- 根据员工ID查询员工归属的有效客户信息 -->
+    <select id="listCustomerByEmployeeId" parameterType="long" resultType="com.dili.customer.domain.Customer">
+        select c.* from customer c,customer_employee ce where ce.customer_id=c.id AND ce.deleted=0 and ce.employee_id=#{employeeId}
+    </select>
+
+    <!-- 根据客户员工关系ID查询员工归属的有效客户信息 -->
+    <select id="listCustomerById" parameterType="long" resultType="com.dili.customer.domain.Customer">
+        select c.* from customer c,customer_employee ce where ce.customer_id=c.id AND ce.deleted=0 and ce.id=#{id}
+    </select>
+
+</mapper>
