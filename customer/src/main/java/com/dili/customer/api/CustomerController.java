@@ -24,7 +24,6 @@ import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import com.dili.ss.exception.AppException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,15 +42,17 @@ import java.util.Set;
  * This file was generated on 2019-12-27 14:43:13.
  * @author yuehongbo
  */
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/customer")
 @Slf4j
 public class CustomerController {
 
-    private final CustomerManageService customerManageService;
-    private final CustomerQueryService customerQueryService;
-    private final UserAccountService userAccountService;
+    @Autowired
+    private CustomerManageService customerManageService;
+    @Autowired
+    private CustomerQueryService customerQueryService;
+    @Autowired
+    private UserAccountService userAccountService;
     @Autowired
     private MqService mqService;
 

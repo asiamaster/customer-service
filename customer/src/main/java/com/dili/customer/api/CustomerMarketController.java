@@ -8,15 +8,15 @@ import com.dili.customer.domain.dto.CustomerMarketDto;
 import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
-import com.dili.customer.service.CustomerMarketService;
 import com.dili.customer.service.CustomerManageService;
+import com.dili.customer.service.CustomerMarketService;
 import com.dili.logger.sdk.annotation.BusinessLogger;
 import com.dili.logger.sdk.util.LoggerUtil;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.uap.sdk.domain.UserTicket;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,14 +30,16 @@ import java.util.Optional;
  * @author yuehongbo
  */
 @Slf4j
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/customerMarket")
 public class CustomerMarketController {
 
-    private final CustomerMarketService customerMarketService;
-    private final UapUserTicket uapUserTicket;
-    private final CustomerManageService customerManageService;
+    @Autowired
+    private CustomerMarketService customerMarketService;
+    @Autowired
+    private UapUserTicket uapUserTicket;
+    @Autowired
+    private CustomerManageService customerManageService;
 
     /**
      * 获取客户在某个市场的信息

@@ -37,7 +37,6 @@ import com.dili.uap.sdk.domain.UserTicket;
 import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +55,6 @@ import java.util.stream.Collectors;
  * @author yuehongbo
  */
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> implements CustomerManageService {
 
@@ -69,18 +67,30 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         return (CustomerMapper) getDao();
     }
 
-    private final TallyingAreaService tallyingAreaService;
-    private final BusinessCategoryService businessCategoryService;
-    private final CustomerConfig customerConfig;
-    private final CharacterTypeService characterTypeService;
-    private final UidRpcService uidRpcService;
-    private final CommonDataService commonDataService;
-    private final CustomerCommonConfig customerCommonConfig;
-    private final AccountTerminalService accountTerminalService;
-    private final DepartmentRpcService departmentRpcService;
-    private final UserAccountService userAccountService;
-    private final BusinessLogRpcService businessLogRpcService;
-    private final UapUserTicket uapUserTicket;
+    @Autowired
+    private TallyingAreaService tallyingAreaService;
+    @Autowired
+    private BusinessCategoryService businessCategoryService;
+    @Autowired
+    private CustomerConfig customerConfig;
+    @Autowired
+    private CharacterTypeService characterTypeService;
+    @Autowired
+    private UidRpcService uidRpcService;
+    @Autowired
+    private CommonDataService commonDataService;
+    @Autowired
+    private CustomerCommonConfig customerCommonConfig;
+    @Autowired
+    private AccountTerminalService accountTerminalService;
+    @Autowired
+    private DepartmentRpcService departmentRpcService;
+    @Autowired
+    private UserAccountService userAccountService;
+    @Autowired
+    private BusinessLogRpcService businessLogRpcService;
+    @Autowired
+    private UapUserTicket uapUserTicket;
     @Autowired
     private CustomerQueryService customerQueryService;
     @Autowired

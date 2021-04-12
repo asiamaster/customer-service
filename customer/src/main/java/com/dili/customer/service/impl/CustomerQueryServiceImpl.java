@@ -27,7 +27,6 @@ import com.dili.uap.sdk.domain.UserTicket;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,6 @@ import java.util.stream.Collectors;
  * @date 2021/3/24 15:32
  */
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class CustomerQueryServiceImpl  extends BaseServiceImpl<Customer, Long> implements CustomerQueryService {
 
@@ -50,13 +48,20 @@ public class CustomerQueryServiceImpl  extends BaseServiceImpl<Customer, Long> i
         return (CustomerMapper) getDao();
     }
 
-    private final TallyingAreaService tallyingAreaService;
-    private final BusinessCategoryService businessCategoryService;
-    private final CharacterTypeService characterTypeService;
-    private final CommonDataService commonDataService;
-    private final UapUserRpcService uapUserRpcService;
-    private final DepartmentRpcService departmentRpcService;
-    private final UapUserTicket uapUserTicket;
+    @Autowired
+    private TallyingAreaService tallyingAreaService;
+    @Autowired
+    private BusinessCategoryService businessCategoryService;
+    @Autowired
+    private CharacterTypeService characterTypeService;
+    @Autowired
+    private CommonDataService commonDataService;
+    @Autowired
+    private UapUserRpcService uapUserRpcService;
+    @Autowired
+    private DepartmentRpcService departmentRpcService;
+    @Autowired
+    private UapUserTicket uapUserTicket;
     @Autowired
     private CustomerMarketService customerMarketService;
     @Autowired
