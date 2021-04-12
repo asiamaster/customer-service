@@ -1,11 +1,12 @@
 package com.dili.customer.api;
 
 import cn.hutool.json.JSONUtil;
-import com.dili.customer.sdk.domain.dto.EmployeeCancelCardInput;
-import com.dili.customer.sdk.domain.dto.EmployeeChangeCardInput;
-import com.dili.customer.sdk.domain.dto.EmployeeOpenCardInput;
+import com.dili.customer.sdk.domain.dto.*;
+import com.dili.customer.sdk.domain.query.CustomerEmployeeDetailQuery;
+import com.dili.customer.sdk.domain.query.CustomerEmployeeQuery;
 import com.dili.customer.service.CustomerEmployeeService;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.domain.PageOutput;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -103,5 +106,31 @@ public class CustomerEmployeeController {
             log.error(String.format("根据条件【%s】换卡操作异常:%s", JSONUtil.toJsonStr(employeeChangeCardInput), e.getMessage()), e);
             return BaseOutput.failure("系统处理异常");
         }
+    }
+
+    /**
+     * 查询客户员工信息数据集
+     * @param query 查询条件
+     * @return
+     */
+    @PostMapping(value="/listPage")
+    public PageOutput<List<CustomerEmployeeList>> listPage(@RequestBody CustomerEmployeeQuery query) {
+        if (Objects.isNull(query.getMarketId())) {
+            return PageOutput.failure("客户所属市场不能为空");
+        }
+        return customerEmployeeService.listPage(query);
+    }
+
+    /**
+     * 客户员工列表详细信息查询
+     * @param query 查询条件
+     * @return
+     */
+    @PostMapping(value="/listEmployeePage")
+    public PageOutput<List<CustomerEmployeeDetailList>> listEmployeePage(@RequestBody CustomerEmployeeDetailQuery query) {
+        if (Objects.isNull(query.getCustomerId())) {
+            return PageOutput.failure("所属客户不能为空");
+        }
+        return customerEmployeeService.listEmployeePage(query);
     }
 }

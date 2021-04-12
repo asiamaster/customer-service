@@ -68,6 +68,7 @@ public class EmployeeController {
      * @param id
      * @return
      */
+    @PostMapping(value = "/resetPassword")
     public BaseOutput resetPassword(@RequestParam("id") Long id){
         employeeService.resetPassword(id);
         return BaseOutput.success();

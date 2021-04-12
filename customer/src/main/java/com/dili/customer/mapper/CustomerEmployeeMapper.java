@@ -2,6 +2,10 @@ package com.dili.customer.mapper;
 
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.CustomerEmployee;
+import com.dili.customer.sdk.domain.dto.CustomerEmployeeDetailList;
+import com.dili.customer.sdk.domain.dto.CustomerEmployeeList;
+import com.dili.customer.sdk.domain.query.CustomerEmployeeDetailQuery;
+import com.dili.customer.sdk.domain.query.CustomerEmployeeQuery;
 import com.dili.ss.base.MyMapper;
 
 import java.util.List;
@@ -26,5 +30,20 @@ public interface CustomerEmployeeMapper extends MyMapper<CustomerEmployee> {
      * @return
      */
     List<Customer> listCustomerById(Long id);
+
+    /**
+     * 前端页面列表查询客户员工信息
+     * @param customerEmployeeQuery 查询条件
+     * @return
+     */
+    List<CustomerEmployeeList> listForPage(CustomerEmployeeQuery customerEmployeeQuery);
+
+
+    /**
+     * 页面列表查询客户员工详细信息
+     * @param customerEmployeeDetailQuery 查询条件
+     * @return
+     */
+    List<CustomerEmployeeDetailList> listEmployeePage(CustomerEmployeeDetailQuery customerEmployeeDetailQuery);
 
 }

@@ -2,15 +2,15 @@ package com.dili.customer.service;
 
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.CustomerEmployee;
-import com.dili.customer.sdk.domain.dto.EmployeeCancelCardInput;
-import com.dili.customer.sdk.domain.dto.EmployeeChangeCardInput;
-import com.dili.customer.sdk.domain.dto.EmployeeOpenCardInput;
+import com.dili.customer.sdk.domain.dto.*;
+import com.dili.customer.sdk.domain.query.CustomerEmployeeDetailQuery;
+import com.dili.customer.sdk.domain.query.CustomerEmployeeQuery;
 import com.dili.ss.base.BaseService;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.domain.PageOutput;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * @author yuehongbo
@@ -61,6 +61,20 @@ public interface CustomerEmployeeService extends BaseService<CustomerEmployee, L
      * @return
      */
     List<Customer> listCustomerById(Long id);
+
+    /**
+     * 查询该市场的客户对应的员工信息
+     * @param query
+     * @return
+     */
+    PageOutput<List<CustomerEmployeeList>>  listPage(CustomerEmployeeQuery query);
+
+    /**
+     * 页面列表查询客户员工详细信息
+     * @param query 查询条件
+     * @return
+     */
+    PageOutput<List<CustomerEmployeeDetailList>> listEmployeePage(CustomerEmployeeDetailQuery query);
 
 
 }

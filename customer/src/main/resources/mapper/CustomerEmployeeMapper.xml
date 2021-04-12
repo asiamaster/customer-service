@@ -10,6 +10,12 @@
         <result column="modify_time" property="modifyTime"/>
     </resultMap>
 
+
+    <!-- list列表查询返回结果集 -->
+    <resultMap id="listResultMap" type="com.dili.customer.sdk.domain.dto.CustomerEmployeeList" extends="com.dili.customer.mapper.CustomerMapper.BaseResultMap">
+        <result column="marketState" property="customerMarket.state"/>
+    </resultMap>
+
     <sql id="Base_Column_List">
         id,
         customer_id,
@@ -28,6 +34,57 @@
     <!-- 根据客户员工关系ID查询员工归属的有效客户信息 -->
     <select id="listCustomerById" parameterType="long" resultType="com.dili.customer.domain.Customer">
         select c.* from customer c,customer_employee ce where ce.customer_id=c.id AND ce.deleted=0 and ce.id=#{id}
+    </select>
+
+    <!-- 前端页面列表查询客户员工信息 -->
+    <select id="listForPage" parameterType="com.dili.customer.sdk.domain.query.CustomerEmployeeQuery" resultMap="listResultMap">
+        SELECT COUNT(e.id) employeeNum, c.id, c.name,c.code,c.organization_type,c.contacts_phone,
+               cm.state as marketState
+        FROM customer c INNER JOIN customer_market cm ON c.id = cm.customer_id AND cm.market_id=#{marketId}
+                       INNER JOIN character_type ct ON c.id = ct.customer_id
+                       INNER  JOIN customer_employee ce ON c.id = ce.customer_id
+                       INNER JOIN employee e ON ce.employee_id = e.id
+        <where>
+            <if test="customerName != null and customerName !=''">
+                and c.name LIKE CONCAT('%',#{customerName},'%')
+            </if>
+            <if test="customerCode != null and customerCode !=''">
+                and c.code = #{customerCode}
+            </if>
+            <if test="customerCellPhone != null and customerCellPhone !=''">
+                and c.contacts_phone = #{customerCellPhone}
+            </if>
+            <if test="characterSubType != null and characterSubType !=''">
+                and ct.sub_type = #{characterSubType}
+            </if>
+            <if test="employeeName != null and employeeName !=''">
+                and e.name LIKE CONCAT('%',#{employeeName},'%')
+            </if>
+            <if test="employeeCellPhone != null and employeeCellPhone !=''">
+                and e.cellphone LIKE CONCAT('',#{employeeCellPhone},'%')
+            </if>
+        </where>
+        GROUP BY c.id
+        ORDER BY ${sort} ${order}
+    </select>
+
+    <!-- 小程序查询客户员工列表信息 -->
+    <select id="listEmployeePage" parameterType="com.dili.customer.sdk.domain.query.CustomerEmployeeDetailQuery" resultType="com.dili.customer.sdk.domain.dto.CustomerEmployeeDetailList">
+        SELECT
+            e.id as employeeId,
+            e.cellphone as employeeCellPhone,
+            e.`name` as employeeName,
+            ce.create_time as createTime,
+            GROUP_CONCAT( ec.card_no ) employeeCardNos
+        FROM
+            employee e
+                INNER JOIN customer_employee ce ON e.id = ce.employee_id AND ce.deleted = 0
+                INNER JOIN employee_card ec ON ce.id = ec.customer_employee_id AND ec.deleted = 0
+        where ce.customer_id = #{customerId}
+        <if test="keywords != null and keywords !=''">
+            and ( e.name like concat('%', #{keywords}, '%') or e.cellphone like concat('', #{keywords}, '%') or ec.card_no = #{keywords} )
+        </if>
+        ORDER BY ce.id desc
     </select>
 
 </mapper>

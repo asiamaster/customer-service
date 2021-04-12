@@ -1,11 +1,14 @@
 package com.dili.customer.sdk.rpc;
 
-import com.dili.customer.sdk.domain.dto.EmployeeCancelCardInput;
-import com.dili.customer.sdk.domain.dto.EmployeeChangeCardInput;
-import com.dili.customer.sdk.domain.dto.EmployeeOpenCardInput;
+import com.dili.customer.sdk.domain.dto.*;
+import com.dili.customer.sdk.domain.query.CustomerEmployeeDetailQuery;
+import com.dili.customer.sdk.domain.query.CustomerEmployeeQuery;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.domain.PageOutput;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.List;
 
 /**
  * @author yuehongbo
@@ -38,5 +41,21 @@ public interface CustomerEmployeeRpc {
      */
     @PostMapping("/api/customerEmployee/changeCard")
     BaseOutput changeCard(EmployeeChangeCardInput employeeChangeCardInput);
+
+    /**
+     * 查询客户员工信息数据集
+     * @param query 查询条件输入项
+     * @return
+     */
+    @PostMapping("/api/customerEmployee/listPage")
+    PageOutput<List<CustomerEmployeeList>> listPage(CustomerEmployeeQuery query);
+
+    /**
+     * 客户员工列表详细信息查询
+     * @param query 查询条件输入项
+     * @return
+     */
+    @PostMapping("/api/customerEmployee/listEmployeePage")
+    PageOutput<List<CustomerEmployeeDetailList>> listEmployeePage(CustomerEmployeeDetailQuery query);
 
 }

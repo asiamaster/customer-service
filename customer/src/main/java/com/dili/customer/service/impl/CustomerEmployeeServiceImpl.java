@@ -1,31 +1,35 @@
 package com.dili.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.commons.constants.CustomerResultCode;
-import com.dili.customer.domain.Customer;
-import com.dili.customer.domain.CustomerEmployee;
-import com.dili.customer.domain.Employee;
-import com.dili.customer.domain.EmployeeCard;
+import com.dili.customer.commons.service.CommonDataService;
+import com.dili.customer.domain.*;
 import com.dili.customer.mapper.CustomerEmployeeMapper;
-import com.dili.customer.sdk.domain.dto.EmployeeCancelCardInput;
-import com.dili.customer.sdk.domain.dto.EmployeeChangeCardInput;
-import com.dili.customer.sdk.domain.dto.EmployeeOpenCardInput;
+import com.dili.customer.sdk.domain.dto.*;
+import com.dili.customer.sdk.domain.query.CustomerEmployeeDetailQuery;
+import com.dili.customer.sdk.domain.query.CustomerEmployeeQuery;
+import com.dili.customer.service.CharacterTypeService;
 import com.dili.customer.service.CustomerEmployeeService;
 import com.dili.customer.service.EmployeeCardService;
 import com.dili.customer.service.EmployeeService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.domain.PageOutput;
+import com.dili.ss.util.POJOUtils;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author yuehongbo
@@ -41,6 +45,10 @@ public class CustomerEmployeeServiceImpl extends BaseServiceImpl<CustomerEmploye
     private EmployeeService employeeService;
     @Autowired
     private EmployeeCardService employeeCardService;
+    @Autowired
+    private CharacterTypeService characterTypeService;
+    @Autowired
+    private CommonDataService commonDataService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -159,5 +167,58 @@ public class CustomerEmployeeServiceImpl extends BaseServiceImpl<CustomerEmploye
             return Collections.emptyList();
         }
         return customerEmployeeMapper.listCustomerById(id);
+    }
+
+    @Override
+    public PageOutput<List<CustomerEmployeeList>> listPage(CustomerEmployeeQuery query) {
+        if (StringUtils.isNotBlank(query.getSort())) {
+            query.setSort(POJOUtils.humpToLineFast(query.getSort()));
+        } else {
+            query.setSort("c.id");
+            query.setOrder("desc");
+        }
+        if (query.getRows() != null && query.getRows() >= 1) {
+            PageHelper.startPage(query.getPage(), query.getRows());
+        }
+        List<CustomerEmployeeList> list = customerEmployeeMapper.listForPage(query);
+        //总记录
+        Long total = list instanceof Page ? ((Page) list).getTotal() : list.size();
+        //总页数
+        int totalPage = list instanceof Page ? ((Page) list).getPages() : 1;
+        //当前页数
+        int pageNum = list instanceof Page ? ((Page) list).getPageNum() : 1;
+        PageOutput output = PageOutput.success();
+        if (CollectionUtil.isNotEmpty(list)) {
+            Set<Long> customerIdSet = list.stream().map(CustomerEmployeeList::getId).collect(Collectors.toSet());
+            //获取客户角色身份信息
+            List<CharacterType> characterTypeList = characterTypeService.listByCustomerAndMarket(customerIdSet, query.getMarketId());
+            Map<Long, List<CharacterType>> characterTypeMap = characterTypeList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(CharacterType::getCustomerId));
+            list.forEach(t -> {
+                if (characterTypeMap.containsKey(t.getId())) {
+                    List<CharacterType> characterTypes = characterTypeMap.get(t.getId());
+                    t.setCharacterTypeList(JSONArray.parseArray(JSONObject.toJSONString(characterTypes), com.dili.customer.sdk.domain.CharacterType.class));
+                    t.setCharacterTypeGroupList(commonDataService.produceCharacterTypeGroup(JSONArray.parseArray(JSONObject.toJSONString(t.getCharacterTypeList()), com.dili.customer.sdk.domain.CharacterType.class), query.getMarketId()));
+                }
+            });
+        }
+        output.setData(list).setPageNum(pageNum).setTotal(total).setPageSize(query.getRows()).setPages(totalPage);
+        return output;
+    }
+
+    @Override
+    public PageOutput<List<CustomerEmployeeDetailList>> listEmployeePage(CustomerEmployeeDetailQuery query) {
+        if (query.getRows() != null && query.getRows() >= 1) {
+            PageHelper.startPage(query.getPage(), query.getRows());
+        }
+        List<CustomerEmployeeDetailList> list = customerEmployeeMapper.listEmployeePage(query);
+        //总记录
+        Long total = list instanceof Page ? ((Page) list).getTotal() : list.size();
+        //总页数
+        int totalPage = list instanceof Page ? ((Page) list).getPages() : 1;
+        //当前页数
+        int pageNum = list instanceof Page ? ((Page) list).getPageNum() : 1;
+        PageOutput output = PageOutput.success();
+        output.setData(list).setPageNum(pageNum).setTotal(total).setPageSize(query.getRows()).setPages(totalPage);
+        return output;
     }
 }
