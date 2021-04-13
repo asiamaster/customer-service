@@ -4,7 +4,7 @@ import com.dili.customer.annotation.UapToken;
 import com.dili.customer.domain.Address;
 import com.dili.customer.service.AddressService;
 import com.dili.ss.domain.BaseOutput;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +17,12 @@ import java.util.Optional;
  * This file was generated on 2020-01-02 16:19:35.
  * @author yuehongbo
  */
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/address")
 public class AddressController {
 
-    private final AddressService addressService;
+    @Autowired
+    private AddressService addressService;
 
     /**
      * 根据客户ID查询该客户的联系地址信息

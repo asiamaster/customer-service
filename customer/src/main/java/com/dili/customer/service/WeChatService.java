@@ -17,8 +17,8 @@ import com.dili.customer.utils.LoginUtil;
 import com.dili.customer.utils.WeChatAppletAesUtil;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,14 +32,17 @@ import java.util.Optional;
  * @date 2020/12/28 19:15
  */
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class WeChatService {
 
-    private final UserAccountService userAccountService;
-    private final AccountTerminalService accountTerminalService;
-    private final CustomerManageService customerManageService;
-    private final AppletRequestInfo appletRequestInfo;
+    @Autowired
+    private UserAccountService userAccountService;
+    @Autowired
+    private AccountTerminalService accountTerminalService;
+    @Autowired
+    private CustomerManageService customerManageService;
+    @Autowired
+    private AppletRequestInfo appletRequestInfo;
 
     /**
      * 本类适用于的小程序类型

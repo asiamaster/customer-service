@@ -5,8 +5,8 @@ import com.dili.customer.domain.Attachment;
 import com.dili.customer.domain.dto.AttachmentDto;
 import com.dili.customer.service.AttachmentService;
 import com.dili.ss.domain.BaseOutput;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,13 +18,13 @@ import java.util.Objects;
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
  * @date 2020/7/25 17:20
  */
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/attachment")
 @Slf4j
 public class AttachmentController {
 
-    private final AttachmentService attachmentService;
+    @Autowired
+    private AttachmentService attachmentService;
 
     /**
      * 根据客户ID查询该客户的附件信息

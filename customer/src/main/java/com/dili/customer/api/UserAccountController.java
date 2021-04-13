@@ -4,8 +4,8 @@ import cn.hutool.json.JSONUtil;
 import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.service.UserAccountService;
 import com.dili.ss.domain.BaseOutput;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -20,11 +20,11 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/userAccount")
 public class UserAccountController {
 
-    private final UserAccountService userAccountService;
+    @Autowired
+    private UserAccountService userAccountService;
 
     /**
      * 根据手机号登录

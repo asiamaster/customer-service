@@ -3,7 +3,7 @@ package com.dili.customer.api;
 import com.dili.customer.domain.BusinessCategory;
 import com.dili.customer.service.BusinessCategoryService;
 import com.dili.ss.domain.BaseOutput;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,12 +16,12 @@ import java.util.List;
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
  * @date 2020/9/1 11:36
  */
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/businessCategory")
 public class BusinessCategoryController {
 
-    private final BusinessCategoryService businessCategoryService;
+    @Autowired
+    private BusinessCategoryService businessCategoryService;
 
     /**
      * 根据客户ID查询该客户的经营品类

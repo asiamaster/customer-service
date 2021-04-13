@@ -9,7 +9,6 @@ import com.dili.customer.domain.dto.ContactsDto;
 import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.mapper.ContactsMapper;
 import com.dili.customer.service.ContactsService;
-import com.dili.customer.service.CustomerManageService;
 import com.dili.customer.service.CustomerQueryService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
@@ -17,7 +16,6 @@ import com.dili.ss.mvc.util.RequestUtils;
 import com.dili.uap.sdk.domain.UserTicket;
 import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Maps;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +28,6 @@ import java.util.stream.Collectors;
  * 由MyBatis Generator工具自动生成
  * This file was generated on 2020-01-02 16:18:39.
  */
-@RequiredArgsConstructor
 @Service
 public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> implements ContactsService {
 
@@ -40,8 +37,10 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
 
     @Autowired
     private CustomerQueryService customerQueryService;
-    private final BusinessLogRpcService businessLogRpcService;
-    private final UapUserTicket uapUserTicket;
+    @Autowired
+    private BusinessLogRpcService businessLogRpcService;
+    @Autowired
+    private UapUserTicket uapUserTicket;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

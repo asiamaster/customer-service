@@ -15,7 +15,6 @@ import com.dili.ss.mvc.util.RequestUtils;
 import com.dili.uap.sdk.domain.UserTicket;
 import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Maps;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
  * 由MyBatis Generator工具自动生成
  * This file was generated on 2020-01-02 16:19:35.
  */
-@RequiredArgsConstructor
 @Service
 public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implements AddressService {
 
@@ -38,8 +36,10 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
 
     @Autowired
     private CustomerManageService customerManageService;
-    private final BusinessLogRpcService businessLogRpcService;
-    private final UapUserTicket uapUserTicket;
+    @Autowired
+    private BusinessLogRpcService businessLogRpcService;
+    @Autowired
+    private UapUserTicket uapUserTicket;
 
     @Override
     public Integer deleteByCustomerAndMarket(Long customerId, Long marketId) {

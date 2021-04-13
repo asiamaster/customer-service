@@ -15,7 +15,6 @@ import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.mvc.util.RequestUtils;
 import com.dili.uap.sdk.domain.UserTicket;
 import com.dili.uap.sdk.util.WebContent;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +28,6 @@ import java.util.stream.Collectors;
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
  * @date 2020/11/29 11:07
  */
-@RequiredArgsConstructor
 @Service
 public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> implements VehicleInfoService {
 
@@ -39,10 +37,12 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
 
     @Autowired
     private CustomerManageService customerManageService;
-
-    private final BusinessLogRpcService businessLogRpcService;
-    private final CarTypeRpcService carTypeRpcService;
-    private final UapUserTicket uapUserTicket;
+    @Autowired
+    private BusinessLogRpcService businessLogRpcService;
+    @Autowired
+    private CarTypeRpcService carTypeRpcService;
+    @Autowired
+    private UapUserTicket uapUserTicket;
 
     @Override
     public Integer deleteByCustomerAndMarket(Long customerId, Long marketId) {

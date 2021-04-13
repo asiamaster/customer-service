@@ -4,7 +4,7 @@ import com.dili.customer.annotation.UapToken;
 import com.dili.customer.domain.Contacts;
 import com.dili.customer.service.ContactsService;
 import com.dili.ss.domain.BaseOutput;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +16,12 @@ import java.util.List;
  * This file was generated on 2020-01-02 16:18:39.
  * @author yuehongbo
  */
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/contacts")
 public class ContactsController {
-    
-    private final ContactsService contactsService;
+
+    @Autowired
+    private ContactsService contactsService;
 
     /**
      * 删除客户联系人

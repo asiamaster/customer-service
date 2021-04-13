@@ -16,7 +16,7 @@ import com.dili.customer.utils.LoginUtil;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +32,12 @@ import java.util.Optional;
  * @date 2020/12/8 14:48
  */
 @Service
-@RequiredArgsConstructor
 public class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, Long> implements UserAccountService {
 
-    private final UserAccountMapper userAccountMapper;
-    private final CommonDataService commonDataService;
+    @Autowired
+    private UserAccountMapper userAccountMapper;
+    @Autowired
+    private CommonDataService commonDataService;
 
     @Override
     public BaseOutput<Boolean> changePassword(Long id, String oldPassword, String newPassword) {

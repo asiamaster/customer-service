@@ -18,7 +18,6 @@ import com.dili.ss.mvc.util.RequestUtils;
 import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import lombok.RequiredArgsConstructor;
 import one.util.streamex.StreamEx;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,6 @@ import java.util.stream.Collectors;
  * 由MyBatis Generator工具自动生成
  * This file was generated on 2020-07-25 17:14:18.
  */
-@RequiredArgsConstructor
 @Service
 public class AttachmentServiceImpl extends BaseServiceImpl<Attachment, Long> implements AttachmentService {
 
@@ -43,8 +41,10 @@ public class AttachmentServiceImpl extends BaseServiceImpl<Attachment, Long> imp
 
     @Autowired
     private CustomerManageService customerManageService;
-    private final BusinessLogRpcService businessLogRpcService;
-    private final UapUserTicket uapUserTicket;
+    @Autowired
+    private BusinessLogRpcService businessLogRpcService;
+    @Autowired
+    private UapUserTicket uapUserTicket;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

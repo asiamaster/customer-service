@@ -19,8 +19,8 @@ import com.dili.uap.sdk.domain.Department;
 import com.dili.uap.sdk.domain.UserTicket;
 import com.dili.uap.sdk.domain.dto.UserQuery;
 import com.google.common.collect.Lists;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,17 +33,21 @@ import java.util.Objects;
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
  * @date 2020/12/21 16:18
  */
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/commonData")
 @Slf4j
 public class CommonDataController {
 
-    private final CommonDataService commonDataService;
-    private final DataDictionaryRpcService dataDictionaryRpcService;
-    private final DepartmentRpcService departmentRpcService;
-    private final UapUserTicket uapUserTicket;
-    private final UapUserRpcService uapUserRpcService;
+    @Autowired
+    private CommonDataService commonDataService;
+    @Autowired
+    private DataDictionaryRpcService dataDictionaryRpcService;
+    @Autowired
+    private DepartmentRpcService departmentRpcService;
+    @Autowired
+    private UapUserTicket uapUserTicket;
+    @Autowired
+    private UapUserRpcService uapUserRpcService;
 
     /**
      * 查询经营性质(用户类型)

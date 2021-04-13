@@ -8,7 +8,6 @@ import com.dili.ss.dto.DTOUtils;
 import com.dili.uap.sdk.domain.UserTicket;
 import com.rabbitmq.client.Channel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -16,6 +15,7 @@ import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -27,10 +27,11 @@ import java.io.IOException;
  */
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class OpenCardListener {
-    private final CustomerMarketService customerMarketService;
-    private final BusinessLogRpcService businessLogRpcService;
+    @Autowired
+    private CustomerMarketService customerMarketService;
+    @Autowired
+    private BusinessLogRpcService businessLogRpcService;
 
     /**
      * 处理客户mq消息数据

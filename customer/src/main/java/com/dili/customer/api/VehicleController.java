@@ -4,8 +4,8 @@ import com.dili.customer.annotation.UapToken;
 import com.dili.customer.domain.VehicleInfo;
 import com.dili.customer.service.VehicleInfoService;
 import com.dili.ss.domain.BaseOutput;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +19,13 @@ import java.util.Optional;
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
  * @date 2020/12/16 14:06
  */
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/vehicle")
 @Slf4j
 public class VehicleController {
 
-    private final VehicleInfoService vehicleInfoService;
+    @Autowired
+    private VehicleInfoService vehicleInfoService;
 
     /**
      * 根据客户ID查询该客户的车辆信息

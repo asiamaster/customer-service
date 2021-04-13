@@ -13,8 +13,8 @@ import com.dili.customer.service.WeChatService;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.exception.AppException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -28,13 +28,14 @@ import java.util.Objects;
  */
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/weChat")
 @AppletRequest(appletType = AppletTerminalType.WE_CHAT)
 public class WeChatController {
 
-    private final WeChatRpc weChatRpc;
-    private final WeChatService weChatService;
+    @Autowired
+    private WeChatRpc weChatRpc;
+    @Autowired
+    private WeChatService weChatService;
 
     /**
      * 微信号登录校验
