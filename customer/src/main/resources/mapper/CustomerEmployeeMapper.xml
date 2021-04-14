@@ -42,7 +42,7 @@
                cm.state as marketState
         FROM customer c INNER JOIN customer_market cm ON c.id = cm.customer_id AND cm.market_id=#{marketId}
                        INNER JOIN character_type ct ON c.id = ct.customer_id
-                       INNER  JOIN customer_employee ce ON c.id = ce.customer_id
+                       INNER  JOIN customer_employee ce ON c.id = ce.customer_id AND ce.deleted = 0
                        INNER JOIN employee e ON ce.employee_id = e.id
         <where>
             <if test="customerName != null and customerName !=''">
