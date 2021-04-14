@@ -84,6 +84,7 @@
         <if test="keywords != null and keywords !=''">
             and ( e.name like concat('%', #{keywords}, '%') or e.cellphone like concat('', #{keywords}, '%') or ec.card_no = #{keywords} )
         </if>
+        GROUP BY e.id
         ORDER BY ce.id desc
     </select>
 

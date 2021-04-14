@@ -207,7 +207,7 @@ public class CustomerEmployeeServiceImpl extends BaseServiceImpl<CustomerEmploye
 
     @Override
     public PageOutput<List<CustomerEmployeeDetailList>> listEmployeePage(CustomerEmployeeDetailQuery query) {
-        if (query.getRows() != null && query.getRows() >= 1) {
+        if (Objects.nonNull(query.getRows()) && query.getRows() >= 1 && Objects.nonNull(query.getPage()) && query.getPage() > 0) {
             PageHelper.startPage(query.getPage(), query.getRows());
         }
         List<CustomerEmployeeDetailList> list = customerEmployeeMapper.listEmployeePage(query);
