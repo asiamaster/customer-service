@@ -144,6 +144,26 @@ public class EmployeeServiceImpl extends BaseServiceImpl<Employee, Long> impleme
         }
     }
 
+    @Override
+    public BaseOutput<Boolean> changePassword(Long id, String oldPassword, String newPassword) {
+        if (Objects.isNull(id) || StrUtil.isBlank(oldPassword) || StrUtil.isBlank(newPassword)) {
+            return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR).setData(false);
+
+        }
+        Employee employee = this.get(id);
+        if (Objects.isNull(employee)) {
+            return BaseOutput.failure("员工信息不存在").setCode(ResultCode.UNAUTHORIZED).setData(false);
+        }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (!encoder.matches(oldPassword, employee.getPassword())) {
+            return BaseOutput.failure("原始密码不正确").setCode(ResultCode.DATA_ERROR).setData(false);
+        }
+        employee.setPassword(encoder.encode(newPassword));
+        employee.setChangedPwdTime(LocalDateTime.now());
+        this.update(employee);
+        return BaseOutput.successData(true);
+    }
+
     /**
      * 根据对象数据，按照规则设置数据密码
      * @param saveData

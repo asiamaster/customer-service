@@ -1,5 +1,6 @@
 package com.dili.customer.api;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.dto.EmployeeLoginDto;
@@ -13,6 +14,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -72,6 +75,32 @@ public class EmployeeController {
     public BaseOutput resetPassword(@RequestParam("id") Long id){
         employeeService.resetPassword(id);
         return BaseOutput.success();
+    }
+
+    /**
+     * 员工更新登录密码
+     * @param params 接口参数
+     *  employeeId 登录账号ID
+     *  oldPassword 旧密码
+     *  newPassword 新密码
+     * @return 是否更新成功
+     */
+    @PostMapping("/changePassword")
+    public BaseOutput<Boolean> changePassword(@RequestBody Map<String, Object> params) {
+        log.info(String.format("员工更改账号密码参数为:%s", JSONUtil.toJsonStr(params)));
+        try {
+            String idStr = Objects.toString(params.get("employeeId"), null);
+            if (StrUtil.isBlank(idStr)) {
+                return BaseOutput.failure("员工信息丢失");
+            }
+            Long id = Long.valueOf(idStr);
+            String oldPassword = Objects.toString(params.get("oldPassword"), null);
+            String newPassword = Objects.toString(params.get("newPassword"), null);
+            return employeeService.changePassword(id, oldPassword, newPassword);
+        } catch (Exception e) {
+            log.error(String.format("根据【%s】修改员工密码异常:", JSONUtil.toJsonStr(params), e.getMessage()), e);
+            return BaseOutput.failure("密码修改异常");
+        }
     }
 
 }

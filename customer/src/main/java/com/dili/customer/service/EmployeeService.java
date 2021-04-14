@@ -56,4 +56,13 @@ public interface EmployeeService extends BaseService<Employee, Long> {
      * @param id
      */
     void resetPassword(Long id);
+
+    /**
+     * 根据员工ID更新登录密码
+     * @param id 登录员工的ID
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     * @return 是否更新成功
+     */
+    BaseOutput<Boolean> changePassword(Long id,String oldPassword, String newPassword);
 }
