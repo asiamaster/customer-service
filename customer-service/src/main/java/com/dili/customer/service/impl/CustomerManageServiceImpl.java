@@ -41,7 +41,7 @@ import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,6 +96,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
     @Autowired
     private CustomerQueryService customerQueryService;
     @Autowired
+    @Lazy
     private CustomerMarketService customerMarketService;
     @Autowired
     private ContactsService contactsService;
@@ -975,7 +976,6 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
      * @param marketIds
      */
     @Override
-    @Async
     public void asyncSendCustomerToMq(String exchange, Long customerId, Set<Long> marketIds) {
         marketIds.forEach(t -> {
             send(exchange, customerQueryService.get(customerId, t));
