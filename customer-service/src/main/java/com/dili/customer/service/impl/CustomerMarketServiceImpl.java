@@ -11,7 +11,6 @@ import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.CustomerManageService;
 import com.dili.customer.service.CustomerMarketService;
-import com.dili.customer.service.MqService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.google.common.collect.Lists;
 import one.util.streamex.StreamEx;

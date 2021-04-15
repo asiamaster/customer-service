@@ -17,7 +17,6 @@ import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.sdk.validator.*;
 import com.dili.customer.service.CustomerManageService;
 import com.dili.customer.service.CustomerQueryService;
-import com.dili.customer.service.MqService;
 import com.dili.customer.service.UserAccountService;
 import com.dili.customer.utils.LoginUtil;
 import com.dili.ss.constant.ResultCode;

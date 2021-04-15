@@ -9,6 +9,7 @@ import cn.hutool.extra.validation.ValidationUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.commons.glossary.YesOrNoEnum;
+import com.dili.commons.rabbitmq.RabbitMQMessageService;
 import com.dili.customer.commons.config.CustomerCommonConfig;
 import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.customer.commons.service.BusinessLogRpcService;
@@ -105,7 +106,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
     @Autowired
     private VehicleInfoService vehicleInfoService;
     @Autowired
-    private MqService mqService;
+    private RabbitMQMessageService rabbitMQMessageService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -965,7 +966,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
 
     @Override
     public void asyncSendCustomerToMq(String exchange, Long customerId, Long marketId) {
-        mqService.asyncSendCustomerToMq(exchange, customerQueryService.get(customerId, marketId));
+        send(exchange, customerQueryService.get(customerId, marketId));
     }
     /**
      * 批量异步数据发送MQ
@@ -977,7 +978,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
     @Async
     public void asyncSendCustomerToMq(String exchange, Long customerId, Set<Long> marketIds) {
         marketIds.forEach(t -> {
-            mqService.asyncSendCustomerToMq(exchange, customerQueryService.get(customerId, t));
+            send(exchange, customerQueryService.get(customerId, t));
         });
     }
 
@@ -1100,4 +1101,12 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         return b ? Optional.empty() : Optional.of("证件类型错误");
     }
 
+    /**
+     * 发送消息
+     * @param exchange
+     * @param customer
+     */
+    private void send(String exchange, Customer customer){
+        rabbitMQMessageService.send(exchange, null, JSONObject.toJSONString(customer));
+    }
 }
