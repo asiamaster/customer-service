@@ -7,9 +7,9 @@
     <packaging>jar</packaging>
     <groupId>com.dili</groupId>
     <artifactId>customer-commons</artifactId>
-
+    <name>客户通用模块</name>
     <parent>
-        <artifactId>customer-parent</artifactId>
+        <artifactId>customer-service-parent</artifactId>
         <groupId>com.dili</groupId>
         <version>1.3.7-SNAPSHOT</version>
     </parent>
