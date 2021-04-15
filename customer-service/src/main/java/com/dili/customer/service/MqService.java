@@ -18,39 +18,22 @@ import java.util.Set;
  * @date 2021/1/21 11:28
  */
 @Service
+@Lazy
 public class MqService {
 
-    @Autowired
-    @Lazy
-    private CustomerQueryService customerQueryService;
     @Autowired
     private RabbitMQMessageService rabbitMQMessageService;
 
     /**
      * 异步发送客户信息到对应的mq中
      * @param exchange
-     * @param customerId
-     * @param marketId
+     * @param customer
      */
     @Async
-    public void asyncSendCustomerToMq(String exchange, Long customerId, Long marketId) {
-        Customer customer = customerQueryService.get(customerId, marketId);
+    public void asyncSendCustomerToMq(String exchange, Customer customer) {
         if (Objects.nonNull(customer)) {
             rabbitMQMessageService.send(exchange, null, JSONObject.toJSONString(customer));
         }
-    }
-
-    /**
-     * 批量异步数据发送MQ
-     * @param exchange
-     * @param customerId
-     * @param marketIds
-     */
-    @Async
-    public void asyncSendCustomerToMq(String exchange, Long customerId, Set<Long> marketIds) {
-        marketIds.forEach(t -> {
-            this.asyncSendCustomerToMq(exchange, customerId, t);
-        });
     }
 
 }

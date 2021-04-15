@@ -7,6 +7,7 @@ import com.dili.ss.domain.BaseOutput;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -118,4 +119,19 @@ public interface CustomerManageService extends BaseService<Customer, Long> {
      */
     Optional<String> verificationCellPhone(String cellphone, Long customerId, String verificationCode);
 
+    /**
+     * 逐条发送消息
+     * @param exchange
+     * @param customerId
+     * @param marketId
+     */
+    void asyncSendCustomerToMq(String exchange, Long customerId, Long marketId);
+
+    /**
+     * 批量发送消息
+     * @param exchange
+     * @param customerId
+     * @param marketIds
+     */
+    void asyncSendCustomerToMq(String exchange, Long customerId, Set<Long> marketIds);
 }

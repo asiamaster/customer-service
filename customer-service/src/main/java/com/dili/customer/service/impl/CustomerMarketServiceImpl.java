@@ -9,13 +9,13 @@ import com.dili.customer.mapper.CustomerMarketMapper;
 import com.dili.customer.sdk.constants.MqConstant;
 import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
+import com.dili.customer.service.CustomerManageService;
 import com.dili.customer.service.CustomerMarketService;
 import com.dili.customer.service.MqService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.google.common.collect.Lists;
 import one.util.streamex.StreamEx;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,8 +37,7 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
     @Autowired
     private MarketRpcService marketRpcService;
     @Autowired
-    @Lazy
-    private MqService mqService;
+    private CustomerManageService customerManageService;
 
     @Override
     public CustomerMarket queryByMarketAndCustomerId(Long marketId, Long customerId) {
@@ -122,7 +121,7 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
         if (Objects.nonNull(customerMarket)) {
             customerMarket.setState(state);
             this.update(customerMarket);
-            mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, customerId, marketId);
+            customerManageService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, customerId, marketId);
             return Optional.empty();
         }
         return Optional.of("未获取到数据");

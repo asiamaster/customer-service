@@ -40,6 +40,7 @@ import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -103,7 +104,8 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
     private AttachmentService attachmentService;
     @Autowired
     private VehicleInfoService vehicleInfoService;
-
+    @Autowired
+    private MqService mqService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -961,6 +963,23 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         }
     }
 
+    @Override
+    public void asyncSendCustomerToMq(String exchange, Long customerId, Long marketId) {
+        mqService.asyncSendCustomerToMq(exchange, customerQueryService.get(customerId, marketId));
+    }
+    /**
+     * 批量异步数据发送MQ
+     * @param exchange
+     * @param customerId
+     * @param marketIds
+     */
+    @Override
+    @Async
+    public void asyncSendCustomerToMq(String exchange, Long customerId, Set<Long> marketIds) {
+        marketIds.forEach(t -> {
+            mqService.asyncSendCustomerToMq(exchange, customerQueryService.get(customerId, t));
+        });
+    }
 
     /**
      *  组装客户联系人信息

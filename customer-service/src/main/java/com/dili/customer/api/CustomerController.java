@@ -53,8 +53,6 @@ public class CustomerController {
     private CustomerQueryService customerQueryService;
     @Autowired
     private UserAccountService userAccountService;
-    @Autowired
-    private MqService mqService;
 
     /**
      * 分页查询客户数据集
@@ -282,7 +280,7 @@ public class CustomerController {
         try {
             BaseOutput update = customerManageService.update(updateInput);
             if (update.isSuccess()) {
-                mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, updateInput.getId(), updateInput.getCustomerMarket().getMarketId());
+                customerManageService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, updateInput.getId(), updateInput.getCustomerMarket().getMarketId());
             }
             return update;
         } catch (AppException appException) {
@@ -308,7 +306,7 @@ public class CustomerController {
         try {
             BaseOutput<Customer> baseOutput = customerManageService.register(customer);
             if (baseOutput.isSuccess()) {
-                mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_ADD_MQ_FANOUT_EXCHANGE, baseOutput.getData().getId(), customer.getCustomerMarket().getMarketId());
+                customerManageService.asyncSendCustomerToMq(MqConstant.CUSTOMER_ADD_MQ_FANOUT_EXCHANGE, baseOutput.getData().getId(), customer.getCustomerMarket().getMarketId());
             }
             return baseOutput;
         } catch (AppException e) {
@@ -337,7 +335,7 @@ public class CustomerController {
         try {
             BaseOutput<Customer> baseOutput = customerManageService.register(input);
             if (baseOutput.isSuccess()) {
-                mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_ADD_MQ_FANOUT_EXCHANGE, baseOutput.getData().getId(), input.getCustomerMarket().getMarketId());
+                customerManageService.asyncSendCustomerToMq(MqConstant.CUSTOMER_ADD_MQ_FANOUT_EXCHANGE, baseOutput.getData().getId(), input.getCustomerMarket().getMarketId());
             }
             return baseOutput;
         } catch (AppException e) {
@@ -443,7 +441,7 @@ public class CustomerController {
         try {
             BaseOutput<Long> longBaseOutput = customerManageService.batchCompleteEnterprise(inputList);
             Set<Long> marketIds = (Set<Long>) (longBaseOutput.getMetadata());
-            mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE,longBaseOutput.getData(),marketIds);
+            customerManageService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE,longBaseOutput.getData(),marketIds);
             return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccountService.getByCellphone(inputList.get(0).getContactsPhone()).get(), null));
         } catch (AppException appException) {
             return BaseOutput.failure(appException.getMessage());
@@ -487,7 +485,7 @@ public class CustomerController {
         try {
             BaseOutput<Long> longBaseOutput = customerManageService.batchCompleteIndividual(inputList);
             Set<Long> marketIds = (Set<Long>) (longBaseOutput.getMetadata());
-            mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE,longBaseOutput.getData(),marketIds);
+            customerManageService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE,longBaseOutput.getData(),marketIds);
             return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccountService.getByCellphone(inputList.get(0).getContactsPhone()).get(), null));
         } catch (AppException appException) {
             return BaseOutput.failure(appException.getMessage());
@@ -512,7 +510,7 @@ public class CustomerController {
         try {
             BaseOutput baseOutput = customerManageService.updateBaseInfo(input, true);
             if (baseOutput.isSuccess()) {
-                mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, input.getId(), input.getCustomerMarket().getMarketId());
+                customerManageService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, input.getId(), input.getCustomerMarket().getMarketId());
             }
             return baseOutput;
         } catch (Exception e) {
@@ -551,7 +549,7 @@ public class CustomerController {
         try {
             BaseOutput<Customer> customerBaseOutput = customerManageService.completeInfo(input);
             if (customerBaseOutput.isSuccess()) {
-                mqService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, customerBaseOutput.getData().getId(), input.getCustomerMarket().getMarketId());
+                customerManageService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, customerBaseOutput.getData().getId(), input.getCustomerMarket().getMarketId());
                 return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccountService.getByCellphone(input.getContactsPhone()).get(), null));
             }
             return BaseOutput.failure(customerBaseOutput.getMessage());
