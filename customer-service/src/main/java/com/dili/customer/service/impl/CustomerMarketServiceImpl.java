@@ -15,6 +15,7 @@ import com.dili.ss.base.BaseServiceImpl;
 import com.google.common.collect.Lists;
 import one.util.streamex.StreamEx;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
     @Autowired
     private MarketRpcService marketRpcService;
     @Autowired
+    @Lazy
     private MqService mqService;
 
     @Override
