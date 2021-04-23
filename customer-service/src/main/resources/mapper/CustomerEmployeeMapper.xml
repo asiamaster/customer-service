@@ -38,7 +38,7 @@
 
     <!-- 前端页面列表查询客户员工信息 -->
     <select id="listForPage" parameterType="com.dili.customer.sdk.domain.query.CustomerEmployeeQuery" resultMap="listResultMap">
-        SELECT COUNT(e.id) employeeNum, c.id, c.name,c.code,c.organization_type,c.contacts_phone,
+        SELECT (SELECT COUNT(e1.id) FROM customer_employee e1 WHERE e1.customer_id = c.id) employeeNum, c.id, c.name,c.code,c.organization_type,c.contacts_phone,
                cm.state as marketState
         FROM customer c INNER JOIN customer_market cm ON c.id = cm.customer_id AND cm.market_id=#{marketId}
                        INNER JOIN character_type ct ON c.id = ct.customer_id

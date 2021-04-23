@@ -192,7 +192,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                         Set<String> departmentIdAuth = departmentList.stream().map(t -> String.valueOf(t.getId())).collect(Collectors.toSet());
                         if (ownerAuth) {
                             if (StrUtil.isNotBlank(temp.getOwnerIds())) {
-                                if (!departmentIdAuth.contains(String.valueOf(userTicket))) {
+                                if (!departmentIdAuth.contains(String.valueOf(userTicket.getDepartmentId()))) {
                                     return BaseOutput.failure("您暂无归属部门的数据权限，不能新增客户");
                                 }
                                 if (!departmentIdSet.contains(String.valueOf(userTicket.getDepartmentId()))) {
