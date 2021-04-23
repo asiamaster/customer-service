@@ -227,7 +227,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                             str.append(getOperatorUserTicket().getRealName()).append("创建").append(CustomerEnum.OrganizationType.getInstance(customer.getOrganizationType()).getValue())
                                     .append("客户[").append(customer.getName()).append("]成功");
                             LoggerUtil.buildBusinessLoggerContext(customer.getId(), customer.getCode(), userTicket.getId(), userTicket.getRealName(), userTicket.getFirmId(), str.toString());
-                            return BaseOutput.success("客户资料维护成功");
+                            return BaseOutput.success("客户资料维护成功").setData(customer);
                         } else {
                             return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR);
                         }
