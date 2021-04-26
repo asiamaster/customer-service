@@ -622,7 +622,6 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                     customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
                     customerMarket.setState(CustomerEnum.State.USELESS.getCode());
                 }
-                customerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
                 customerMarket.setCreateTime(LocalDateTime.now());
                 customerMarket.setModifyTime(LocalDateTime.now());
                 customerMarket.setAlias(input.getName());
