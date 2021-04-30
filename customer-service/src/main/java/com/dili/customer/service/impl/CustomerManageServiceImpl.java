@@ -39,6 +39,7 @@ import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -111,10 +112,10 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @BusinessLogger(businessType = "customer", systemCode = "CUSTOMER",operationType = "add")
+    @BusinessLogger(businessType = "customer", systemCode = "CUSTOMER", operationType = "add")
     public BaseOutput<Customer> register(EnterpriseCustomerInput baseInfo) {
         UserTicket userTicket = getOperatorUserTicket();
-        if (Objects.isNull(baseInfo.getCustomerMarket())){
+        if (Objects.isNull(baseInfo.getCustomerMarket())) {
             return BaseOutput.failure("客户所属市场信息丢失");
         }
         if (Objects.isNull(baseInfo.getOperatorId())) {
@@ -126,7 +127,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         }
         //客户归属市场信息
         CustomerMarket marketInfo = new CustomerMarket();
-        BeanUtils.copyProperties(baseInfo.getCustomerMarket(),marketInfo);
+        BeanUtils.copyProperties(baseInfo.getCustomerMarket(), marketInfo);
         marketInfo.setState(CustomerEnum.State.NORMAL.getCode());
         //客户基本信息对象
         Customer customer = null;
@@ -137,81 +138,64 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
             //根据证件号判断客户是否已存在
             customer = customerQueryService.getBaseInfoByCertificateNumber(baseInfo.getCertificateNumber());
             if (null == customer) {
-                Integer countByContactsPhone = this.countByContactsPhone(baseInfo.getContactsPhone());
-                if (countByContactsPhone > 0) {
-                    return BaseOutput.failure("该手机号已被其他客户验证");
+                String invalidPhoneNumberInfo = validatePhoneNumberBeforeAddingCustomer(baseInfo);
+                // 如果存在异常信息，则直接返回
+                if (StringUtils.isNotBlank(invalidPhoneNumberInfo)) {
+                    return BaseOutput.failure(invalidPhoneNumberInfo);
                 }
-                /**
-                 * 身份证号对应的客户不存在，手机号对应的客户已存在，则认为手机号已被使用
-                 * 个人客户中，手机号不允许重复，企业客户中，手机号允许重复
-                 */
-                List<Customer> phoneExist = customerQueryService.getByContactsPhone(baseInfo.getContactsPhone(), baseInfo.getOrganizationType());
-                //如果为个人用户
-                if (CustomerEnum.OrganizationType.INDIVIDUAL.equals(CustomerEnum.OrganizationType.getInstance(baseInfo.getOrganizationType()))) {
-                    if (CollectionUtil.isNotEmpty(phoneExist)) {
-                        return BaseOutput.failure("此手机号对应的客户已存在");
-                    }
-                } else {
-                    if (CollectionUtil.isNotEmpty(phoneExist) && phoneExist.size() >= customerConfig.getPhoneLimit()) {
-                        return BaseOutput.failure("此手机号注册的客户数量已达上限");
-                    }
-                }
-                customer = new Customer();
-                BeanUtils.copyProperties(baseInfo, customer);
-                String customerCode = getCustomerCode();
-                if (StrUtil.isBlank(customerCode)) {
-                    throw new AppException(ResultCode.APP_ERROR, "未获取到编号");
-                }
-                customer.setCode(customerCode);
-                customer.setCreatorId(baseInfo.getOperatorId());
-                customer.setCreateTime(LocalDateTime.now());
-                customer.setModifyTime(customer.getCreateTime());
-                customer.setIsDelete(0);
-                customer.setIsCertification(YesOrNoEnum.NO.getCode());
-                super.insertSelective(customer);
+                customer = addCustomer(baseInfo);
             } else {
                 if (!customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())) {
                     return BaseOutput.failure("已存在相同证件号的客户").setCode(ResultCode.DATA_ERROR);
                 }
-                //查询客户在当前传入市场的信息
-                CustomerMarket temp = customerMarketService.queryByMarketAndCustomerId(marketInfo.getMarketId(), customer.getId());
-                if (Objects.nonNull(temp)) {
+                /**
+                 *  查询客户与市场的关联信息，本平台已启用市场隔离。
+                 *  如果未启用部门或归属人权限隔离，则查询客户与市场的关联信息存在，则为全局存在，可直接判定客户存在
+                 *  如果启用部门或归属人权限隔离，
+                */
+                CustomerMarket customerMarket = customerMarketService.queryByMarketAndCustomerId(marketInfo.getMarketId(), customer.getId());
+                if (Objects.nonNull(customerMarket)) {
                     Boolean departmentAuth = commonDataService.checkCustomerDepartmentAuth(marketInfo.getMarketId());
                     Boolean ownerAuth = commonDataService.checkCustomerOwnerAuth(marketInfo.getMarketId());
+                    // 当部门或归属人权限启用至少一种时：
                     if (departmentAuth || ownerAuth) {
                         if (Objects.isNull(userTicket.getDepartmentId())) {
                             return BaseOutput.failure("当前市场客户数据已启用部门、归属人权限，您归属部门为空").setCode(ResultCode.NOT_AUTH_ERROR);
                         }
-                        if (StrUtil.isBlank(temp.getDepartmentIds()) && StrUtil.isBlank(temp.getOwnerIds())) {
+                        if (StrUtil.isBlank(customerMarket.getDepartmentIds()) && StrUtil.isBlank(customerMarket.getOwnerIds())) {
                             return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR);
                         }
+                        // 更新标志，true表示将有更新操作。
                         Boolean updateFlag = false;
-                        Set<String> departmentIdSet = Arrays.stream(temp.getDepartmentIds().split(",")).collect(Collectors.toSet());
-                        //查询客户有权限的部门
-                        List<Department> departmentList = departmentRpcService.listUserAuthDepartmentByFirmId(userTicket.getId(), userTicket.getFirmId());
-                        Set<String> departmentIdAuth = departmentList.stream().map(t -> String.valueOf(t.getId())).collect(Collectors.toSet());
+                        // 获取客户所在的部门id，并去重
+                        Set<String> customerDepartmentIds = Arrays.stream(customerMarket.getDepartmentIds().split(",")).collect(Collectors.toSet());
+                        // 查询用户在该市场中有权限的部门id，并去重
+                        List<Department> userHasAuthorityDepartments = departmentRpcService.listUserAuthDepartmentByFirmId(userTicket.getId(), userTicket.getFirmId());
+                        Set<String> userHasAuthorityDepartmentIds = userHasAuthorityDepartments.stream().map(t -> String.valueOf(t.getId())).collect(Collectors.toSet());
                         if (ownerAuth) {
-                            if (StrUtil.isNotBlank(temp.getOwnerIds())) {
-                                if (!departmentIdAuth.contains(String.valueOf(userTicket.getDepartmentId()))) {
+                            if (StrUtil.isNotBlank(customerMarket.getOwnerIds())) {
+                                // 如果用户登录凭证中的归属部门信息不包含在用户市场权限部门中，则其无权操作此部门的数据，直接返回失败
+                                if (!userHasAuthorityDepartmentIds.contains(String.valueOf(userTicket.getDepartmentId()))) {
                                     return BaseOutput.failure("您暂无归属部门的数据权限，不能新增客户");
                                 }
-                                if (!departmentIdSet.contains(String.valueOf(userTicket.getDepartmentId()))) {
-                                    departmentIdSet.add(String.valueOf(userTicket.getDepartmentId()));
+                                // 如果客户所在部门信息不包含当前登录用户凭证中归属部门信息，则将用户归属部门信息添加到客户所属部门
+                                if (!customerDepartmentIds.contains(String.valueOf(userTicket.getDepartmentId()))) {
+                                    customerDepartmentIds.add(String.valueOf(userTicket.getDepartmentId()));
                                 }
-                                Set<String> ownerIdSet = Arrays.stream(temp.getOwnerIds().split(",")).collect(Collectors.toSet());
+                                Set<String> ownerIdSet = Arrays.stream(customerMarket.getOwnerIds().split(",")).collect(Collectors.toSet());
                                 ownerIdSet.add(String.valueOf(userTicket.getId()));
-                                temp.setOwnerIds(ownerIdSet.stream().collect(Collectors.joining(",")));
+                                customerMarket.setOwnerIds(ownerIdSet.stream().collect(Collectors.joining(",")));
                                 updateFlag = true;
                             }
                         }
                         if (departmentAuth) {
-                            if (StrUtil.isNotBlank(temp.getDepartmentIds())) {
+                            if (StrUtil.isNotBlank(customerMarket.getDepartmentIds())) {
                                 Set<String> departmentIdTemp = new HashSet<>();
-                                departmentIdTemp.addAll(departmentIdSet);
-                                departmentIdTemp.retainAll(departmentIdAuth);
+                                departmentIdTemp.addAll(customerDepartmentIds);
+                                departmentIdTemp.retainAll(userHasAuthorityDepartmentIds);
                                 //已有归属部门与部门权限不存在
-                                if (CollectionUtil.isEmpty(departmentIdTemp) && departmentIdAuth.contains(String.valueOf(userTicket.getDepartmentId()))) {
-                                    departmentIdSet.add(String.valueOf(userTicket.getDepartmentId()));
+                                if (CollectionUtil.isEmpty(departmentIdTemp) && userHasAuthorityDepartmentIds.contains(String.valueOf(userTicket.getDepartmentId()))) {
+                                    customerDepartmentIds.add(String.valueOf(userTicket.getDepartmentId()));
                                     updateFlag = true;
                                 } else if (CollectionUtil.isNotEmpty(departmentIdTemp) && departmentIdTemp.contains(String.valueOf(userTicket.getDepartmentId()))) {
                                     updateFlag = true;
@@ -221,8 +205,8 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                             }
                         }
                         if (updateFlag) {
-                            temp.setDepartmentIds(departmentIdSet.stream().collect(Collectors.joining(",")));
-                            customerMarketService.update(temp);
+                            customerMarket.setDepartmentIds(customerDepartmentIds.stream().collect(Collectors.joining(",")));
+                            customerMarketService.update(customerMarket);
                             StringBuffer str = new StringBuffer();
                             str.append(getOperatorUserTicket().getRealName()).append("创建").append(CustomerEnum.OrganizationType.getInstance(customer.getOrganizationType()).getValue())
                                     .append("客户[").append(customer.getName()).append("]成功");
@@ -283,7 +267,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         List<Contacts> contactsList = generateContacts(baseInfo, customer);
         contactsService.batchInsert(contactsList);
         //如果联系地址不为空，则保存默认联系地址
-        if(Objects.nonNull(baseInfo.getCurrentCityPath()) && StrUtil.isNotBlank(baseInfo.getCurrentAddress())){
+        if (Objects.nonNull(baseInfo.getCurrentCityPath()) && StrUtil.isNotBlank(baseInfo.getCurrentAddress())) {
             Address address = new Address();
             address.setCityPath(baseInfo.getCurrentCityPath());
             address.setCityName(baseInfo.getCurrentCityName());
@@ -305,14 +289,14 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
             tallyingAreaService.saveInfo(tallyingAreaList, customer.getId(), marketInfo.getMarketId());
         }
         //处理客户经营品类信息
-        if (CollectionUtil.isNotEmpty(baseInfo.getBusinessCategoryList())){
+        if (CollectionUtil.isNotEmpty(baseInfo.getBusinessCategoryList())) {
             List<BusinessCategory> businessCategoryList = JSONArray.parseArray(JSONObject.toJSONString(baseInfo.getBusinessCategoryList()), BusinessCategory.class);
             businessCategoryService.saveInfo(businessCategoryList, customer.getId(), marketInfo.getMarketId());
         }
         //组装保存客户角色身份信息
-        if (CollectionUtil.isNotEmpty(baseInfo.getCharacterTypeList())){
+        if (CollectionUtil.isNotEmpty(baseInfo.getCharacterTypeList())) {
             List<CharacterType> characterTypeList = JSONArray.parseArray(JSONObject.toJSONString(baseInfo.getCharacterTypeList()), CharacterType.class);
-            characterTypeService.saveInfo(characterTypeList,customer.getId(),marketInfo.getMarketId());
+            characterTypeService.saveInfo(characterTypeList, customer.getId(), marketInfo.getMarketId());
             customer.setCharacterTypeList(characterTypeList);
         }
         customer.setCustomerMarket(marketInfo);
@@ -322,6 +306,49 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         LoggerUtil.buildBusinessLoggerContext(customer.getId(), customer.getCode(), userTicket.getId(), userTicket.getRealName(), userTicket.getFirmId(), str.toString());
         return BaseOutput.success().setData(customer);
     }
+
+    private String validatePhoneNumberBeforeAddingCustomer(EnterpriseCustomerInput baseInfo) {
+        Integer countByContactsPhone = this.countByContactsPhone(baseInfo.getContactsPhone());
+        if (countByContactsPhone > 0) {
+            return "该手机号已被其他客户验证";
+        }
+        /**
+         * 身份证号对应的客户不存在，手机号对应的客户已存在，则认为手机号已被使用
+         * 个人客户中，手机号不允许重复，企业客户中，手机号允许重复
+         */
+        List<Customer> phoneExist = customerQueryService.getByContactsPhone(baseInfo.getContactsPhone(), baseInfo.getOrganizationType());
+        //如果为个人用户
+        if (CustomerEnum.OrganizationType.INDIVIDUAL.equals(CustomerEnum.OrganizationType.getInstance(baseInfo.getOrganizationType()))) {
+            if (CollectionUtil.isNotEmpty(phoneExist)) {
+                return "此手机号对应的客户已存在";
+            }
+        } else {
+            if (CollectionUtil.isNotEmpty(phoneExist) && phoneExist.size() >= customerConfig.getPhoneLimit()) {
+                return "此手机号注册的客户数量已达上限";
+            }
+        }
+        return null;
+    }
+
+    private Customer addCustomer(EnterpriseCustomerInput baseInfo) {
+        Customer customer = new Customer();
+        BeanUtils.copyProperties(baseInfo, customer);
+        String customerCode = getCustomerCode();
+        if (StrUtil.isBlank(customerCode)) {
+            throw new AppException(ResultCode.APP_ERROR, "未获取到编号");
+        }
+
+        customer.setCode(customerCode);
+        customer.setCreatorId(baseInfo.getOperatorId());
+        customer.setCreateTime(LocalDateTime.now());
+        customer.setModifyTime(customer.getCreateTime());
+        customer.setIsDelete(0);
+        customer.setIsCertification(YesOrNoEnum.NO.getCode());
+        customer.setCurrentCityName(baseInfo.getCurrentCityName());
+        customer.setCurrentCityPath(baseInfo.getCurrentCityPath());
+        super.insertSelective(customer);
+        return customer;
+     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -422,7 +449,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                     vehicleInfoList.add(temp);
                 }
             }
-            if (exist){
+            if (exist) {
                 throw new AppException("车辆信息车牌号存在重复");
             }
             vehicleInfoService.batchSaveOrUpdate(vehicleInfoList);
@@ -444,7 +471,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         if (byCellphone.isPresent()) {
             return BaseOutput.failure("您的联系电话系统已存在对应账号，请更换其他号码，谢谢！");
         }
-        BaseOutput<Customer> customerBaseOutput = this.insertByContactsPhone(dto.getContactsPhone(), dto.getSourceSystem(),dto.getName());
+        BaseOutput<Customer> customerBaseOutput = this.insertByContactsPhone(dto.getContactsPhone(), dto.getSourceSystem(), dto.getName());
         if (customerBaseOutput.isSuccess()) {
             Customer customer = customerBaseOutput.getData();
             UserAccount userAccount = new UserAccount();
@@ -868,12 +895,12 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
             StringBuffer content = new StringBuffer("修改后的数据为：");
             List<CharacterTypeGroupDto> characterTypeGroupDtoList = commonDataService.produceCharacterTypeGroup(updateInput.getCharacterTypeList(), getOperatorUserTicket().getFirmId());
             StringBuffer characterType = new StringBuffer("角色身份：");
-            characterTypeGroupDtoList.stream().forEach(t->{
-                if (t.getSelected()){
+            characterTypeGroupDtoList.stream().forEach(t -> {
+                if (t.getSelected()) {
                     characterType.append(" &").append(t.getValue());
-                    if (CollectionUtil.isNotEmpty(t.getSubTypeList())){
-                        t.getSubTypeList().forEach(s->{
-                            if (s.getSelected()){
+                    if (CollectionUtil.isNotEmpty(t.getSubTypeList())) {
+                        t.getSubTypeList().forEach(s -> {
+                            if (s.getSelected()) {
                                 characterType.append(" ").append(s.getName());
                             }
                         });
@@ -968,8 +995,10 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
     public void asyncSendCustomerToMq(String exchange, Long customerId, Long marketId) {
         send(exchange, customerQueryService.get(customerId, marketId));
     }
+
     /**
      * 批量异步数据发送MQ
+     *
      * @param exchange
      * @param customerId
      * @param marketIds
@@ -982,7 +1011,8 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
     }
 
     /**
-     *  组装客户联系人信息
+     * 组装客户联系人信息
+     *
      * @param baseInfo
      * @param customer
      * @return
@@ -997,6 +1027,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         }
         contacts.setPhone(customer.getContactsPhone());
         contacts.setMarketId(baseInfo.getCustomerMarket().getMarketId());
+        contacts.setAddress(customer.getCurrentCityName().replaceAll(",", "") + customer.getCurrentAddress());
         contacts.setCreatorId(baseInfo.getOperatorId());
         contacts.setModifierId(baseInfo.getOperatorId());
         contacts.setCreateTime(LocalDateTime.now());
@@ -1020,6 +1051,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
 
     /**
      * 根据手机号，获取此手机号已认证的数量
+     *
      * @param contactsPhone
      * @return
      */
@@ -1032,6 +1064,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
 
     /**
      * 获取客户编码
+     *
      * @return 客户编码
      */
     private String getCustomerCode() {
@@ -1040,10 +1073,11 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
 
     /**
      * 验证完善资料时的数据
+     *
      * @param input
      * @return
      */
-    private Optional<String> validationCompleteData(CustomerUpdateInput input){
+    private Optional<String> validationCompleteData(CustomerUpdateInput input) {
         //客户行业ID是否为空
         boolean profession = StrUtil.isNotBlank(input.getCustomerMarket().getProfession());
         //客户行业名称是否为空
@@ -1059,18 +1093,20 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
 
     /**
      * 获取当前操作人的信息
+     *
      * @return
      */
-    private UserTicket getOperatorUserTicket(){
+    private UserTicket getOperatorUserTicket() {
         return uapUserTicket.getUserTicket();
     }
 
     /**
      * 保存客户操作日志
-     * @param businessId 业务ID
-     * @param businessCode 业务编号
-     * @param content 日志内容
-     * @param notes 备注
+     *
+     * @param businessId    业务ID
+     * @param businessCode  业务编号
+     * @param content       日志内容
+     * @param notes         备注
      * @param operationType 操作类型
      */
     private void saveBusinessLogger(Long businessId, String businessCode, String content, String notes, String operationType) {
@@ -1079,8 +1115,9 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
 
     /**
      * 根据组织类型验证证件类型是否合法
+     *
      * @param organizationType 组织类型
-     * @param certificateType 证件类型
+     * @param certificateType  证件类型
      * @return
      */
     private Optional<String> checkCertificateType(String organizationType, String certificateType) {
@@ -1102,10 +1139,11 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
 
     /**
      * 发送消息
+     *
      * @param exchange
      * @param customer
      */
-    private void send(String exchange, Customer customer){
+    private void send(String exchange, Customer customer) {
         rabbitMQMessageService.send(exchange, null, JSONObject.toJSONString(customer));
     }
 }

@@ -103,7 +103,8 @@ public class CommonDataService {
      * @return true-按部门隔离
      */
     public Boolean checkCustomerDepartmentAuth(Long marketId) {
-        Optional<DataDictionaryValue> byDdCodeAndCode = dataDictionaryRpcService.getByDdCodeAndCode(DdCodeEnum.customer_data_auth.name(), CustomerConstant.customer_department_auth, EnabledStateEnum.ENABLED.getCode(), marketId);
+        Optional<DataDictionaryValue> byDdCodeAndCode = dataDictionaryRpcService.getByDdCodeAndCode(DdCodeEnum.customer_data_auth.name(),
+                CustomerConstant.customer_department_auth, EnabledStateEnum.ENABLED.getCode(), marketId);
         return byDdCodeAndCode.isPresent();
     }
 
@@ -113,7 +114,8 @@ public class CommonDataService {
      * @return true-按归属人隔离
      */
     public Boolean checkCustomerOwnerAuth(Long marketId) {
-        Optional<DataDictionaryValue> byDdCodeAndCode = dataDictionaryRpcService.getByDdCodeAndCode(DdCodeEnum.customer_data_auth.name(), CustomerConstant.customer_owner_auth, EnabledStateEnum.ENABLED.getCode(), marketId);
+        Optional<DataDictionaryValue> byDdCodeAndCode = dataDictionaryRpcService.getByDdCodeAndCode(DdCodeEnum.customer_data_auth.name(),
+                CustomerConstant.customer_owner_auth, EnabledStateEnum.ENABLED.getCode(), marketId);
         return byDdCodeAndCode.isPresent();
     }
 

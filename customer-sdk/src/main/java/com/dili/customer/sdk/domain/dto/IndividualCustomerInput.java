@@ -43,7 +43,7 @@ public class IndividualCustomerInput implements Serializable {
      */
     @NotBlank(message = "(企业/个人)证件号码不能为空", groups = {AddView.class, CompleteView.class})
     @Size(min = 1, max = 40, message = "(企业/个人)证件号码请保持在40个字以内", groups = {AddView.class, CompleteView.class})
-    @Pattern(regexp = ValidatedConstant.CUSTOMER_CERTIFICATE_NUMBER_VALID_REGEXP, message = "请输入正确的(企业/个人)证件号码", groups = {AddView.class,CompleteView.class})
+    @Pattern(regexp = ValidatedConstant.CUSTOMER_CERTIFICATE_NUMBER_VALID_REGEXP, message = "请输入正确的(企业/个人)证件号码", groups = {AddView.class, CompleteView.class})
     private String certificateNumber;
 
     /**
@@ -55,8 +55,8 @@ public class IndividualCustomerInput implements Serializable {
     /**
      * 客户名称
      */
-    @NotBlank(message = "客户名称不能为空", groups = {AddView.class,UpdateView.class})
-    @Size(min = 1, max = 40, message = "客户名称请保持在40个字以内", groups = {AddView.class,UpdateView.class})
+    @NotBlank(message = "客户名称不能为空", groups = {AddView.class, UpdateView.class})
+    @Size(min = 1, max = 40, message = "客户名称请保持在40个字以内", groups = {AddView.class, UpdateView.class})
     @Pattern(regexp = ValidatedConstant.CUSTOMER_NAME_VALID_REGEXP, message = "请输入正确的客户姓名", groups = {AddView.class, UpdateView.class})
     private String name;
 
@@ -81,7 +81,7 @@ public class IndividualCustomerInput implements Serializable {
     /**
      * 联系电话
      */
-    @NotBlank(message = "联系电话不能为空", groups = {AddView.class,UpdateView.class})
+    @NotBlank(message = "联系电话不能为空", groups = {AddView.class, UpdateView.class})
     @Pattern(regexp = ValidatedConstant.CUSTOMER_CELLPHONE_VALID_REGEXP, message = "请输入正确的联系方式", groups = {AddView.class, UpdateView.class})
     private String contactsPhone;
 
@@ -189,4 +189,33 @@ public class IndividualCustomerInput implements Serializable {
     @NotNull(message = "【是否已实名】不能为空")
     private Integer isCertification;
 
+    /**
+     * 客户角色身份
+     */
+    @NotNull(message = "客户角色身份不能为空")
+    private String characterType;
+
+    /**
+     * 客户角色子身份
+     */
+    @NotNull(message = "客户角色子身份不能为空")
+    private String subType;
+
+    /**
+     * 省级别地址信息不能为空
+     */
+    @NotNull(message = "省级别地址信息不能为空")
+    private String firstLevelRegionName;
+
+    /**
+     * 地级市级别地址信息不能为空
+     */
+    @NotNull(message = "地级市级别地址信息不能为空")
+    private String secondLevelRegionName;
+
+    /**
+     * 区/县/县级市级别地址信息
+     */
+    @NotNull(message = "区/县/县级市级别地址信息不能为空")
+    private String thirdLevelRegionName;
 }
