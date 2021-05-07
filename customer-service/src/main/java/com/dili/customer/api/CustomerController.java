@@ -9,6 +9,7 @@ import com.dili.customer.annotation.UapToken;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.sdk.constants.MqConstant;
+import com.dili.customer.sdk.constants.SecurityConstant;
 import com.dili.customer.sdk.domain.CustomerMarket;
 import com.dili.customer.sdk.domain.dto.*;
 import com.dili.customer.sdk.domain.query.CustomerBaseQueryInput;
@@ -344,32 +345,34 @@ public class CustomerController {
     }
 
     /**
-     * 用户批量导入
+     * 用户批量导入, 须注意Customer对象的类型，否则feign调用者会出现序列化错误
      * @param baseInfos 用户批量导入数据
      * @return result
      */
     @UapToken
     @PostMapping(value = "/batchImportCustomers")
-    List<BaseOutput<Customer>> batchImportCustomers(@Validated({AddView.class}) @RequestBody List<IndividualCustomerInput> baseInfos, String type, BindingResult bindingResult) {
+    List<BaseOutput<com.dili.customer.sdk.domain.Customer>> batchImportCustomers(@Validated({AddView.class}) @RequestBody List<IndividualCustomerInput> baseInfos,
+                                                    String type, BindingResult bindingResult) {
         String customerType = (type.equals(CustomerEnum.OrganizationType.INDIVIDUAL.getCode())) ? "个人客户" : "企业客户";
         log.info(String.format("%s批量导入，导入条数:%s", customerType, baseInfos.size()));
-        List<BaseOutput<Customer>> result = new ArrayList<>();
+        List<BaseOutput<com.dili.customer.sdk.domain.Customer>> result = new ArrayList<>();
         if (CollectionUtils.isEmpty(baseInfos)) {
             return result;
         }
         if (bindingResult.hasErrors()) {
             return new ArrayList<>(Collections.nCopies(baseInfos.size(), BaseOutput.failure(bindingResult.getAllErrors().get(0).getDefaultMessage())));
         }
+        com.dili.customer.sdk.domain.Customer customer = new com.dili.customer.sdk.domain.Customer();
         for (IndividualCustomerInput baseInfo : baseInfos) {
             EnterpriseCustomerInput input = new EnterpriseCustomerInput();
             BeanUtils.copyProperties(baseInfo, input);
             try {
-                BaseOutput<Customer> baseOutput = customerManageService.register(input);
+                BaseOutput<Customer> output = customerManageService.register(input);
+                BaseOutput<com.dili.customer.sdk.domain.Customer> baseOutput = new BaseOutput<>();
+                BeanUtils.copyProperties(output, baseOutput);
                 if (baseOutput.isSuccess()) {
                     customerManageService.asyncSendCustomerToMq(MqConstant.CUSTOMER_ADD_MQ_FANOUT_EXCHANGE, baseOutput.getData().getId(), input.getCustomerMarket().getMarketId());
                 } else {
-                    // 错误数据需返回完整数据信息
-                    Customer customer = new Customer();
                     BeanUtils.copyProperties(baseInfo, customer);
                     baseOutput.setData(customer);
                     result.add(baseOutput);
@@ -377,13 +380,11 @@ public class CustomerController {
             } catch (AppException e) {
                 log.error(String.format("%s注册:%s 异常:%s", customerType, JSONUtil.toJsonStr(baseInfo), e.getMessage()), e);
                 // 错误数据需返回完整数据信息
-                Customer customer = new Customer();
                 BeanUtils.copyProperties(baseInfo, customer);
                 result.add(BaseOutput.failure(e.getMessage()).setData(customer));
             } catch (Exception e) {
                 log.error(String.format("%s注册:%s 异常:%s", customerType, JSONUtil.toJsonStr(baseInfo), e.getMessage()), e);
                 // 错误数据需返回完整数据信息
-                Customer customer = new Customer();
                 BeanUtils.copyProperties(baseInfo, customer);
                 result.add(BaseOutput.failure("系统异常").setData(customer));
             }
