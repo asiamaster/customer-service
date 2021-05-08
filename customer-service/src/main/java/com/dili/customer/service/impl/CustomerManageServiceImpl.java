@@ -114,19 +114,16 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
     @Transactional(rollbackFor = Exception.class)
     @BusinessLogger(businessType = "customer", systemCode = "CUSTOMER", operationType = "add")
     public BaseOutput<Customer> register(EnterpriseCustomerInput baseInfo) {
-       // 创建一个错误信息返回对象，仅用于数据错误时，返回完整数据信息
-        Customer invalidCustomer = new Customer();
-        BeanUtils.copyProperties(baseInfo, invalidCustomer);
         UserTicket userTicket = getOperatorUserTicket();
         if (Objects.isNull(baseInfo.getCustomerMarket())) {
-            return BaseOutput.failure("客户所属市场信息丢失").setData(invalidCustomer);
+            return BaseOutput.failure("客户所属市场信息丢失");
         }
         if (Objects.isNull(baseInfo.getOperatorId())) {
             baseInfo.setOperatorId(getOperatorUserTicket().getId());
         }
         Optional<String> checkCertificateType = checkCertificateType(baseInfo.getOrganizationType(), baseInfo.getCertificateType());
         if (checkCertificateType.isPresent()) {
-            return BaseOutput.failure(checkCertificateType.get()).setData(invalidCustomer);
+            return BaseOutput.failure(checkCertificateType.get());
         }
         //客户归属市场信息
         CustomerMarket marketInfo = new CustomerMarket();
@@ -143,12 +140,12 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
             if (null == customer) {
                 String invalidPhoneNumberInfo = validatePhoneNumberBeforeAddingCustomer(baseInfo);
                 if (StringUtils.isNotBlank(invalidPhoneNumberInfo)) {
-                    return BaseOutput.failure(invalidPhoneNumberInfo).setData(invalidCustomer);
+                    return BaseOutput.failure(invalidPhoneNumberInfo);
                 }
                 customer = addCustomer(baseInfo);
             } else {
                 if (customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())) {
-                    return BaseOutput.failure("已存在相同证件号的客户").setCode(ResultCode.DATA_ERROR).setData(invalidCustomer);
+                    return BaseOutput.failure("已存在相同证件号的客户").setCode(ResultCode.DATA_ERROR);
                 }
                 /**
                  *  查询客户与市场的关联信息，本平台已启用市场隔离。
@@ -162,10 +159,10 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                     // 当部门或归属人权限启用至少一种时：
                     if (departmentAuth || ownerAuth) {
                         if (Objects.isNull(userTicket.getDepartmentId())) {
-                            return BaseOutput.failure("当前市场客户数据已启用部门、归属人权限，您归属部门为空").setCode(ResultCode.NOT_AUTH_ERROR).setData(invalidCustomer);
+                            return BaseOutput.failure("当前市场客户数据已启用部门、归属人权限，您归属部门为空").setCode(ResultCode.NOT_AUTH_ERROR);
                         }
                         if (StrUtil.isBlank(customerMarket.getDepartmentIds()) && StrUtil.isBlank(customerMarket.getOwnerIds())) {
-                            return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR).setData(invalidCustomer);
+                            return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR);
                         }
                         // 更新标志，true表示将有更新操作。
                         Boolean updateFlag = false;
@@ -178,7 +175,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                             if (StrUtil.isNotBlank(customerMarket.getOwnerIds())) {
                                 // 如果用户登录凭证中的归属部门信息不包含在用户市场权限部门中，则其无权操作此部门的数据，直接返回失败
                                 if (!userHasAuthorityDepartmentIds.contains(String.valueOf(userTicket.getDepartmentId()))) {
-                                    return BaseOutput.failure("您暂无归属部门的数据权限，不能新增客户").setData(invalidCustomer);
+                                    return BaseOutput.failure("您暂无归属部门的数据权限，不能新增客户");
                                 }
                                 // 如果客户所在部门信息不包含当前登录用户凭证中归属部门信息，则将用户归属部门信息添加到客户所属部门
                                 if (!customerDepartmentIds.contains(String.valueOf(userTicket.getDepartmentId()))) {
@@ -202,7 +199,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                                 } else if (CollectionUtil.isNotEmpty(departmentIdTemp) && departmentIdTemp.contains(String.valueOf(userTicket.getDepartmentId()))) {
                                     updateFlag = true;
                                 } else {
-                                    return BaseOutput.failure("您暂无归属部门的数据权限，不能新增客户").setData(invalidCustomer);
+                                    return BaseOutput.failure("您暂无归属部门的数据权限，不能新增客户");
                                 }
                             }
                         }
@@ -215,10 +212,10 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                             LoggerUtil.buildBusinessLoggerContext(customer.getId(), customer.getCode(), userTicket.getId(), userTicket.getRealName(), userTicket.getFirmId(), str.toString());
                             return BaseOutput.success("客户资料维护成功").setData(customer);
                         } else {
-                            return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR).setData(invalidCustomer);
+                            return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR);
                         }
                     }
-                    return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR).setData(invalidCustomer);
+                    return BaseOutput.failure("当前客户已存在，请勿重复添加").setCode(ResultCode.DATA_ERROR);
                 } else {
                     marketInfo.setCreateTime(LocalDateTime.now());
                     marketInfo.setCreatorId(baseInfo.getOperatorId());
@@ -228,7 +225,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
             //查询当前客户信息
             customer = this.get(baseInfo.getId());
             if (customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())) {
-                return BaseOutput.failure("已存在相同证件号的客户").setCode(ResultCode.DATA_ERROR).setData(invalidCustomer);
+                return BaseOutput.failure("已存在相同证件号的客户").setCode(ResultCode.DATA_ERROR);
             }
             //查询客户在当前传入市场的信息
             CustomerMarket temp = customerMarketService.queryByMarketAndCustomerId(marketInfo.getMarketId(), customer.getId());
