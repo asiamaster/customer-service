@@ -42,7 +42,7 @@
     <result column="marketCreateTime" property="customerMarket.createTime"/>
     <result column="marketCreatorId" property="customerMarket.creatorId"/>
     <result column="grade" property="customerMarket.grade"/>
-    <result column="department_id" property="customerMarket.departmentId"/>
+    <result column="department_ids" property="customerMarket.departmentIds"/>
     <result column="profession" property="customerMarket.profession"/>
     <result column="profession_name" property="customerMarket.professionName" />
     <result column="business_nature" property="customerMarket.businessNature" />
@@ -52,7 +52,7 @@
     <result column="approval_status" property="customerMarket.approvalStatus" />
     <result column="approval_time" property="customerMarket.approvalTime" />
     <result column="approval_user_id" property="customerMarket.approvalUserId" />
-    <result column="owner_id" property="customerMarket.ownerId" />
+    <result column="owner_ids" property="customerMarket.ownerIds" />
   </resultMap>
 
   <!-- 公共查询customer 单表 条件 -->
