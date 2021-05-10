@@ -1026,7 +1026,9 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         }
         contacts.setPhone(customer.getContactsPhone());
         contacts.setMarketId(baseInfo.getCustomerMarket().getMarketId());
-        contacts.setAddress(customer.getCurrentCityName().replaceAll(",", "") + customer.getCurrentAddress());
+        if (StringUtils.isNotBlank(customer.getCurrentCityName())) {
+            contacts.setAddress(customer.getCurrentCityName().replaceAll(",", "") + customer.getCurrentAddress());
+        }
         contacts.setCreatorId(baseInfo.getOperatorId());
         contacts.setModifierId(baseInfo.getOperatorId());
         contacts.setCreateTime(LocalDateTime.now());
