@@ -1,6 +1,5 @@
 package com.dili.customer.aop;
 
-import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import com.dili.uap.sdk.domain.UserTicket;
@@ -28,8 +27,6 @@ import java.util.Objects;
 @Component
 public class UapTokenAspect {
 
-    private final UapUserTicket uapUserTicket;
-
     /**
      * 设置token
      *
@@ -41,7 +38,6 @@ public class UapTokenAspect {
     public Object appletRequestAround(ProceedingJoinPoint point) throws Throwable {
         UserTicket userTicket = SessionContext.getSessionContext().getUserTicket();
         if (Objects.nonNull(userTicket)) {
-            uapUserTicket.setUserTicket(userTicket);
             //先执行方法
             Object retValue = point.proceed();
             return retValue;

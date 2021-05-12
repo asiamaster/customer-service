@@ -4,17 +4,17 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.commons.glossary.YesOrNoEnum;
+import com.dili.commons.rabbitmq.RabbitMQMessageService;
 import com.dili.customer.commons.constants.CustomerResultCode;
 import com.dili.customer.commons.service.CommonDataService;
 import com.dili.customer.domain.*;
 import com.dili.customer.mapper.CustomerEmployeeMapper;
+import com.dili.customer.sdk.boot.CustomerRabbitConfiguration;
+import com.dili.customer.sdk.constants.MqConstant;
 import com.dili.customer.sdk.domain.dto.*;
 import com.dili.customer.sdk.domain.query.CustomerEmployeeDetailQuery;
 import com.dili.customer.sdk.domain.query.CustomerEmployeeQuery;
-import com.dili.customer.service.CharacterTypeService;
-import com.dili.customer.service.CustomerEmployeeService;
-import com.dili.customer.service.EmployeeCardService;
-import com.dili.customer.service.EmployeeService;
+import com.dili.customer.service.*;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
@@ -23,6 +23,7 @@ import com.dili.ss.util.POJOUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,11 +50,14 @@ public class CustomerEmployeeServiceImpl extends BaseServiceImpl<CustomerEmploye
     private CharacterTypeService characterTypeService;
     @Autowired
     private CommonDataService commonDataService;
+    @Autowired
+    private RabbitMQMessageService rabbitMQMessageService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public BaseOutput<String> createdByOpenCard(EmployeeOpenCardInput input) {
         Optional<Employee> byCellphone = employeeService.getByCellphone(input.getCellphone());
+        // 如果根据号码查询员工。如果成功，则直接返回，否则新增
         Employee employee = byCellphone.orElseGet(() -> {
             Employee saveData = new Employee();
             saveData.setCellphone(input.getCellphone());
@@ -65,6 +69,7 @@ public class CustomerEmployeeServiceImpl extends BaseServiceImpl<CustomerEmploye
             return BaseOutput.failure("已存在相同手机号但名称不一致的数据").setCode(ResultCode.DATA_ERROR);
         }
         Optional<CustomerEmployee> customerEmployeeOptional = queryByCustomerAndEmployee(input.getCustomerId(), employee.getId());
+        // 根据customerId和employeeId查询CustomerEmployee关联信息。查到则直接返回，否则新增
         CustomerEmployee customerEmployee = customerEmployeeOptional.orElseGet(() -> {
             CustomerEmployee saveData = new CustomerEmployee();
             saveData.setCustomerId(input.getCustomerId());
@@ -118,13 +123,18 @@ public class CustomerEmployeeServiceImpl extends BaseServiceImpl<CustomerEmploye
         List<EmployeeCard> employeeCardList = employeeCardService.listByCustomerEmployeeId(customerEmployee.getId());
         long count = employeeCardList.stream().filter(t -> !t.getId().equals(employeeCard.getId())).count();
         /**
-         * 如果除了当前持卡信息，已无其它的持卡数据，则任务该员工已不属于该客户了
+         * 如果除了当前持卡信息，已无其它的持卡数据，则认为该员工已不属于该客户了
          * 要设置客户员工关系为解除
          */
         if (count == 0) {
             customerEmployee.setDeleted(YesOrNoEnum.YES.getCode());
             customerEmployee.setModifyTime(LocalDateTime.now());
             this.update(customerEmployee);
+            // 客户员工解除关系后，将员工id通知集团CRM系统
+            employee.setDeleted(true);
+            rabbitMQMessageService.send(MqConstant.CUSTOMER_EMPLOYEE_MQ_UPDATE_EXCHANGE,
+                    CustomerRabbitConfiguration.CUSTOMER_UPDATE_EMPLOYEE_NAME_PHONENUMBER_KEY,
+                    JSONObject.toJSONString(employee));
         }
         return Optional.empty();
     }

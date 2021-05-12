@@ -9,7 +9,6 @@ import com.dili.customer.commons.service.CommonDataService;
 import com.dili.customer.commons.service.DepartmentRpcService;
 import com.dili.customer.commons.service.UapUserRpcService;
 import com.dili.customer.domain.*;
-import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.mapper.CustomerMapper;
 import com.dili.customer.sdk.domain.query.CustomerBaseQueryInput;
 import com.dili.customer.sdk.domain.query.CustomerQueryInput;
@@ -24,6 +23,7 @@ import com.dili.uap.sdk.domain.DataDictionaryValue;
 import com.dili.uap.sdk.domain.Department;
 import com.dili.uap.sdk.domain.User;
 import com.dili.uap.sdk.domain.UserTicket;
+import com.dili.uap.sdk.session.SessionContext;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
@@ -60,8 +60,6 @@ public class CustomerQueryServiceImpl  extends BaseServiceImpl<Customer, Long> i
     private UapUserRpcService uapUserRpcService;
     @Autowired
     private DepartmentRpcService departmentRpcService;
-    @Autowired
-    private UapUserTicket uapUserTicket;
     @Autowired
     private CustomerMarketService customerMarketService;
     @Autowired
@@ -380,7 +378,7 @@ public class CustomerQueryServiceImpl  extends BaseServiceImpl<Customer, Long> i
      * @return
      */
     private UserTicket getOperatorUserTicket(){
-        return uapUserTicket.getUserTicket();
+        return  SessionContext.getSessionContext().getUserTicket();
     }
 
 }

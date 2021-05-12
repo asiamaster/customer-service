@@ -18,4 +18,8 @@ public interface MqConstant {
      */
     String CUSTOMER_ADD_MQ_FANOUT_EXCHANGE = "dili.customer.add.fanoutExchange";
 
+    /**
+     * 员工信息修改后 MQ 消息同步 交换机配置
+     */
+    String CUSTOMER_EMPLOYEE_MQ_UPDATE_EXCHANGE = "dili.customer.employee.update.exchange";
 }

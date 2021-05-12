@@ -35,6 +35,7 @@ import com.dili.ss.mvc.util.RequestUtils;
 import com.dili.uap.sdk.domain.DataDictionaryValue;
 import com.dili.uap.sdk.domain.Department;
 import com.dili.uap.sdk.domain.UserTicket;
+import com.dili.uap.sdk.session.SessionContext;
 import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -183,7 +184,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                                 }
                                 Set<String> ownerIdSet = Arrays.stream(customerMarket.getOwnerIds().split(",")).collect(Collectors.toSet());
                                 ownerIdSet.add(String.valueOf(userTicket.getId()));
-                                customerMarket.setOwnerIds(ownerIdSet.stream().collect(Collectors.joining(",")));
+                                customerMarket.setOwnerIds(String.join(",", ownerIdSet));
                                 updateFlag = true;
                             }
                         }
@@ -1098,7 +1099,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
      * @return
      */
     private UserTicket getOperatorUserTicket() {
-        return uapUserTicket.getUserTicket();
+        return SessionContext.getSessionContext().getUserTicket();
     }
 
     /**

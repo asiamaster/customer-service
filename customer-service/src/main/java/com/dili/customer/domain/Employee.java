@@ -67,4 +67,9 @@ public class Employee extends BaseDomain implements Serializable {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyTime;
 
+    /**
+     *  当客户与员工解除关系后，此字段才为true
+     */
+    @Transient
+    private boolean deleted = false;
 }
