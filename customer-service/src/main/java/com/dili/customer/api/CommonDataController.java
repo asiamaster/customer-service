@@ -18,6 +18,7 @@ import com.dili.uap.sdk.domain.DataDictionaryValue;
 import com.dili.uap.sdk.domain.Department;
 import com.dili.uap.sdk.domain.UserTicket;
 import com.dili.uap.sdk.domain.dto.UserQuery;
+import com.dili.uap.sdk.session.SessionContext;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,7 +174,7 @@ public class CommonDataController {
     @ResponseBody
     public BaseOutput<List<Department>> listAuthDepartment() {
         try {
-            UserTicket userTicket = uapUserTicket.getUserTicket();
+            UserTicket userTicket = SessionContext.getSessionContext().getUserTicket();
             Boolean aBoolean = commonDataService.checkCustomerDepartmentAuth(userTicket.getFirmId());
             List<Department> departmentList = departmentRpcService.listData(aBoolean, userTicket.getId(), userTicket.getFirmId());
             return BaseOutput.successData(departmentList);
@@ -198,7 +199,7 @@ public class CommonDataController {
         if (CollectionUtil.isEmpty(departmentIdList)) {
             return BaseOutput.success();
         }
-        UserTicket userTicket = uapUserTicket.getUserTicket();
+        UserTicket userTicket = SessionContext.getSessionContext().getUserTicket();
         UserQuery userQuery = DTOUtils.newInstance(UserQuery.class);
         userQuery.setFirmCode(userTicket.getFirmCode());
         userQuery.setDepartmentIds(departmentIdList);

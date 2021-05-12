@@ -15,6 +15,7 @@ import com.dili.logger.sdk.util.LoggerUtil;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.uap.sdk.domain.UserTicket;
+import com.dili.uap.sdk.session.SessionContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -61,7 +62,7 @@ public class CustomerMarketController {
     @PostMapping("/changeGrade")
     @BusinessLogger(businessType = "customer", operationType = "edit", systemCode = "CUSTOMER")
     public BaseOutput changeGrade(@RequestParam("customerId") Long customerId, @RequestParam("grade") Integer nextGrade) {
-        UserTicket userTicket = uapUserTicket.getUserTicket();
+        UserTicket userTicket = SessionContext.getSessionContext().getUserTicket();
         try {
             CustomerEnum.Grade instance = CustomerEnum.Grade.getInstance(nextGrade);
             if (Objects.nonNull(instance)) {
@@ -95,7 +96,7 @@ public class CustomerMarketController {
         if (Objects.isNull(instance)) {
             return BaseOutput.failure("目标状态不支持");
         }
-        UserTicket userTicket = uapUserTicket.getUserTicket();
+        UserTicket userTicket = SessionContext.getSessionContext().getUserTicket();
         try {
             Optional<String> s = customerMarketService.updateState(customerId, userTicket.getFirmId(), state);
             if (s.isPresent()) {

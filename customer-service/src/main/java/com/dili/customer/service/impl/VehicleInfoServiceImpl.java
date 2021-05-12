@@ -14,6 +14,7 @@ import com.dili.customer.service.VehicleInfoService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.mvc.util.RequestUtils;
 import com.dili.uap.sdk.domain.UserTicket;
+import com.dili.uap.sdk.session.SessionContext;
 import com.dili.uap.sdk.util.WebContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -98,7 +99,7 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
         condition.setCustomerId(vehicleInfo.getCustomerId());
         condition.setRegistrationNumber(vehicleInfo.getRegistrationNumber());
         List<VehicleInfo> vehicleInfoList = list(condition);
-        UserTicket userTicket = uapUserTicket.getUserTicket();
+        UserTicket userTicket = SessionContext.getSessionContext().getUserTicket();
         if (Objects.isNull(vehicleInfo.getModifierId())) {
             vehicleInfo.setModifierId(userTicket.getId());
         }
@@ -155,7 +156,7 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
         }
         this.delete(id);
         Customer customer = customerManageService.get(vehicleInfo.getCustomerId());
-        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(vehicleInfo, String.format("车辆数据ID %s :", id)), "操作渠道:APP", "del", uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
+        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(vehicleInfo, String.format("车辆数据ID %s :", id)), "操作渠道:APP", "del", SessionContext.getSessionContext().getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
         return Optional.empty();
     }
 

@@ -13,6 +13,7 @@ import com.dili.customer.service.CustomerManageService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.mvc.util.RequestUtils;
 import com.dili.uap.sdk.domain.UserTicket;
+import com.dili.uap.sdk.session.SessionContext;
 import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +82,7 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
     @Transactional(rollbackFor = Exception.class)
     public Optional<String> saveAddress(Address address) {
         String operationType = "edit";
-        UserTicket userTicket = uapUserTicket.getUserTicket();
+        UserTicket userTicket = SessionContext.getSessionContext().getUserTicket();
         if (Objects.isNull(address.getModifierId())) {
             address.setModifierId(userTicket.getId());
         }
@@ -123,7 +124,7 @@ public class AddressServiceImpl extends BaseServiceImpl<Address, Long> implement
         }
         this.delete(id);
         Customer customer = customerManageService.get(address.getCustomerId());
-        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(address, String.format("地址数据ID %s :", id)), "操作渠道:APP", "del", uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
+        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(address, String.format("地址数据ID %s :", id)), "操作渠道:APP", "del", SessionContext.getSessionContext().getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
         return Optional.empty();
     }
 

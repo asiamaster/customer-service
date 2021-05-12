@@ -14,6 +14,7 @@ import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.mvc.util.RequestUtils;
 import com.dili.uap.sdk.domain.UserTicket;
+import com.dili.uap.sdk.session.SessionContext;
 import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
     public BaseOutput saveContacts(Contacts customerContacts) {
         StringBuilder content = new StringBuilder();
         String operationType = "add";
-        UserTicket userTicket = uapUserTicket.getUserTicket();
+        UserTicket userTicket = SessionContext.getSessionContext().getUserTicket();
         if (Objects.isNull(customerContacts.getModifierId())) {
             customerContacts.setModifierId(userTicket.getId());
         }
@@ -142,7 +143,7 @@ public class ContactsServiceImpl extends BaseServiceImpl<Contacts, Long> impleme
         }
         this.delete(id);
         Customer customer = customerQueryService.get(contacts.getCustomerId());
-        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(contacts, String.format("联系人数据ID %s :", id)), "操作渠道:APP", "del", uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
+        businessLogRpcService.asyncSave(customer.getId(), customer.getCode(), produceLoggerContent(contacts, String.format("联系人数据ID %s :", id)), "操作渠道:APP", "del", SessionContext.getSessionContext().getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
         return Optional.empty();
     }
 

@@ -15,6 +15,7 @@ import com.dili.customer.service.AttachmentService;
 import com.dili.customer.service.CustomerManageService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.mvc.util.RequestUtils;
+import com.dili.uap.sdk.session.SessionContext;
 import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -131,7 +132,7 @@ public class AttachmentServiceImpl extends BaseServiceImpl<Attachment, Long> imp
             condition.setMarketId(marketId);
             getActualMapper().delete(condition);
             Customer customer = customerManageService.get(customerId);
-            businessLogRpcService.asyncSave(customerId, customer.getCode(), "删除所有附件", "", "del", uapUserTicket.getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
+            businessLogRpcService.asyncSave(customerId, customer.getCode(), "删除所有附件", "", "del", SessionContext.getSessionContext().getUserTicket(), RequestUtils.getIpAddress(WebContent.getRequest()));
         }
     }
 
