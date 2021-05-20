@@ -176,8 +176,8 @@
       <if test="null != customerMarket.salesMarket and ''!=customerMarket.salesMarket">
         and cm.sales_market = #{customerMarket.salesMarket}
       </if>
-      <if test="customerMarket.departmentId != null">
-        and cm.department_id = #{customerMarket.departmentId}
+      <if test="customerMarket.departmentIds != null">
+        and cm.department_ids = #{customerMarket.departmentIds}
       </if>
       <if test="customerMarket.grade != null">
         and cm.grade = #{customerMarket.grade}
