@@ -35,7 +35,7 @@ public interface BusinessCategoryRpc {
      * @param marketId    所属市场
      * @return
      */
-    @PostMapping(value = "/batchQuery")
+    @PostMapping(value = "/api/businessCategory/batchQuery")
     BaseOutput<Map<Long, List<BusinessCategory>>> batchQuery(@RequestParam("customerIds") Set<Long> customerIds, @RequestParam("marketId") Long marketId);
 
 }

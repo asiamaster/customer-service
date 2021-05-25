@@ -67,7 +67,7 @@ public interface AttachmentRpc {
      * @param marketId    所属市场
      * @return
      */
-    @PostMapping(value = "/batchQuery")
+    @PostMapping(value = "/api/attachment/batchQuery")
     BaseOutput<Map<Long, List<Attachment>>> batchQuery(@RequestParam("customerIds") Set<Long> customerIds, @RequestParam("marketId") Long marketId);
 
 }

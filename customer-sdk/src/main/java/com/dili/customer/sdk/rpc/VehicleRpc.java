@@ -46,7 +46,7 @@ public interface VehicleRpc {
      * @param marketId    所属市场
      * @return
      */
-    @PostMapping(value = "/batchQuery")
+    @PostMapping(value = "/api/vehicle/batchQuery")
     BaseOutput<Map<Long, List<VehicleInfo>>> batchQuery(@RequestParam("customerIds") Set<Long> customerIds, @RequestParam("marketId") Long marketId);
 
 }

@@ -55,7 +55,7 @@ public interface TallyingAreaRpc {
      * @param marketId    所属市场
      * @return
      */
-    @PostMapping(value = "/batchQuery")
+    @PostMapping(value = "/api/tallyingArea/batchQuery")
     BaseOutput<Map<Long, List<TallyingArea>>> batchQuery(@RequestParam("customerIds") Set<Long> customerIds, @RequestParam("marketId") Long marketId);
 
 }

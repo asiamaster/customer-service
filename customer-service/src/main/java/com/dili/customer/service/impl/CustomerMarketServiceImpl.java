@@ -111,6 +111,7 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
         customerMarket.setApprovalUserId(input.getOperatorId());
         customerMarket.setApprovalNotes(input.getApprovalNotes());
         this.update(customerMarket);
+        customerManageService.asyncSendCustomerToMq(MqConstant.CUSTOMER_MQ_FANOUT_EXCHANGE, input.getCustomerId(), input.getMarketId());
         return Optional.empty();
     }
 
