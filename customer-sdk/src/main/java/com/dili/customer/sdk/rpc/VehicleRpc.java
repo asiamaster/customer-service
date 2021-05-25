@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author yuehongbo
@@ -20,8 +22,9 @@ public interface VehicleRpc {
 
     /**
      * 根据客户ID查询该客户的车辆信息
+     *
      * @param customerId 客户ID
-     * @param marketId 所属市场
+     * @param marketId   所属市场
      * @return 客户车辆信息数据
      */
     @PostMapping(value = "/api/vehicle/listVehicle")
@@ -29,9 +32,21 @@ public interface VehicleRpc {
 
     /**
      * 绑定客户车辆信息
+     *
      * @param vehicleInfo 客户ID
      * @return 客户地址信息数据
      */
     @PostMapping(value = "/bindingVehicle")
     BaseOutput<Boolean> bindingVehicle(VehicleInfo vehicleInfo, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
+
+    /**
+     * 根据批量客户ID查询该客户的车辆信息
+     *
+     * @param customerIds 客户ID
+     * @param marketId    所属市场
+     * @return
+     */
+    @PostMapping(value = "/batchQuery")
+    BaseOutput<Map<Long, List<VehicleInfo>>> batchQuery(@RequestParam("customerIds") Set<Long> customerIds, @RequestParam("marketId") Long marketId);
+
 }

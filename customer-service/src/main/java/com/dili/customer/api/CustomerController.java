@@ -134,7 +134,7 @@ public class CustomerController {
 
     /**
      * 分页查询正常的简单客户数据集
-     * 用户未删除切状态为生效的
+     * 用户未删除且状态为生效的
      * 此方法只会简单的返回客户及市场信息数据，不会返回其它关联对象数据
      * 如不关心客户的理货区、车辆、图片等附加数据，建议用此接口
      * @param customer
@@ -551,5 +551,4 @@ public class CustomerController {
             return BaseOutput.failure("系统异常").setData(false);
         }
     }
-
 }

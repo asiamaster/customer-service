@@ -11,9 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 客户经营品类
@@ -58,5 +57,21 @@ public class BusinessCategoryServiceImpl extends BaseServiceImpl<BusinessCategor
         condition.setCustomerIdSet(customerIdSet);
         condition.setMarketId(marketId);
         return listByExample(condition);
+    }
+
+    @Override
+    public Map<Long, List<BusinessCategory>> batchQuery(Set<Long> customerIds, Long marketId) {
+        BusinessCategoryDto condition = new BusinessCategoryDto();
+        condition.setCustomerIdSet(customerIds);
+        condition.setMarketId(marketId);
+        List<BusinessCategory> businessCategories = listByExample(condition);
+        Map<Long, List<BusinessCategory>> businessCategoryMap = new HashMap<>();
+        for (Long id : customerIds) {
+            List<BusinessCategory> categories = businessCategories.stream().filter(b -> id.equals(b.getCustomerId()))
+                    .collect(Collectors.toList());
+            businessCategoryMap.put(id, categories);
+            businessCategories.removeAll(categories);
+        }
+        return businessCategoryMap;
     }
 }

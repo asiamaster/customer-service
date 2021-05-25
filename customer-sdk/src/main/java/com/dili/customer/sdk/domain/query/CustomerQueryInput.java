@@ -27,7 +27,7 @@ public class CustomerQueryInput extends CustomerBaseQueryInput{
     private LocalDateTime marketCreateTimeStart;
 
     /**
-     * 客户所在市场中的创建时间-介绍
+     * 客户所在市场中的创建时间-结束
      */
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

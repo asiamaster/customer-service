@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 客户经营品类信息
@@ -25,4 +27,15 @@ public interface BusinessCategoryRpc {
      */
     @PostMapping(value = "/api/businessCategory/list")
     BaseOutput<List<BusinessCategory>> list(@RequestParam("customerId") Long customerId, @RequestParam("marketId") Long marketId);
+
+    /**
+     * 根据批量客户ID查询该客户的经营品类
+     *
+     * @param customerIds 客户ID
+     * @param marketId    所属市场
+     * @return
+     */
+    @PostMapping(value = "/batchQuery")
+    BaseOutput<Map<Long, List<BusinessCategory>>> batchQuery(@RequestParam("customerIds") Set<Long> customerIds, @RequestParam("marketId") Long marketId);
+
 }

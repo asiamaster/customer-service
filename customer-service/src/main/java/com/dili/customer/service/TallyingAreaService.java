@@ -4,6 +4,8 @@ import com.dili.customer.domain.TallyingArea;
 import com.dili.ss.base.BaseService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author yuehongbo
@@ -35,4 +37,12 @@ public interface TallyingAreaService extends BaseService<TallyingArea, Long> {
      * @return
      */
     Integer syncAssetsLease(List<TallyingArea> list);
+
+    /**
+     * 根据批量客户ID查询该客户的理货区
+     * @param customerIds 客户ID
+     * @param marketId 所属市场
+     * @return
+     */
+    Map<Long, List<TallyingArea>> batchQuery(Set<Long> customerIds, Long marketId);
 }

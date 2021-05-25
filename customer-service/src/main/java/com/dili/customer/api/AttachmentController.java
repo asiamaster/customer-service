@@ -6,11 +6,14 @@ import com.dili.customer.domain.dto.AttachmentDto;
 import com.dili.customer.service.AttachmentService;
 import com.dili.ss.domain.BaseOutput;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * 客户附件信息
@@ -76,4 +79,18 @@ public class AttachmentController {
         return BaseOutput.success().setData(attachmentService.batchSave(attachmentList));
     }
 
+    /**
+     * 根据批量客户ID查询客户附件信息
+     * @param customerIds 客户ID
+     * @param marketId 所属市场
+     * @return
+     */
+    @PostMapping(value = "/batchQuery")
+    public BaseOutput<Map<Long, List<Attachment>>> batchQuery(@RequestParam("customerIds") Set<Long> customerIds, @RequestParam("marketId") Long marketId) {
+        if (CollectionUtils.isNotEmpty(customerIds) && customerIds.size() > 50) {
+            return BaseOutput.failure("单次传入的客户数量不得大于50条");
+        }
+        Map<Long, List<Attachment>> attachmentMap = attachmentService.batchQuery(customerIds, marketId);
+        return BaseOutput.success().setData(attachmentMap);
+    }
 }

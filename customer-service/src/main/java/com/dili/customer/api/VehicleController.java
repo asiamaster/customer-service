@@ -5,13 +5,16 @@ import com.dili.customer.domain.VehicleInfo;
 import com.dili.customer.service.VehicleInfoService;
 import com.dili.ss.domain.BaseOutput;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * 客户车辆信息
@@ -66,5 +69,20 @@ public class VehicleController {
     public BaseOutput delete(@RequestParam("id") Long id) {
         vehicleInfoService.deleteWithLogger(id);
         return BaseOutput.success("删除成功");
+    }
+
+    /**
+     * 根据批量客户ID查询该客户的车辆信息
+     * @param customerIds 客户ID
+     * @param marketId 所属市场
+     * @return
+     */
+    @PostMapping(value = "/batchQuery")
+    public BaseOutput<Map<Long, List<VehicleInfo>>> batchQuery(@RequestParam("customerIds") Set<Long> customerIds, @RequestParam("marketId") Long marketId) {
+        if (CollectionUtils.isNotEmpty(customerIds) && customerIds.size() > 50) {
+            return BaseOutput.failure("单次传入的客户数量不得大于50条");
+        }
+        Map<Long, List<VehicleInfo>> vehicleInfoMap = vehicleInfoService.batchQuery(customerIds, marketId);
+        return BaseOutput.success().setData(vehicleInfoMap);
     }
 }

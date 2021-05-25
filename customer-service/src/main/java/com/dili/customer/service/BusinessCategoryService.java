@@ -4,6 +4,7 @@ import com.dili.customer.domain.BusinessCategory;
 import com.dili.ss.base.BaseService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,4 +31,11 @@ public interface BusinessCategoryService extends BaseService<BusinessCategory, L
      */
     List<BusinessCategory> listByCustomerAndMarket(Set<Long> customerIdSet, Long marketId);
 
+    /**
+     * 根据批量客户ID查询该客户的经营品类
+     * @param customerIds 客户ID
+     * @param marketId 所属市场
+     * @return
+     */
+    Map<Long, List<BusinessCategory>> batchQuery(Set<Long> customerIds, Long marketId);
 }

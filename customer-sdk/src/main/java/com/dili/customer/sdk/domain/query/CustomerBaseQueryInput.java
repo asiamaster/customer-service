@@ -1,10 +1,7 @@
 package com.dili.customer.sdk.domain.query;
 
-import com.dili.customer.sdk.domain.CharacterType;
 import com.dili.customer.sdk.domain.Customer;
 import lombok.Data;
-
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

@@ -2,6 +2,7 @@ package com.dili.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.dili.customer.domain.TallyingArea;
+import com.dili.customer.domain.dto.TallyingAreaDto;
 import com.dili.customer.mapper.TallyingAreaMapper;
 import com.dili.customer.service.TallyingAreaService;
 import com.dili.ss.base.BaseServiceImpl;
@@ -10,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -105,6 +103,24 @@ public class TallyingAreaServiceImpl extends BaseServiceImpl<TallyingArea, Long>
             saveOrUpdate(tallyingArea);
         });
         return list.size();
+    }
+
+    @Override
+    public Map<Long, List<TallyingArea>> batchQuery(Set<Long> customerIds, Long marketId) {
+        TallyingAreaDto condition = new TallyingAreaDto();
+        condition.setCustomerIdSet(customerIds);
+        condition.setMarketId(marketId);
+        List<TallyingArea> tallyingAreas = listByExample(condition);
+        Map<Long, List<TallyingArea>> tallyingAreaMap = new HashMap<>();
+        for (Long id : customerIds) {
+            List<TallyingArea> categories = tallyingAreas.stream().filter(b -> id.equals(b.getCustomerId()))
+                    .collect(Collectors.toList());
+            tallyingAreaMap.put(id, categories);
+            tallyingAreas.removeAll(categories);
+        }
+        return tallyingAreaMap;
+
+
     }
 
 

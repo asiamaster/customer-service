@@ -96,7 +96,7 @@ public class CustomerQueryServiceImpl  extends BaseServiceImpl<Customer, Long> i
         int totalPage = list instanceof Page ? ((Page) list).getPages() : 1;
         //当前页数
         int pageNum = list instanceof Page ? ((Page) list).getPageNum() : 1;
-        PageOutput output = PageOutput.success();
+        PageOutput<List<Customer>> output = PageOutput.success();
         if (CollectionUtil.isNotEmpty(list)) {
             Set<Long> customerIdSet = list.stream().map(Customer::getId).collect(Collectors.toSet());
             //获取客户角色身份信息

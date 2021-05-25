@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 客户附件信息服务
+ *
  * @author yuehongbo
  * @Copyright 本软件源代码版权归农丰时代科技有限公司及其研发团队所有, 未经许可不得任意复制与传播.
  * @date 2020/7/25 17:43
@@ -21,8 +24,9 @@ public interface AttachmentRpc {
 
     /**
      * 根据客户ID查询该客户的附件信息
+     *
      * @param customerId 客户ID
-     * @param marketId 市场ID
+     * @param marketId   市场ID
      * @return 客户附件信息
      */
     @PostMapping(value = "/api/attachment/listAttachment")
@@ -30,6 +34,7 @@ public interface AttachmentRpc {
 
     /**
      * 根据条件查询该客户的附件信息
+     *
      * @param attachment 查询条件
      * @return 客户附件信息
      */
@@ -38,6 +43,7 @@ public interface AttachmentRpc {
 
     /**
      * 根据客户信息删除该客户的附件信息
+     *
      * @param customerId 客户ID
      * @param marketId   市场ID
      * @return 是否删除成功
@@ -47,9 +53,21 @@ public interface AttachmentRpc {
 
     /**
      * 批量保存客户附件信息
+     *
      * @param attachmentList 客户附件信息
      * @return 保存结果
      */
     @PostMapping(value = "/api/attachment/batchSave")
     BaseOutput batchSave(List<Attachment> attachmentList);
+
+    /**
+     * 根据批量客户ID查询客户附件信息
+     *
+     * @param customerIds 客户ID
+     * @param marketId    所属市场
+     * @return
+     */
+    @PostMapping(value = "/batchQuery")
+    BaseOutput<Map<Long, List<Attachment>>> batchQuery(@RequestParam("customerIds") Set<Long> customerIds, @RequestParam("marketId") Long marketId);
+
 }

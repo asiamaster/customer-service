@@ -136,4 +136,21 @@ public class AttachmentServiceImpl extends BaseServiceImpl<Attachment, Long> imp
         }
     }
 
+    @Override
+    public Map<Long, List<Attachment>> batchQuery(Set<Long> customerIds, Long marketId) {
+        AttachmentDto condition = new AttachmentDto();
+        condition.setCustomerIdSet(customerIds);
+        condition.setMarketId(marketId);
+        List<Attachment> attachments = listByExample(condition);
+        Map<Long, List<Attachment>> attachmentMap = new HashMap<>();
+        for (Long id : customerIds) {
+            List<Attachment> categories = attachments.stream().filter(b -> id.equals(b.getCustomerId()))
+                    .collect(Collectors.toList());
+            attachmentMap.put(id, categories);
+            attachments.removeAll(categories);
+        }
+        return attachmentMap;
+
+    }
+
 }

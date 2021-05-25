@@ -1,12 +1,10 @@
 package com.dili.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.dili.assets.sdk.dto.CarTypeDTO;
 import com.dili.customer.commons.service.BusinessLogRpcService;
 import com.dili.customer.commons.service.CarTypeRpcService;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.VehicleInfo;
-import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.domain.dto.VehicleInfoDto;
 import com.dili.customer.mapper.VehicleInfoMapper;
 import com.dili.customer.service.CustomerManageService;
@@ -19,7 +17,7 @@ import com.dili.uap.sdk.util.WebContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.dili.assets.sdk.dto.CarTypeDTO;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,8 +40,6 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
     private BusinessLogRpcService businessLogRpcService;
     @Autowired
     private CarTypeRpcService carTypeRpcService;
-    @Autowired
-    private UapUserTicket uapUserTicket;
 
     @Override
     public Integer deleteByCustomerAndMarket(Long customerId, Long marketId) {
@@ -160,6 +156,21 @@ public class VehicleInfoServiceImpl extends BaseServiceImpl<VehicleInfo, Long> i
         return Optional.empty();
     }
 
+    @Override
+    public Map<Long, List<VehicleInfo>> batchQuery(Set<Long> customerIds, Long marketId) {
+        VehicleInfoDto condition = new VehicleInfoDto();
+        condition.setCustomerIdSet(customerIds);
+        condition.setMarketId(marketId);
+        List<VehicleInfo> vehicleInfos = listByExample(condition);
+        Map<Long, List<VehicleInfo>> vehicleInfoMap = new HashMap<>();
+        for (Long id : customerIds) {
+            List<VehicleInfo> categories = vehicleInfos.stream().filter(b -> id.equals(b.getCustomerId()))
+                    .collect(Collectors.toList());
+            vehicleInfoMap.put(id, categories);
+            vehicleInfos.removeAll(categories);
+        }
+        return vehicleInfoMap;
+    }
 
     /**
      * 构建日志存储对象

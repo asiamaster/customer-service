@@ -5,6 +5,7 @@ import com.dili.customer.sdk.domain.dto.AttachmentGroupInfo;
 import com.dili.ss.base.BaseService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -61,4 +62,12 @@ public interface AttachmentService extends BaseService<Attachment, Long> {
      * @param marketId 市场ID
      */
     void deleteByCustomerAndMarket(Long customerId, Long marketId);
+
+    /**
+     * 根据批量客户ID查询客户附件信息
+     * @param customerIds 客户ID
+     * @param marketId 所属市场
+     * @return
+     */
+    Map<Long, List<Attachment>> batchQuery(Set<Long> customerIds, Long marketId);
 }

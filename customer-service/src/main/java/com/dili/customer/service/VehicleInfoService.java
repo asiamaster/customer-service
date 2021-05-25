@@ -4,6 +4,7 @@ import com.dili.customer.domain.VehicleInfo;
 import com.dili.ss.base.BaseService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -59,4 +60,13 @@ public interface VehicleInfoService extends BaseService<VehicleInfo, Long> {
      * @return
      */
     Optional<String> deleteWithLogger(Long id);
+
+    /**
+     * 根据批量客户ID查询该客户的车辆信息
+     * @param customerIds 客户ID
+     * @param marketId 所属市场
+     * @return
+     */
+    Map<Long, List<VehicleInfo>> batchQuery(Set<Long> customerIds, Long marketId);
+
 }

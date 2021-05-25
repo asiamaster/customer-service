@@ -3,6 +3,7 @@ package com.dili.customer.api;
 import com.dili.customer.domain.BusinessCategory;
 import com.dili.customer.service.BusinessCategoryService;
 import com.dili.ss.domain.BaseOutput;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author yuehongbo
@@ -36,4 +39,20 @@ public class BusinessCategoryController {
         condition.setMarketId(marketId);
         return BaseOutput.success().setData(businessCategoryService.list(condition));
     }
+
+    /**
+     * 根据批量客户ID查询该客户的经营品类
+     * @param customerIds 客户ID
+     * @param marketId 所属市场
+     * @return
+     */
+    @PostMapping(value = "/batchQuery")
+    public BaseOutput<Map<Long, List<BusinessCategory>>> batchQuery(@RequestParam("customerIds") Set<Long> customerIds, @RequestParam("marketId") Long marketId) {
+        if (CollectionUtils.isNotEmpty(customerIds) && customerIds.size() > 50) {
+            return BaseOutput.failure("单次传入的客户数量不得大于50条");
+        }
+        Map<Long, List<BusinessCategory>> businessCategoryMap = businessCategoryService.batchQuery(customerIds, marketId);
+        return BaseOutput.success().setData(businessCategoryMap);
+    }
+
 }
