@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.dili.customer.commons.service.MarketRpcService;
 import com.dili.customer.domain.CustomerMarket;
+import com.dili.customer.domain.dto.CustomerMarketCharacterTypeDto;
 import com.dili.customer.domain.dto.CustomerMarketDto;
 import com.dili.customer.mapper.CustomerMarketMapper;
 import com.dili.customer.sdk.constants.MqConstant;
@@ -12,6 +13,14 @@ import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.CustomerManageService;
 import com.dili.customer.service.CustomerMarketService;
 import com.dili.ss.base.BaseServiceImpl;
+import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.dto.DTOUtils;
+import com.dili.uap.sdk.domain.DataDictionaryValue;
+import com.dili.uap.sdk.domain.Firm;
+import com.dili.uap.sdk.domain.dto.DataDictionaryValueQueryDto;
+import com.dili.uap.sdk.domain.dto.FirmDto;
+import com.dili.uap.sdk.rpc.DataDictionaryRpc;
+import com.dili.uap.sdk.rpc.FirmRpc;
 import com.google.common.collect.Lists;
 import one.util.streamex.StreamEx;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +37,11 @@ import java.util.*;
  */
 @Service
 public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, Long> implements CustomerMarketService {
+
+    @Autowired
+    private FirmRpc firmRpc;
+    @Autowired
+    private DataDictionaryRpc dataDictionaryRpc;
 
     public CustomerMarketMapper getActualMapper() {
         return (CustomerMarketMapper)getDao();
@@ -124,5 +138,28 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
             return Optional.empty();
         }
         return Optional.of("未获取到数据");
+    }
+
+
+    public List<CustomerMarketCharacterTypeDto> listOtherCharacterType(List<Long> marketIds) {
+        List<CustomerMarketCharacterTypeDto> dtos = new ArrayList<>();
+        for (long marketId : marketIds) {
+            CustomerMarketCharacterTypeDto dto = new CustomerMarketCharacterTypeDto();
+            FirmDto firmDto = DTOUtils.newInstance(FirmDto.class);
+            firmDto.setId(marketId);
+            BaseOutput<List<Firm>> firmOutput = firmRpc.listByExample(firmDto);
+            if (firmOutput.isSuccess() && CollectionUtil.isNotEmpty(firmOutput.getData())) {
+                dto.setFirm(firmOutput.getData().get(0));
+            }
+            DataDictionaryValueQueryDto valueQueryDto = DTOUtils.newInstance(DataDictionaryValueQueryDto.class);
+            valueQueryDto.setFirmId(marketId);
+            valueQueryDto.setDdCode(CustomerEnum.CharacterType.其他类型.getCode());
+            BaseOutput<List<DataDictionaryValue>> dataDictionaryOutput = dataDictionaryRpc.listDataDictionaryValueByDto(valueQueryDto);
+            if (dataDictionaryOutput.isSuccess() && CollectionUtil.isNotEmpty(dataDictionaryOutput.getData())) {
+                dto.setCharacterTypes(dataDictionaryOutput.getData());
+            }
+            dtos.add(dto);
+        }
+        return dtos;
     }
 }

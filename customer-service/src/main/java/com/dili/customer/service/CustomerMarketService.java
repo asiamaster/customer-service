@@ -1,6 +1,7 @@
 package com.dili.customer.service;
 
 import com.dili.customer.domain.CustomerMarket;
+import com.dili.customer.domain.dto.CustomerMarketCharacterTypeDto;
 import com.dili.customer.domain.dto.CustomerMarketDto;
 import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
@@ -60,4 +61,12 @@ public interface CustomerMarketService extends BaseService<CustomerMarket, Long>
      * @param state 客户状态
      */
     Optional<String> updateState(Long customerId, Long marketId, Integer state);
+
+    /**
+     * 获取市场和其他类型子角色分类信息的组合对象
+     * @param marketIds 市场id集合
+     * @return
+     */
+    List<CustomerMarketCharacterTypeDto> listOtherCharacterType(List<Long> marketIds);
+
 }

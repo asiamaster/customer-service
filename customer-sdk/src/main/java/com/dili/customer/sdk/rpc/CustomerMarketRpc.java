@@ -2,9 +2,11 @@ package com.dili.customer.sdk.rpc;
 
 import com.dili.customer.sdk.constants.SecurityConstant;
 import com.dili.customer.sdk.domain.CustomerMarket;
+import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.ss.domain.BaseOutput;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -21,8 +23,9 @@ public interface CustomerMarketRpc {
 
     /**
      * 获取客户在某市场内的信息
+     *
      * @param customerId 客户ID
-     * @param marketId 市场ID
+     * @param marketId   市场ID
      * @return
      */
     @PostMapping(value = "/api/customerMarket/getByCustomerAndMarket")
@@ -30,20 +33,33 @@ public interface CustomerMarketRpc {
 
     /**
      * 更改客户所在市场的客户等级,将通过当前登录人所在的市场为指定为客户所属市场
+     *
      * @param customerId 客户ID
-     * @param nextGrade 想要更新成的等级
-     * @param uapToken uapToken
+     * @param nextGrade  想要更新成的等级
+     * @param uapToken   uapToken
      */
     @PostMapping("/api/customerMarket/changeGrade")
     BaseOutput changeGrade(@RequestParam("customerId") Long customerId, @RequestParam("grade") Integer nextGrade, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
 
     /**
      * 更新用户状态,将获取当前登录人所在的市场为客户所属市场
+     *
      * @param customerId 客户ID
      * @param state      状态值
-     * @param uapToken uapToken
+     * @param uapToken   uapToken
      * @return
      */
     @PostMapping(value = "/api/customerMarket/updateState")
     BaseOutput updateState(@RequestParam("customerId") Long customerId, @RequestParam("state") Integer state, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
+
+
+    /**
+     * 客户审核结果处理
+     *
+     * @param input 审核结果
+     * @return
+     */
+    @PostMapping("/api/customerMarket/approval")
+    BaseOutput<Boolean> approval(@RequestBody MarketApprovalResultInput input, @RequestHeader(SecurityConstant.UAP_TOKEN_KEY) String uapToken);
+
 }

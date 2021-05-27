@@ -225,14 +225,21 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         } else {
             //查询当前客户信息
             customer = this.get(baseInfo.getId());
-            if (customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())) {
+            //查询客户在当前传入市场的信息是否已经存在
+            CustomerMarket customerMarkeExisted = customerMarketService.queryByMarketAndCustomerId(marketInfo.getMarketId(), customer.getId());
+            /**
+             * 判断客户重复，需以下条件同时满足：
+             *  1. 根据客户id和市场id查询的CustomerMarket对象不为空；
+             *  2. 客户类型与当前传入的类型相同；
+             *  3. 若查询出的CustomerMarket对象部门id集合为空，可直接认定为重复。
+             *  4. 若查询出的CustomerMarket对象部门id集合不为空，则此集合包含当前传入的客户部门id，方可认定为重复。
+             */
+            if (Objects.nonNull(customerMarkeExisted)
+                    && customer.getOrganizationType().equalsIgnoreCase(baseInfo.getOrganizationType())
+                    && Arrays.asList(customerMarkeExisted.getDepartmentIds().split(",")).contains(marketInfo.getDepartmentIds())) {
                 return BaseOutput.failure("已存在相同证件号的客户").setCode(ResultCode.DATA_ERROR);
             }
-            //查询客户在当前传入市场的信息
-            CustomerMarket temp = customerMarketService.queryByMarketAndCustomerId(marketInfo.getMarketId(), customer.getId());
-            if (Objects.nonNull(temp)) {
-                BeanUtils.copyProperties(temp, marketInfo);
-            }
+
             //如果数据库中已存在的客户未实名，而本次传入的数据为已实名，则需要更新实名认证标识
 //            if (YesOrNoEnum.NO.getCode().equals(customer.getIsCertification()) && YesOrNoEnum.YES.getCode().equals(baseInfo.getIsCertification())){
 //                customer.setIsCertification(baseInfo.getIsCertification());
@@ -320,7 +327,9 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         //如果为个人用户
         if (CustomerEnum.OrganizationType.INDIVIDUAL.equals(CustomerEnum.OrganizationType.getInstance(baseInfo.getOrganizationType()))) {
             if (CollectionUtil.isNotEmpty(phoneExist)) {
-                return "此手机号对应的客户已存在";
+                Customer phoneExistCustomer = phoneExist.get(0);
+                return "此手机号对应的客户已存在 (" + phoneExistCustomer.getName() + "： " + phoneExistCustomer.getCertificateNumber() + ")";
+
             }
         } else {
             if (CollectionUtil.isNotEmpty(phoneExist) && phoneExist.size() >= customerConfig.getPhoneLimit()) {
@@ -348,7 +357,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         customer.setCurrentCityPath(baseInfo.getCurrentCityPath());
         super.insertSelective(customer);
         return customer;
-     }
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -839,7 +848,8 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
             //如果为个人用户
             if (CustomerEnum.OrganizationType.INDIVIDUAL.equals(CustomerEnum.OrganizationType.getInstance(updateInput.getOrganizationType()))) {
                 if (CollectionUtil.isNotEmpty(phoneExist)) {
-                    return BaseOutput.failure("此手机号对应的客户已存在");
+                    Customer phoneExistCustomer = phoneExist.get(0);
+                    return BaseOutput.failure("此手机号对应的客户已存在 (" + phoneExistCustomer.getName() + "： " + phoneExistCustomer.getCertificateNumber() + ")");
                 }
             } else {
                 if (CollectionUtil.isNotEmpty(phoneExist) && phoneExist.size() >= customerConfig.getPhoneLimit()) {

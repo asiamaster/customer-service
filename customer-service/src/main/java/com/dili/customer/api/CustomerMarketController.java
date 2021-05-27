@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.dili.customer.annotation.UapToken;
 import com.dili.customer.domain.Customer;
 import com.dili.customer.domain.CustomerMarket;
+import com.dili.customer.domain.dto.CustomerMarketCharacterTypeDto;
 import com.dili.customer.domain.dto.CustomerMarketDto;
 import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static org.beetl.ext.fn.DebugFunction.enable;
 
 /**
  * 客户所属市场
@@ -153,5 +156,15 @@ public class CustomerMarketController {
             log.error(String.format("客户信息审核结果:%s 修改异常:%s", JSONUtil.toJsonStr(input), e.getMessage()), e);
             return BaseOutput.failure("系统异常").setData(false);
         }
+    }
+
+    /**
+     * 获取市场和其他类型子角色分类信息的组合对象
+     * @param marketIds 市场id集合
+     * @return
+     */
+    @PostMapping(value = "/listOtherCharacterType")
+    public BaseOutput<List<CustomerMarketCharacterTypeDto>> listOtherCharacterType(@RequestBody List<Long> marketIds) {
+        return BaseOutput.success().setData(customerMarketService.listOtherCharacterType(marketIds));
     }
 }
