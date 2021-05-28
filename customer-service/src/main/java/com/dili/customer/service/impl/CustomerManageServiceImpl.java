@@ -327,8 +327,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         //如果为个人用户
         if (CustomerEnum.OrganizationType.INDIVIDUAL.equals(CustomerEnum.OrganizationType.getInstance(baseInfo.getOrganizationType()))) {
             if (CollectionUtil.isNotEmpty(phoneExist)) {
-                Customer phoneExistCustomer = phoneExist.get(0);
-                return "此手机号对应的客户已存在 (" + phoneExistCustomer.getName() + "： " + phoneExistCustomer.getCertificateNumber() + ")";
+                return "此手机号对应的客户已存在";
 
             }
         } else {
@@ -848,8 +847,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
             //如果为个人用户
             if (CustomerEnum.OrganizationType.INDIVIDUAL.equals(CustomerEnum.OrganizationType.getInstance(updateInput.getOrganizationType()))) {
                 if (CollectionUtil.isNotEmpty(phoneExist)) {
-                    Customer phoneExistCustomer = phoneExist.get(0);
-                    return BaseOutput.failure("此手机号对应的客户已存在 (" + phoneExistCustomer.getName() + "： " + phoneExistCustomer.getCertificateNumber() + ")");
+                    return BaseOutput.failure("此手机号对应的客户已存在";
                 }
             } else {
                 if (CollectionUtil.isNotEmpty(phoneExist) && phoneExist.size() >= customerConfig.getPhoneLimit()) {
