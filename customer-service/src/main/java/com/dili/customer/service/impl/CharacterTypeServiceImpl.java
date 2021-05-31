@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author yuehongbo
@@ -61,5 +58,20 @@ public class CharacterTypeServiceImpl extends BaseServiceImpl<CharacterType, Lon
             this.batchInsert(characterTypeList);
         }
         return 0;
+    }
+
+    @Override
+    public List<CharacterType> listByCustomerAndMarkets(Long customerId, Set<Long> marketIds) {
+        if (Objects.nonNull(customerId) && Objects.nonNull(marketIds)) {
+            CharacterTypeQuery characterType = new CharacterTypeQuery();
+            Set<Long> customerSets = new HashSet<>();
+            customerSets.add(customerId);
+            characterType.setCustomerIdSet(customerSets);
+            characterType.setMarketIdSet(marketIds);
+            return this.listByExample(characterType);
+        }
+        return Collections.emptyList();
+
+
     }
 }

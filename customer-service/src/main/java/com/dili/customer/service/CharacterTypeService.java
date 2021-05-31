@@ -1,6 +1,5 @@
 package com.dili.customer.service;
 
-import com.dili.customer.domain.BusinessCategory;
 import com.dili.customer.domain.CharacterType;
 import com.dili.ss.base.BaseService;
 
@@ -30,4 +29,12 @@ public interface CharacterTypeService extends BaseService<CharacterType, Long> {
      * @return 返回保存后的客户身份信息
      */
     Integer saveInfo(List<CharacterType> characterTypeList, Long customerId, Long marketId);
+
+    /**
+     * 根据单个id及多个市场id，查询客户角色信息
+     * @param customerId 客户ID
+     * @param marketIds 市场ID集合
+     * @return
+     */
+    List<CharacterType> listByCustomerAndMarkets(Long customerId, Set<Long> marketIds);
 }

@@ -1,13 +1,10 @@
 package com.dili.customer.api;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.dili.assets.sdk.dto.CarTypeForBusinessDTO;
 import com.dili.customer.annotation.UapToken;
-import com.dili.customer.commons.service.CommonDataService;
-import com.dili.customer.commons.service.DataDictionaryRpcService;
-import com.dili.customer.commons.service.DepartmentRpcService;
-import com.dili.customer.commons.service.UapUserRpcService;
+import com.dili.customer.commons.service.*;
 import com.dili.customer.commons.util.EnumUtil;
-import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.sdk.domain.dto.CharacterTypeGroupDto;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.sdk.enums.NationEnum;
@@ -46,12 +43,13 @@ public class CommonDataController {
     @Autowired
     private DepartmentRpcService departmentRpcService;
     @Autowired
-    private UapUserTicket uapUserTicket;
-    @Autowired
     private UapUserRpcService uapUserRpcService;
+    @Autowired
+    private CarTypeRpcService carTypeRpcService;
 
     /**
      * 查询经营性质(用户类型)
+     *
      * @return
      */
     @PostMapping(value = "/listBusinessNature")
@@ -61,6 +59,7 @@ public class CommonDataController {
 
     /**
      * 获取行业主数据
+     *
      * @return
      */
     @PostMapping(value = "/listIndustry")
@@ -70,6 +69,7 @@ public class CommonDataController {
 
     /**
      * 获取个人证件类型
+     *
      * @return
      */
     @PostMapping(value = "/listIndividualCertificate")
@@ -79,6 +79,7 @@ public class CommonDataController {
 
     /**
      * 获取企业证件类型
+     *
      * @return
      */
     @PostMapping(value = "/listEnterpriseCertificate")
@@ -88,6 +89,7 @@ public class CommonDataController {
 
     /**
      * 获取角色主信息
+     *
      * @return
      */
     @PostMapping(value = "/listCharacter")
@@ -97,6 +99,7 @@ public class CommonDataController {
 
     /**
      * 获取市场角色身份分类信息
+     *
      * @return
      */
     @PostMapping(value = "/listCharacterSubType")
@@ -134,6 +137,7 @@ public class CommonDataController {
 
     /**
      * 获取市场角色分类信息
+     *
      * @return
      */
     @PostMapping(value = "/listCharacterTypeGroup")
@@ -149,6 +153,7 @@ public class CommonDataController {
 
     /**
      * 获取民族信息
+     *
      * @return
      */
     @PostMapping(value = "/listNation")
@@ -158,6 +163,7 @@ public class CommonDataController {
 
     /**
      * 获取客户组织类型
+     *
      * @return
      */
     @PostMapping(value = "/listOrganizationType")
@@ -167,6 +173,7 @@ public class CommonDataController {
 
     /**
      * 获取有权限的部门信息
+     *
      * @return
      */
     @UapToken
@@ -186,6 +193,7 @@ public class CommonDataController {
 
     /**
      * 根据部门获取对应的uap用户信息
+     *
      * @return
      */
     @UapToken
@@ -206,4 +214,15 @@ public class CommonDataController {
         return BaseOutput.successData(uapUserRpcService.listByExample(userQuery));
     }
 
+    /**
+     * 根据市场id获取对应的所有车辆类型信息
+     *
+     * @return
+     */
+
+    @RequestMapping(value = "/listCarTypes", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public BaseOutput<List<CarTypeForBusinessDTO>> listCarTypes(@RequestParam("marketId") Long marketId) {
+        return carTypeRpcService.listCarTypes(marketId);
+    }
 }

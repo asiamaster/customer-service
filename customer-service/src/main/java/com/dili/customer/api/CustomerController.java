@@ -7,6 +7,7 @@ import cn.hutool.json.JSONUtil;
 import com.dili.commons.glossary.YesOrNoEnum;
 import com.dili.customer.annotation.UapToken;
 import com.dili.customer.domain.Customer;
+import com.dili.customer.domain.vo.FirmCharcterTypeVo;
 import com.dili.customer.domain.wechat.LoginSuccessData;
 import com.dili.customer.sdk.constants.MqConstant;
 import com.dili.customer.sdk.domain.CustomerMarket;
@@ -24,6 +25,7 @@ import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import com.dili.ss.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -550,5 +552,20 @@ public class CustomerController {
             log.error(String.format("完善信息数据：%s 异常:%s", JSONUtil.toJsonStr(input), e.getMessage()), e);
             return BaseOutput.failure("系统异常").setData(false);
         }
+    }
+
+    /**
+     * 根据单个客户id及多个市场id，查询市场信息详情及客户在多个市场的角色信息
+     * @param customerId 客户ID
+     * @param marketIds 市场ID集合
+     * @return
+     */
+    @PostMapping(value="/getMarketInfoAndCharacterTypes")
+    public BaseOutput<List<FirmCharcterTypeVo>> getMarketInfoAndCharacterTypes(@RequestParam("customerId") Long customerId,
+                                                                          @RequestParam("marketIds") Set<Long> marketIds) {
+        if (Objects.isNull(customerId) || CollectionUtils.isEmpty(marketIds)) {
+            return BaseOutput.failure("必要参数丢失").setCode(ResultCode.PARAMS_ERROR);
+        }
+        return customerQueryService.getMarketInfoAndCharacterTypes(customerId, marketIds);
     }
 }

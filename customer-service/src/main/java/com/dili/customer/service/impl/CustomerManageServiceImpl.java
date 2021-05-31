@@ -67,6 +67,9 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
      */
     private static final String UID_TYPE = "customerCode";
 
+
+    private static final String DRIVER_CLIENT_BUSINESSNATURE_TEMPORARY_ABSENT = "driver_client_businessNature_absent";
+
     private CustomerMapper getActualMapper() {
         return (CustomerMapper) getDao();
     }
@@ -152,7 +155,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                  *  查询客户与市场的关联信息，本平台已启用市场隔离。
                  *  如果未启用部门或归属人权限隔离，则查询客户与市场的关联信息存在，则为全局存在，可直接判定客户存在
                  *  如果启用部门或归属人权限隔离，
-                */
+                 */
                 CustomerMarket customerMarket = customerMarketService.queryByMarketAndCustomerId(marketInfo.getMarketId(), customer.getId());
                 if (Objects.nonNull(customerMarket)) {
                     Boolean departmentAuth = commonDataService.checkCustomerDepartmentAuth(marketInfo.getMarketId());
@@ -621,7 +624,10 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                 oldCustomerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
                 oldCustomerMarket.setState(CustomerEnum.State.USELESS.getCode());
             }
-            oldCustomerMarket.setBusinessNature(input.getCustomerMarket().getBusinessNature());
+            // 如果请求来自"农溯安-司机端"，且设置这个值为"driver_client_businessNature_absent"（客户经营性质暂时空缺）时，则暂时不设置客户经营性质的值
+            if (!input.getCustomerMarket().getBusinessNature().equals(DRIVER_CLIENT_BUSINESSNATURE_TEMPORARY_ABSENT)) {
+                oldCustomerMarket.setBusinessNature(input.getCustomerMarket().getBusinessNature());
+            }
             oldCustomerMarket.setApprovalUserId(null);
             oldCustomerMarket.setApprovalTime(null);
             customerMarketService.update(oldCustomerMarket);
@@ -639,7 +645,10 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                         old.setState(CustomerEnum.State.USELESS.getCode());
                     }
                     old.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
-                    old.setBusinessNature(input.getCustomerMarket().getBusinessNature());
+                    // 如果请求来自"农溯安-司机端"，且设置这个值为"driver_client_businessNature_absent"（客户经营性质暂时空缺）时，则暂时不设置客户经营性质的值
+                    if (!input.getCustomerMarket().getBusinessNature().equals(DRIVER_CLIENT_BUSINESSNATURE_TEMPORARY_ABSENT)) {
+                        old.setBusinessNature(input.getCustomerMarket().getBusinessNature());
+                    }
                     old.setApprovalUserId(null);
                     old.setApprovalTime(null);
                     customerMarketService.update(old);

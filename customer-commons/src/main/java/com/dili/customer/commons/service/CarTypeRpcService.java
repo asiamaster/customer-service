@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.dili.assets.sdk.dto.CarTypeDTO;
+import com.dili.assets.sdk.dto.CarTypeForBusinessDTO;
 import com.dili.assets.sdk.rpc.CarTypeRpc;
 import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.ss.domain.BaseOutput;
@@ -18,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @author yuehongbo
@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 public class CarTypeRpcService {
 
     private final CarTypeRpc carTypeRpc;
+
     @Resource(name = "caffeineTimedCache")
     private Cache<String, String> caffeineTimedCache;
 
@@ -69,5 +70,11 @@ public class CarTypeRpcService {
             return StreamEx.of(carTypeDTOS).toMap(CarTypeDTO::getId, Function.identity());
         }
         return Collections.emptyMap();
+    }
+
+    public BaseOutput<List<CarTypeForBusinessDTO>> listCarTypes(Long marketId) {
+        CarTypeForBusinessDTO carTypeForBusinessDTO = new CarTypeForBusinessDTO();
+        carTypeForBusinessDTO.setMarketId(marketId);
+        return carTypeRpc.queryCarType(carTypeForBusinessDTO);
     }
 }

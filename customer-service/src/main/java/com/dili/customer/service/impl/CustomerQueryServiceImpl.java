@@ -9,7 +9,9 @@ import com.dili.customer.commons.service.CommonDataService;
 import com.dili.customer.commons.service.DepartmentRpcService;
 import com.dili.customer.commons.service.UapUserRpcService;
 import com.dili.customer.domain.*;
+import com.dili.customer.domain.vo.FirmCharcterTypeVo;
 import com.dili.customer.mapper.CustomerMapper;
+import com.dili.customer.sdk.domain.dto.CustomerExtendDto;
 import com.dili.customer.sdk.domain.query.CustomerBaseQueryInput;
 import com.dili.customer.sdk.domain.query.CustomerQueryInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
@@ -19,16 +21,16 @@ import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 import com.dili.ss.util.POJOUtils;
-import com.dili.uap.sdk.domain.DataDictionaryValue;
-import com.dili.uap.sdk.domain.Department;
-import com.dili.uap.sdk.domain.User;
-import com.dili.uap.sdk.domain.UserTicket;
+import com.dili.uap.sdk.domain.*;
+import com.dili.uap.sdk.rpc.FirmRpc;
 import com.dili.uap.sdk.session.SessionContext;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,6 +68,8 @@ public class CustomerQueryServiceImpl  extends BaseServiceImpl<Customer, Long> i
     private AttachmentService attachmentService;
     @Autowired
     private VehicleInfoService vehicleInfoService;
+    @Autowired
+    private FirmRpc firmRpc;
 
 
     @Override
@@ -379,6 +383,28 @@ public class CustomerQueryServiceImpl  extends BaseServiceImpl<Customer, Long> i
      */
     private UserTicket getOperatorUserTicket(){
         return  SessionContext.getSessionContext().getUserTicket();
+    }
+
+    @Override
+    public BaseOutput<List<FirmCharcterTypeVo>> getMarketInfoAndCharacterTypes(Long customerId, Set<Long> marketIds) {
+        List<FirmCharcterTypeVo> vos = new ArrayList<>();
+        List<CharacterType> characterTypes = characterTypeService.listByCustomerAndMarkets(customerId, marketIds);
+        Map<Long, List<CharacterType>> firmIdCharacterTypeMap = characterTypes.stream()
+                .filter(Objects::nonNull).collect(Collectors.groupingBy(CharacterType::getMarketId));
+        for (Map.Entry<Long, List<CharacterType>> c : firmIdCharacterTypeMap.entrySet()) {
+            FirmCharcterTypeVo vo = new FirmCharcterTypeVo();
+            BaseOutput<Firm> firmOutput = firmRpc.getById(c.getKey());
+            if (Objects.isNull(firmOutput.getData())) {
+                return BaseOutput.failure(" 用户已归属的市场不存在，数据有误");
+            }
+            Firm firm = firmOutput.getData();
+            List<CharacterType> value = c.getValue();
+            Map<String, List<CharacterType>> characterTypeSubTypeMap = value.stream().collect(Collectors.groupingBy(CharacterType::getCharacterType));
+            vo.setFirm(firm);
+            vo.setCharacterTypeSubTypes(characterTypeSubTypeMap);
+            vos.add(vo);
+        }
+        return BaseOutput.success().setData(vos);
     }
 
 }
