@@ -2,16 +2,23 @@ package com.dili.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.dili.assets.sdk.dto.CarTypeDTO;
+import com.dili.assets.sdk.rpc.AssetsRpc;
+import com.dili.assets.sdk.rpc.CarTypeRpc;
 import com.dili.customer.commons.service.MarketRpcService;
 import com.dili.customer.domain.CustomerMarket;
+import com.dili.customer.domain.VehicleInfo;
 import com.dili.customer.domain.dto.CustomerMarketCharacterTypeDto;
 import com.dili.customer.domain.dto.CustomerMarketDto;
+import com.dili.customer.domain.vo.CustomerMarketVehicleVo;
+import com.dili.customer.domain.vo.VehicleInfoVo;
 import com.dili.customer.mapper.CustomerMarketMapper;
 import com.dili.customer.sdk.constants.MqConstant;
 import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.service.CustomerManageService;
 import com.dili.customer.service.CustomerMarketService;
+import com.dili.customer.service.VehicleInfoService;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.dto.DTOUtils;
@@ -23,12 +30,15 @@ import com.dili.uap.sdk.rpc.DataDictionaryRpc;
 import com.dili.uap.sdk.rpc.FirmRpc;
 import com.google.common.collect.Lists;
 import one.util.streamex.StreamEx;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -51,6 +61,13 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
     private MarketRpcService marketRpcService;
     @Autowired
     private CustomerManageService customerManageService;
+    @Autowired
+    private VehicleInfoService vehicleInfoService;
+    @Autowired
+    private CarTypeRpc carTypeRpc;
+    @Autowired
+    private AssetsRpc assetsRpc;
+
 
     @Override
     public CustomerMarket queryByMarketAndCustomerId(Long marketId, Long customerId) {
@@ -161,5 +178,50 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
             dtos.add(dto);
         }
         return dtos;
+    }
+
+    @Override
+    public List<CustomerMarketVehicleVo> listCustomerMarketAndVehicleInfo(Long customerId) {
+        List<CustomerMarketVehicleVo> vos = new ArrayList<>();
+        // 获取该客户的所有市场id
+        CustomerMarket info = new CustomerMarket();
+        info.setCustomerId(customerId);
+        List<CustomerMarket> firmInfos = list(info);
+        if (CollectionUtils.isEmpty(firmInfos)) {
+            return vos;
+        }
+        List<Long> idList = firmInfos.stream().map(CustomerMarket::getMarketId).distinct().collect(Collectors.toList());
+       // 根据该客户的所有市场id获取市场对象
+        FirmDto firmDto = DTOUtils.newInstance(FirmDto.class);
+        firmDto.setIdList(idList);
+        BaseOutput<List<Firm>> firmOutput = firmRpc.listByExample(firmDto);
+        if (firmOutput.isSuccess() && CollectionUtil.isNotEmpty(firmOutput.getData())) {
+            VehicleInfo vehicleInfo = new VehicleInfo();
+            vehicleInfo.setCustomerId(customerId);
+            List<Firm> firms = firmOutput.getData();
+            for (Firm firm : firms) {
+                vehicleInfo.setMarketId(firm.getId());
+                // 根据市场id和客户id获取车辆信息
+                List<VehicleInfo> vehicleInfos = vehicleInfoService.list(vehicleInfo);
+                CustomerMarketVehicleVo vo = new CustomerMarketVehicleVo();
+                List<VehicleInfoVo> vehicleInfoVos = new ArrayList<>();
+                for (VehicleInfo v : vehicleInfos){
+                    // 获取车型信息
+                    BaseOutput<CarTypeDTO> carTypeOutput = assetsRpc.getCarTypeById(v.getTypeNumber());
+                    if(carTypeOutput.isSuccess() && Objects.nonNull(carTypeOutput.getData())){
+                        CarTypeDTO dto = carTypeOutput.getData();
+                        String carTypeName = dto.getName();
+                        VehicleInfoVo vehicleInfoVo = new VehicleInfoVo();
+                        vehicleInfoVo.setCarTypeName(carTypeName);
+                        BeanUtils.copyProperties(dto, vehicleInfoVo);
+                        vehicleInfoVos.add(vehicleInfoVo);
+                    }
+                }
+                vo.setFirm(firm);
+                vo.setVehicleInfoVos(vehicleInfoVos);
+                vos.add(vo);
+            }
+        }
+        return vos;
     }
 }
