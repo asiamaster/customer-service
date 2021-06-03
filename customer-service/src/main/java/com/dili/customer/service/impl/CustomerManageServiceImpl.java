@@ -40,6 +40,7 @@ import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -703,6 +704,10 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         if (CollectionUtil.isNotEmpty(input.getAttachmentList())) {
             List<Attachment> attachmentList = JSONArray.parseArray(JSONObject.toJSONString(input.getAttachmentList()), Attachment.class);
             attachmentService.batchSave(attachmentList, customer.getId(), marketId);
+        }
+        if (CollectionUtils.isNotEmpty(input.getVehicleInfoList())) {
+            List<com.dili.customer.domain.VehicleInfo> vehicleInfoList = JSONArray.parseArray(JSONObject.toJSONString(input.getVehicleInfoList()), com.dili.customer.domain.VehicleInfo.class);
+            vehicleInfoService.batchSaveOrUpdate(vehicleInfoList);
         }
         return BaseOutput.successData(customer);
     }
