@@ -191,6 +191,15 @@
             <if test="customerMarket.state != null">
                 and cm.state = #{customerMarket.state}
             </if>
+            <if test="null != customerMarket.departmentIdSet and customerMarket.departmentIdSet.size > 0">
+                AND
+                <foreach collection="customerMarket.departmentIdSet" item="temp"  open="(" separator=" or " close=")" >
+                    FIND_IN_SET(#{temp}, cm.department_ids) > 0
+                </foreach>
+            </if>
+            <if test="customerMarket.ownerIds != null and customerMarket.ownerIds !=''">
+                and FIND_IN_SET(#{customerMarket.ownerIds}, cm.owner_ids) > 0
+            </if>
         </if>
         <!-- 如果客户身份类型参数不为空 -->
         <if test="null != characterType">

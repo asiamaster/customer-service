@@ -315,7 +315,9 @@ public class CustomerQueryServiceImpl  extends BaseServiceImpl<Customer, Long> i
                 return Optional.empty();
             }
             Set<Long> collect = departmentList.stream().filter(t -> Objects.nonNull(t.getId())).map(t -> t.getId()).collect(Collectors.toSet());
-            customerMarket.setDepartmentIdSet(collect);
+            if (departmentAuth) {
+                customerMarket.setDepartmentIdSet(collect);
+            }
             if (ownerAuth) {
                 customerMarket.setOwnerIds(String.valueOf(userTicket.getId()));
             }
