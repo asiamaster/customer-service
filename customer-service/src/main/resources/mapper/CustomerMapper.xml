@@ -202,7 +202,6 @@
             <if test="customerMarket.ownerIds != null and customerMarket.ownerIds !=''">
                 and FIND_IN_SET(#{customerMarket.ownerIds}, cm.owner_ids) > 0
             </if>
-            OR length(cm.department_ids) = 0 OR length(cm.owner_ids) = 0
         </if>
         <!-- 如果客户身份类型参数不为空 -->
         <if test="null != characterType">
@@ -222,6 +221,98 @@
             )
         </if>
        </where>
+        UNION
+        ( SELECT
+        c.*,
+        cm.id as customerMarketId, cm.market_id,cm.create_time as marketCreateTime,cm.creator_id AS marketCreatorId,
+        cm.grade,cm.department_ids,cm.profession,cm.profession_name,cm.sales_market,cm.business_nature,cm.approval_status,
+        cm.approval_user_id,cm.approval_time,cm.owner_ids,cm.business_region_tag,cm.state AS marketState
+        FROM
+        customer c
+        INNER JOIN customer_market cm
+        ON c.id = cm.customer_id
+        <where>
+            <include refid="Base_Where_Clause"/>
+            <if test="marketId != null">
+                and cm.market_id = #{marketId}
+            </if>
+            <if test="marketCreateTimeStart != null">
+                and cm.create_time >= #{marketCreateTimeStart}
+            </if>
+            <if test="marketCreateTimeEnd != null">
+                and cm.create_time <![CDATA[ <= ]]> #{marketCreateTimeEnd}
+            </if>
+            <if test="(null != assetsIdSet and  assetsIdSet.size() > 0) or (assetsName !=null and assetsName !='')">
+                and c.id in
+                (select customer_id from tallying_area ta where ta.market_id=#{marketId}
+                <if test="null != assetsIdSet and  assetsIdSet.size() > 0">
+                    and ta.assets_id in
+                    <foreach collection="assetsIdSet" index="index" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="assetsName !=null and assetsName !=''">
+                    and ta.assets_name = #{assetsName}
+                </if>
+                /* 直接可用的，或者有租赁状态且已生效的 */
+                and (ta.is_usable = 1 or (ta.is_lease=1 and ta.state=5)))
+            </if>
+            <if test="null != vehicleNumber and vehicleNumber !=''">
+                and c.id in
+                (select customer_id from vehicle_info vi where vi.market_id=#{marketId} and vi.registration_number = #{vehicleNumber})
+            </if>
+            <if test="null != hasLicense">
+                <if test="hasLicense == 1">
+                    and c.id in
+                </if>
+                <if test="hasLicense == 0">
+                    and c.id not in
+                </if>
+                (select customer_id from attachment att
+                <if test="marketId != null">
+                    where att.market_id = #{marketId}
+                </if>
+                )
+            </if>
+            <if test="null != customerMarket">
+                <if test="null != customerMarket.salesMarket and ''!=customerMarket.salesMarket">
+                    and cm.sales_market = #{customerMarket.salesMarket}
+                </if>
+                <if test="customerMarket.departmentIds != null and customerMarket.departmentIds !=''">
+                    and cm.department_ids = #{customerMarket.departmentIds}
+                </if>
+                <if test="customerMarket.grade != null">
+                    and cm.grade = #{customerMarket.grade}
+                </if>
+                <if test="customerMarket.creatorId != null">
+                    and cm.creator_id = #{customerMarket.creatorId}
+                </if>
+                <if test="customerMarket.approvalStatus != null">
+                    and cm.approval_status = #{customerMarket.approvalStatus}
+                </if>
+                <if test="customerMarket.state != null">
+                    and cm.state = #{customerMarket.state}
+                </if>
+                    AND (length(cm.department_ids) = 0 or length(cm.owner_ids) = 0)
+            </if>
+            <!-- 如果客户身份类型参数不为空 -->
+            <if test="null != characterType">
+                and c.id in
+                (select customer_id from character_type ct
+                <where>
+                    <if test="marketId != null">
+                        and ct.market_id = #{marketId}
+                    </if>
+                    <if test="null != characterType.characterType and ''!=characterType.characterType">
+                        and ct.character_type = #{characterType.characterType}
+                    </if>
+                    <if test="null != characterType.subType and ''!=characterType.subType">
+                        and ct.sub_type = #{characterType.subType}
+                    </if>
+                </where>
+                )
+            </if>
+        </where>)
         ORDER BY ${sort} ${order}
     </select>
 
