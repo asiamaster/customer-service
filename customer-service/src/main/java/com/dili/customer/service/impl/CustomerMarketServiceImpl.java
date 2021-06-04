@@ -213,6 +213,7 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
                         String carTypeName = dto.getName();
                         VehicleInfoVo vehicleInfoVo = new VehicleInfoVo();
                         vehicleInfoVo.setCarTypeName(carTypeName);
+                        BeanUtils.copyProperties(v, vehicleInfoVo);
                         BeanUtils.copyProperties(dto, vehicleInfoVo);
                         vehicleInfoVos.add(vehicleInfoVo);
                     }
