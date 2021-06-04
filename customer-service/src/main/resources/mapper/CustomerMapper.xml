@@ -293,7 +293,8 @@
                 <if test="customerMarket.state != null">
                     and cm.state = #{customerMarket.state}
                 </if>
-                    AND (length(cm.department_ids) = 0 or length(cm.owner_ids) = 0)
+                        AND (  cm.department_ids IS NULL OR length(cm.department_ids) = 0
+                        OR length(cm.owner_ids) = 0  cm.owner_ids IS NULL)
             </if>
             <!-- 如果客户身份类型参数不为空 -->
             <if test="null != characterType">
