@@ -1,8 +1,13 @@
 package com.dili.customer.api;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import com.dili.assets.sdk.dto.CarTypeDTO;
 import com.dili.assets.sdk.dto.CarTypeForBusinessDTO;
+import com.dili.assets.sdk.rpc.CarTypeRpc;
 import com.dili.customer.annotation.UapToken;
+import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.customer.commons.service.*;
 import com.dili.customer.commons.util.EnumUtil;
 import com.dili.customer.sdk.domain.dto.CharacterTypeGroupDto;
@@ -16,11 +21,14 @@ import com.dili.uap.sdk.domain.Department;
 import com.dili.uap.sdk.domain.UserTicket;
 import com.dili.uap.sdk.domain.dto.UserQuery;
 import com.dili.uap.sdk.session.SessionContext;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -46,7 +54,10 @@ public class CommonDataController {
     private UapUserRpcService uapUserRpcService;
     @Autowired
     private CarTypeRpcService carTypeRpcService;
-
+    @Autowired
+    private CarTypeRpc carTypeRpc;
+    @Resource(name = "caffeineTimedCache")
+    private Cache<String, String> caffeineTimedCache;
     /**
      * 查询经营性质(用户类型)
      *
@@ -222,7 +233,7 @@ public class CommonDataController {
 
     @RequestMapping(value = "/listCarTypes", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    public BaseOutput<List<CarTypeForBusinessDTO>> listCarTypes(@RequestParam("marketId") Long marketId) {
-        return carTypeRpcService.listCarTypes(marketId);
+    public BaseOutput<List<CarTypeDTO>> listCarTypes() {
+        return BaseOutput.success().setData(carTypeRpcService.listCarTypes());
     }
 }
