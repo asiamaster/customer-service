@@ -252,6 +252,19 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                 customer.setCurrentAddress(baseInfo.getCurrentAddress());
             }
             this.update(customer);
+            // 如果客户市场信息存在，要把id赋给待保存对象，否则将被视为新增处理
+            if (Objects.nonNull(customerMarkeExisted)) {
+                marketInfo.setId(customerMarkeExisted.getId());
+                marketInfo.setModifyTime(customerMarkeExisted.getModifyTime());
+                // 如果已存在的客户归属部门不包含传入的归属部门，需在字符串后添加
+                if (StringUtils.isNotBlank(marketInfo.getDepartmentIds()) && !Arrays.asList(customerMarkeExisted.getDepartmentIds().split(",")).contains(marketInfo.getDepartmentIds())) {
+                    marketInfo.setDepartmentIds(customerMarkeExisted.getDepartmentIds() + "," + marketInfo.getDepartmentIds());
+                }
+                // 如果已存在的客户归属人id不包含传入的客户归属人id，需在字符串后添加
+                if (StringUtils.isNotBlank(marketInfo.getOwnerIds()) && !Arrays.asList(customerMarkeExisted.getOwnerIds().split(",")).contains(marketInfo.getOwnerIds())) {
+                    marketInfo.setOwnerIds(customerMarkeExisted.getOwnerIds() + "," + marketInfo.getOwnerIds());
+                }
+            }
         }
         marketInfo.setAlias(baseInfo.getName());
         marketInfo.setCustomerId(customer.getId());
@@ -265,10 +278,9 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
             marketInfo.setApprovalTime(LocalDateTime.now());
             marketInfo.setApprovalUserId(baseInfo.getOperatorId());
             marketInfo.setCreatorId(baseInfo.getOperatorId());
-            marketInfo.setModifyTime(LocalDateTime.now());
             marketInfo.setCreateTime(marketInfo.getModifyTime());
         }
-        customerMarketService.saveOrUpdate(marketInfo);
+        customerMarketService.saveOrUpdateSelective(marketInfo);
         //组装并保存客户联系人信息
         List<Contacts> contactsList = generateContacts(baseInfo, customer);
         contactsService.batchInsert(contactsList);
