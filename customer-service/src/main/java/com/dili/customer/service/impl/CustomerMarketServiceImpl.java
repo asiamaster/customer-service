@@ -206,6 +206,7 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
                 CustomerMarketVehicleVo vo = new CustomerMarketVehicleVo();
                 List<VehicleInfoVo> vehicleInfoVos = new ArrayList<>();
                 for (VehicleInfo v : vehicleInfos){
+
                     // 获取车型信息
                     BaseOutput<CarTypeDTO> carTypeOutput = assetsRpc.getCarTypeById(v.getTypeNumber());
                     if(carTypeOutput.isSuccess() && Objects.nonNull(carTypeOutput.getData())){
@@ -217,6 +218,7 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
                         BeanUtils.copyProperties(v, vehicleInfoVo);
                         vehicleInfoVos.add(vehicleInfoVo);
                     }
+
                 }
                 vo.setFirm(firm);
                 vo.setVehicleInfoVos(vehicleInfoVos);
