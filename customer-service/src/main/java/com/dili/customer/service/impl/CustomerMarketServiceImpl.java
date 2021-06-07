@@ -196,29 +196,27 @@ public class CustomerMarketServiceImpl extends BaseServiceImpl<CustomerMarket, L
         firmDto.setIdList(idList);
         BaseOutput<List<Firm>> firmOutput = firmRpc.listByExample(firmDto);
         if (firmOutput.isSuccess() && CollectionUtil.isNotEmpty(firmOutput.getData())) {
-            VehicleInfo vehicleInfo = new VehicleInfo();
-            vehicleInfo.setCustomerId(customerId);
             List<Firm> firms = firmOutput.getData();
             for (Firm firm : firms) {
+                VehicleInfo vehicleInfo = new VehicleInfo();
+                vehicleInfo.setCustomerId(customerId);
                 vehicleInfo.setMarketId(firm.getId());
                 // 根据市场id和客户id获取车辆信息
                 List<VehicleInfo> vehicleInfos = vehicleInfoService.list(vehicleInfo);
                 CustomerMarketVehicleVo vo = new CustomerMarketVehicleVo();
                 List<VehicleInfoVo> vehicleInfoVos = new ArrayList<>();
                 for (VehicleInfo v : vehicleInfos){
-
+                    VehicleInfoVo vehicleInfoVo = new VehicleInfoVo();
                     // 获取车型信息
                     BaseOutput<CarTypeDTO> carTypeOutput = assetsRpc.getCarTypeById(v.getTypeNumber());
                     if(carTypeOutput.isSuccess() && Objects.nonNull(carTypeOutput.getData())){
                         CarTypeDTO dto = carTypeOutput.getData();
                         String carTypeName = dto.getName();
-                        VehicleInfoVo vehicleInfoVo = new VehicleInfoVo();
                         vehicleInfoVo.setCarTypeName(carTypeName);
                         BeanUtils.copyProperties(dto, vehicleInfoVo);
                         BeanUtils.copyProperties(v, vehicleInfoVo);
-                        vehicleInfoVos.add(vehicleInfoVo);
                     }
-
+                    vehicleInfoVos.add(vehicleInfoVo);
                 }
                 vo.setFirm(firm);
                 vo.setVehicleInfoVos(vehicleInfoVos);
