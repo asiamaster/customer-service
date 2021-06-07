@@ -246,7 +246,7 @@ public class CustomerQueryServiceImpl  extends BaseServiceImpl<Customer, Long> i
         CustomerMarket customerFirm = customerMarketService.queryByMarketAndCustomerId(marketId, customer.getId());
         if (Objects.nonNull(customerFirm)) {
             customer.setCustomerMarket(customerFirm);
-            return BaseOutput.failure("该证件号对应的客户已存在").setCode(ResultCode.DATA_ERROR).setData(customer);
+            return BaseOutput.failure("该市场下，该证件号对应的客户已存在").setCode(ResultCode.DATA_ERROR).setData(customer);
         }
         return BaseOutput.success().setData(customer);
     }
