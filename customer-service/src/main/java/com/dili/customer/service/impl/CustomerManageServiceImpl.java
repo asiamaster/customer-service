@@ -709,6 +709,9 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
             List<com.dili.customer.domain.VehicleInfo> vehicleInfoList = JSONArray.parseArray(JSONObject.toJSONString(input.getVehicleInfoList()), com.dili.customer.domain.VehicleInfo.class);
             vehicleInfoService.batchSaveOrUpdate(vehicleInfoList);
         }
+        if (CollectionUtils.isNotEmpty(input.getDeletedVehicleInfoIds())) {
+            vehicleInfoService.delete(new ArrayList<>(input.getDeletedVehicleInfoIds()));
+        }
         return BaseOutput.successData(customer);
     }
 
