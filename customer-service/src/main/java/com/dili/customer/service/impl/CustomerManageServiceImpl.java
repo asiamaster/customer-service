@@ -705,17 +705,16 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
             List<Attachment> attachmentList = JSONArray.parseArray(JSONObject.toJSONString(input.getAttachmentList()), Attachment.class);
             attachmentService.batchSave(attachmentList, customer.getId(), marketId);
         }
-        UserTicket userTicket = getOperatorUserTicket();
         if (CollectionUtils.isNotEmpty(input.getVehicleInfoList())) {
             List<com.dili.customer.domain.VehicleInfo> vehicleInfoList = JSONArray.parseArray(JSONObject.toJSONString(input.getVehicleInfoList()), com.dili.customer.domain.VehicleInfo.class);
             for (com.dili.customer.domain.VehicleInfo v : vehicleInfoList) {
                 // id为空对应新增情形，设置创建人和更新人id
                 if (null == v.getId()) {
-                    v.setCreatorId(userTicket.getId());
-                    v.setModifierId(userTicket.getId());
+                    v.setCreatorId(input.getOperatorId());
+                    v.setModifierId(input.getOperatorId());
                 // id不为空对应更新情形，只设置更新人id
                 } else {
-                    v.setModifierId(userTicket.getId());
+                    v.setModifierId(input.getOperatorId());
                 }
             }
             vehicleInfoService.batchSaveOrUpdate(vehicleInfoList);
