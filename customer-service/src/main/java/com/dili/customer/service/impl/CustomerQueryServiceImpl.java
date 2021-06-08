@@ -131,6 +131,12 @@ public class CustomerQueryServiceImpl  extends BaseServiceImpl<Customer, Long> i
             input.setSort("id");
             input.setOrder("desc");
         }
+        if (null == input.getRows()) {
+            input.setRows(40);
+        }
+        if (null == input.getPage()) {
+            input.setPage(1);
+        }
         if (input.getRows() != null && input.getRows() >= 1) {
             PageHelper.startPage(input.getPage(), input.getRows());
         }
