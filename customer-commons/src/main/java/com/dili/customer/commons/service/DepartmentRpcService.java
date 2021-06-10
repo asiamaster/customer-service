@@ -191,4 +191,56 @@ public class DepartmentRpcService {
         }
     }
 
+    /**
+     * 查询部门信息，如果查询权限部门，userId为必须，如果查询市场所有部门，则userId 可不传
+     *
+     * @param auth     是否查询用户的权限部门，true-是
+     * @param keyword  部门名称关键字
+     * @param userId   用户ID
+     * @param marketId 市场ID
+     * @return
+     */
+    public List<Department> listDataWithKeyWord(String keyword, Boolean auth, Long userId, Long marketId) {
+        if (Objects.isNull(marketId)) {
+            return Collections.emptyList();
+        }
+        if (auth) {
+            if (Objects.isNull(userId)) {
+                return Collections.emptyList();
+            }
+            if (Objects.isNull(marketId) || Objects.isNull(userId)) {
+                return Collections.emptyList();
+            }
+            try {
+                StringJoiner keyBuilder = new StringJoiner("_");
+                keyBuilder.add(CustomerConstant.CACHE_KEY);
+                keyBuilder.add("authDepartment");
+                keyBuilder.add(String.valueOf(userId));
+                keyBuilder.add(String.valueOf(marketId));
+                String str = caffeineTimedCache.get(keyBuilder.toString(), t -> {
+                    BaseOutput<List<Department>> baseOutput = departmentRpc.listUserAuthDepartmentByFirmId(userId, marketId);
+                    if (baseOutput.isSuccess() && CollectionUtil.isNotEmpty(baseOutput.getData())) {
+                        return JSONObject.toJSONString(baseOutput.getData());
+                    }
+                    return null;
+                });
+                if (StrUtil.isNotBlank(str)) {
+                    List<Department> departments = JSONArray.parseArray(str, Department.class);
+                    return filterByNameLike(departments, keyword);
+                }
+            } catch (Exception e) {
+                log.error(String.format("根据用户【%d】市场【%d】查询权限部门异常:%s", userId, marketId, e.getMessage()), e);
+            }
+            return Collections.emptyList();
+        } else {
+            List<Department> departments = listByMarketId(marketId);
+            return filterByNameLike(departments, keyword);
+        }
+    }
+
+    private List<Department> filterByNameLike(List<Department> departments, String keyword) {
+        return departments.stream().filter(d -> d.getName().contains(keyword)).collect(Collectors.toList());
+    }
+
+
 }

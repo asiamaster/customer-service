@@ -152,7 +152,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                  *  查询客户与市场的关联信息，本平台已启用市场隔离。
                  *  如果未启用部门或归属人权限隔离，则查询客户与市场的关联信息存在，则为全局存在，可直接判定客户存在
                  *  如果启用部门或归属人权限隔离，
-                */
+                 */
                 CustomerMarket customerMarket = customerMarketService.queryByMarketAndCustomerId(marketInfo.getMarketId(), customer.getId());
                 if (Objects.nonNull(customerMarket)) {
                     Boolean departmentAuth = commonDataService.checkCustomerDepartmentAuth(marketInfo.getMarketId());
@@ -252,18 +252,17 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                 customer.setCurrentAddress(baseInfo.getCurrentAddress());
             }
             this.update(customer);
-            // 如果客户市场信息存在，要把id赋给待保存对象，否则将被视为新增处理
+
             if (Objects.nonNull(customerMarkeExisted)) {
+                // 如果客户市场信息存在，要把id赋给待保存对象，否则将被视为新增处理
                 marketInfo.setId(customerMarkeExisted.getId());
                 marketInfo.setModifyTime(customerMarkeExisted.getModifyTime());
-                // 如果已存在的客户归属部门不包含传入的归属部门，需在字符串后添加
-                if (StringUtils.isNotBlank(marketInfo.getDepartmentIds()) && !Arrays.asList(customerMarkeExisted.getDepartmentIds().split(",")).contains(marketInfo.getDepartmentIds())) {
-                    marketInfo.setDepartmentIds(customerMarkeExisted.getDepartmentIds() + "," + marketInfo.getDepartmentIds());
-                }
-                // 如果已存在的客户归属人id不包含传入的客户归属人id，需在字符串后添加
-                if (StringUtils.isNotBlank(marketInfo.getOwnerIds()) && !Arrays.asList(customerMarkeExisted.getOwnerIds().split(",")).contains(marketInfo.getOwnerIds())) {
-                    marketInfo.setOwnerIds(customerMarkeExisted.getOwnerIds() + "," + marketInfo.getOwnerIds());
-                }
+                // 在客户归属部门后添加新传入的部门，需要进行重复判断,如果已存在的客户归属部门不包含传入的归属部门，需在字符串后添加
+                String departmentIdsStr = appendDepartmentIds(marketInfo, customerMarkeExisted);
+                marketInfo.setDepartmentIds(departmentIdsStr);
+                // 在客户归属人后添加新的归属人，需要进行重复判断,如果已存在的客户归属人id不包含传入的客户归属人id，需在字符串后添加
+                String ownerIdsStr = appendOwnerIds(marketInfo, customerMarkeExisted);
+                marketInfo.setOwnerIds(ownerIdsStr);
             }
         }
         marketInfo.setAlias(baseInfo.getName());
@@ -325,6 +324,28 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         return BaseOutput.success().setData(customer);
     }
 
+    private String appendDepartmentIds(CustomerMarket marketInfo, CustomerMarket customerMarkeExisted) {
+        // 传入的部门id
+        String inputDepartmentIdsStr = marketInfo.getDepartmentIds();
+        // 已存在的部门id
+        String existedDepartmentIdsStr = customerMarkeExisted.getDepartmentIds();
+        Set<String> inputDepartmentIds = new HashSet<>(Set.of(inputDepartmentIdsStr.split(",")));
+        Set<String> existedDepartmentIds = new HashSet<>(Set.of(existedDepartmentIdsStr.split(",")));
+        inputDepartmentIds.addAll(existedDepartmentIds);
+        return StringUtils.join(inputDepartmentIds, ",");
+    }
+
+    private String appendOwnerIds(CustomerMarket marketInfo, CustomerMarket customerMarkeExisted) {
+        // 传入的所属人id
+        String inputOwnerIdsStr = marketInfo.getOwnerIds();
+        // 已存在的所属人id
+        String existedOwnerIdsStr = customerMarkeExisted.getOwnerIds();
+        Set<String> inputOwnerIds = new HashSet<>(Set.of(inputOwnerIdsStr.split(",")));
+        Set<String> existedOwnerIds = new HashSet<>(Set.of(existedOwnerIdsStr.split(",")));
+        inputOwnerIds.addAll(existedOwnerIds);
+        return StringUtils.join(inputOwnerIds, ",");
+    }
+
     private String validatePhoneNumberBeforeAddingCustomer(EnterpriseCustomerInput baseInfo) {
         Integer countByContactsPhone = this.countByContactsPhone(baseInfo.getContactsPhone());
         if (countByContactsPhone > 0) {
@@ -367,7 +388,7 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         customer.setCurrentCityPath(baseInfo.getCurrentCityPath());
         super.insertSelective(customer);
         return customer;
-     }
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
