@@ -70,11 +70,11 @@ public class WeChatService {
         Optional<AccountTerminal> byAppAndTerminalCode = accountTerminalService.getByAppAndTerminalCode(dto.getAppId(), appletTerminalType, dto.getOpenId());
         if (byAppAndTerminalCode.isPresent()) {
             AccountTerminal accountTerminal = byAppAndTerminalCode.get();
-            log.info("asass:" + accountTerminal.getAccountId());
             UserAccount userAccount = userAccountService.get(accountTerminal.getAccountId());
+            if (Objects.isNull(userAccount)) {
+                return BaseOutput.failure("客户端所绑定的客户不存在").setCode(ResultCode.DATA_ERROR);
+            }
             if (login) {
-                log.info("ssass:" + userAccount.getId());
-                log.info("esass:" + userAccount.getIsEnable());
                 if (!YesOrNoEnum.YES.getCode().equals(userAccount.getIsEnable())) {
                     return BaseOutput.failure("用户为不可用状态,不能进行此操作").setCode(ResultCode.DATA_ERROR);
                 }
