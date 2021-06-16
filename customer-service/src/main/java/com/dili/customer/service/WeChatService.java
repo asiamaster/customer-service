@@ -70,8 +70,11 @@ public class WeChatService {
         Optional<AccountTerminal> byAppAndTerminalCode = accountTerminalService.getByAppAndTerminalCode(dto.getAppId(), appletTerminalType, dto.getOpenId());
         if (byAppAndTerminalCode.isPresent()) {
             AccountTerminal accountTerminal = byAppAndTerminalCode.get();
+            System.out.println("asass:" + accountTerminal.getAccountId());
             UserAccount userAccount = userAccountService.get(accountTerminal.getAccountId());
             if (login) {
+                System.out.println("ssass:" + userAccount.getId());
+                System.out.println("esass:" + userAccount.getIsEnable());
                 if (!userAccount.getIsEnable().equals(YesOrNoEnum.YES.getCode())) {
                     return BaseOutput.failure("用户为不可用状态,不能进行此操作").setCode(ResultCode.DATA_ERROR);
                 }
