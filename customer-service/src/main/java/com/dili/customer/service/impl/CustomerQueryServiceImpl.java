@@ -365,6 +365,7 @@ public class CustomerQueryServiceImpl  extends BaseServiceImpl<Customer, Long> i
                 customerMarket.setMetadata("userRealName", userList.stream().map(User::getRealName).collect(Collectors.joining(",")));
             }
         }
+        log.info("customerMarket.getDepartmentIds( :" + customerMarket.getDepartmentIds());
         if (StrUtil.isNotBlank(customerMarket.getDepartmentIds())) {
             Set<Long> collect = Arrays.stream(customerMarket.getDepartmentIds().split(",")).map(Long::parseLong).collect(Collectors.toSet());
             List<Department> departmentList = departmentRpcService.getByIds(collect);
