@@ -25,4 +25,11 @@ public class CharacterTypeQuery extends CharacterType {
     @Column(name = "customer_id")
     @Operator(Operator.IN)
     private Set<Long> customerIdSet;
+
+    /**
+     * 客户数据群
+     */
+    @Column(name = "market_id")
+    @Operator(Operator.IN)
+    private Set<Long> marketIdSet;
 }

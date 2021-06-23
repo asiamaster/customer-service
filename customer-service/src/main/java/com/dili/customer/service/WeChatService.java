@@ -71,8 +71,11 @@ public class WeChatService {
         if (byAppAndTerminalCode.isPresent()) {
             AccountTerminal accountTerminal = byAppAndTerminalCode.get();
             UserAccount userAccount = userAccountService.get(accountTerminal.getAccountId());
+            if (Objects.isNull(userAccount)) {
+                return BaseOutput.failure("客户端所绑定的客户不存在").setCode(ResultCode.DATA_ERROR);
+            }
             if (login) {
-                if (!userAccount.getIsEnable().equals(YesOrNoEnum.YES.getCode())) {
+                if (!YesOrNoEnum.YES.getCode().equals(userAccount.getIsEnable())) {
                     return BaseOutput.failure("用户为不可用状态,不能进行此操作").setCode(ResultCode.DATA_ERROR);
                 }
                 return BaseOutput.successData(LoginUtil.getLoginSuccessData(userAccount, accountTerminal));

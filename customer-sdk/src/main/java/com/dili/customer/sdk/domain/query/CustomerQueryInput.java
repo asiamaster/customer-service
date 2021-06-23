@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -69,4 +70,8 @@ public class CustomerQueryInput extends CustomerBaseQueryInput{
      */
     private String assetsName;
 
+    /**
+     * 客户角色身份code集合
+     */
+    private List<String> characterTypes;
 }

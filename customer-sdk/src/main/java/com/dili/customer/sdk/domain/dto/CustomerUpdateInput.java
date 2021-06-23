@@ -8,6 +8,7 @@ import lombok.Data;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <B>Description</B>
@@ -49,4 +50,8 @@ public class CustomerUpdateInput extends CustomerBaseUpdateInput {
     @Valid
     private List<Attachment> attachmentList;
 
+    /**
+     * 要删除的客户车型信息
+     */
+    private Set<Long> deletedVehicleInfoIds;
 }

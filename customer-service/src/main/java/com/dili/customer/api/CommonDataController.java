@@ -1,13 +1,15 @@
 package com.dili.customer.api;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import com.dili.assets.sdk.dto.CarTypeDTO;
+import com.dili.assets.sdk.dto.CarTypeForBusinessDTO;
+import com.dili.assets.sdk.rpc.CarTypeRpc;
 import com.dili.customer.annotation.UapToken;
-import com.dili.customer.commons.service.CommonDataService;
-import com.dili.customer.commons.service.DataDictionaryRpcService;
-import com.dili.customer.commons.service.DepartmentRpcService;
-import com.dili.customer.commons.service.UapUserRpcService;
+import com.dili.customer.commons.constants.CustomerConstant;
+import com.dili.customer.commons.service.*;
 import com.dili.customer.commons.util.EnumUtil;
-import com.dili.customer.domain.dto.UapUserTicket;
 import com.dili.customer.sdk.domain.dto.CharacterTypeGroupDto;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.customer.sdk.enums.NationEnum;
@@ -19,11 +21,14 @@ import com.dili.uap.sdk.domain.Department;
 import com.dili.uap.sdk.domain.UserTicket;
 import com.dili.uap.sdk.domain.dto.UserQuery;
 import com.dili.uap.sdk.session.SessionContext;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -46,12 +51,17 @@ public class CommonDataController {
     @Autowired
     private DepartmentRpcService departmentRpcService;
     @Autowired
-    private UapUserTicket uapUserTicket;
-    @Autowired
     private UapUserRpcService uapUserRpcService;
+    @Autowired
+    private CarTypeRpcService carTypeRpcService;
+    @Autowired
+    private CarTypeRpc carTypeRpc;
+    @Resource(name = "caffeineTimedCache")
+    private Cache<String, String> caffeineTimedCache;
 
     /**
      * 查询经营性质(用户类型)
+     *
      * @return
      */
     @PostMapping(value = "/listBusinessNature")
@@ -61,6 +71,7 @@ public class CommonDataController {
 
     /**
      * 获取行业主数据
+     *
      * @return
      */
     @PostMapping(value = "/listIndustry")
@@ -70,6 +81,7 @@ public class CommonDataController {
 
     /**
      * 获取个人证件类型
+     *
      * @return
      */
     @PostMapping(value = "/listIndividualCertificate")
@@ -79,6 +91,7 @@ public class CommonDataController {
 
     /**
      * 获取企业证件类型
+     *
      * @return
      */
     @PostMapping(value = "/listEnterpriseCertificate")
@@ -88,6 +101,7 @@ public class CommonDataController {
 
     /**
      * 获取角色主信息
+     *
      * @return
      */
     @PostMapping(value = "/listCharacter")
@@ -97,6 +111,7 @@ public class CommonDataController {
 
     /**
      * 获取市场角色身份分类信息
+     *
      * @return
      */
     @PostMapping(value = "/listCharacterSubType")
@@ -134,6 +149,7 @@ public class CommonDataController {
 
     /**
      * 获取市场角色分类信息
+     *
      * @return
      */
     @PostMapping(value = "/listCharacterTypeGroup")
@@ -149,6 +165,7 @@ public class CommonDataController {
 
     /**
      * 获取民族信息
+     *
      * @return
      */
     @PostMapping(value = "/listNation")
@@ -158,6 +175,7 @@ public class CommonDataController {
 
     /**
      * 获取客户组织类型
+     *
      * @return
      */
     @PostMapping(value = "/listOrganizationType")
@@ -167,6 +185,7 @@ public class CommonDataController {
 
     /**
      * 获取有权限的部门信息
+     *
      * @return
      */
     @UapToken
@@ -186,6 +205,7 @@ public class CommonDataController {
 
     /**
      * 根据部门获取对应的uap用户信息
+     *
      * @return
      */
     @UapToken
@@ -206,4 +226,15 @@ public class CommonDataController {
         return BaseOutput.successData(uapUserRpcService.listByExample(userQuery));
     }
 
+    /**
+     * 根据市场id获取对应的所有车辆类型信息
+     *
+     * @return
+     */
+
+    @RequestMapping(value = "/listCarTypes", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public BaseOutput<List<CarTypeDTO>> listCarTypes() {
+        return BaseOutput.success().setData(carTypeRpcService.listCarTypes());
+    }
 }

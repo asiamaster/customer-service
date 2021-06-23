@@ -40,6 +40,7 @@ import com.dili.uap.sdk.util.WebContent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,9 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
      * 客户编号生成策略类型
      */
     private static final String UID_TYPE = "customerCode";
+
+
+    private static final String DRIVER_CLIENT_BUSINESSNATURE_TEMPORARY_ABSENT = "driver_client_businessNature_absent";
 
     private CustomerMapper getActualMapper() {
         return (CustomerMapper) getDao();
@@ -653,7 +657,10 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                 oldCustomerMarket.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
                 oldCustomerMarket.setState(CustomerEnum.State.USELESS.getCode());
             }
-            oldCustomerMarket.setBusinessNature(input.getCustomerMarket().getBusinessNature());
+            // 如果请求来自"农溯安-司机端"，且设置这个值为"driver_client_businessNature_absent"（客户经营性质暂时空缺）时，则暂时不设置客户经营性质的值
+            if (!input.getCustomerMarket().getBusinessNature().equals(DRIVER_CLIENT_BUSINESSNATURE_TEMPORARY_ABSENT)) {
+                oldCustomerMarket.setBusinessNature(input.getCustomerMarket().getBusinessNature());
+            }
             oldCustomerMarket.setApprovalUserId(null);
             oldCustomerMarket.setApprovalTime(null);
             customerMarketService.update(oldCustomerMarket);
@@ -671,7 +678,10 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
                         old.setState(CustomerEnum.State.USELESS.getCode());
                     }
                     old.setApprovalStatus(CustomerEnum.ApprovalStatus.WAIT_CONFIRM.getCode());
-                    old.setBusinessNature(input.getCustomerMarket().getBusinessNature());
+                    // 如果请求来自"农溯安-司机端"，且设置这个值为"driver_client_businessNature_absent"（客户经营性质暂时空缺）时，则暂时不设置客户经营性质的值
+                    if (!input.getCustomerMarket().getBusinessNature().equals(DRIVER_CLIENT_BUSINESSNATURE_TEMPORARY_ABSENT)) {
+                        old.setBusinessNature(input.getCustomerMarket().getBusinessNature());
+                    }
                     old.setApprovalUserId(null);
                     old.setApprovalTime(null);
                     customerMarketService.update(old);
@@ -726,6 +736,23 @@ public class CustomerManageServiceImpl extends BaseServiceImpl<Customer, Long> i
         if (CollectionUtil.isNotEmpty(input.getAttachmentList())) {
             List<Attachment> attachmentList = JSONArray.parseArray(JSONObject.toJSONString(input.getAttachmentList()), Attachment.class);
             attachmentService.batchSave(attachmentList, customer.getId(), marketId);
+        }
+        if (CollectionUtils.isNotEmpty(input.getVehicleInfoList())) {
+            List<com.dili.customer.domain.VehicleInfo> vehicleInfoList = JSONArray.parseArray(JSONObject.toJSONString(input.getVehicleInfoList()), com.dili.customer.domain.VehicleInfo.class);
+            for (com.dili.customer.domain.VehicleInfo v : vehicleInfoList) {
+                // id为空对应新增情形，设置创建人和更新人id
+                if (null == v.getId()) {
+                    v.setCreatorId(input.getOperatorId());
+                    v.setModifierId(input.getOperatorId());
+                    // id不为空对应更新情形，只设置更新人id
+                } else {
+                    v.setModifierId(input.getOperatorId());
+                }
+            }
+            vehicleInfoService.batchSaveOrUpdate(vehicleInfoList);
+        }
+        if (CollectionUtils.isNotEmpty(input.getDeletedVehicleInfoIds())) {
+            vehicleInfoService.delete(new ArrayList<>(input.getDeletedVehicleInfoIds()));
         }
         return BaseOutput.successData(customer);
     }

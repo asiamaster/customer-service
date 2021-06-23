@@ -14,6 +14,7 @@ public interface CustomerMapper extends MyMapper<Customer> {
 
     /**
      * 分页联合客户市场表查询客户信息
+     *
      * @param customerQueryInput
      * @return
      */
@@ -21,6 +22,7 @@ public interface CustomerMapper extends MyMapper<Customer> {
 
     /**
      * 客户基础信息查询
+     *
      * @param customerBaseQueryInput 基础信息查询条件
      * @return
      */

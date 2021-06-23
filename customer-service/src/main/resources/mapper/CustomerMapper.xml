@@ -313,6 +313,15 @@
                 </where>
                 )
             </if>
+            <if test="null != characterTypes and characterTypes.size()>0">
+                and c.id in
+                (select customer_id from character_type where
+                character_type in
+                <foreach collection="characterTypes" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+                )
+            </if>
         </where>
         )
         ORDER BY ${sort} ${order}

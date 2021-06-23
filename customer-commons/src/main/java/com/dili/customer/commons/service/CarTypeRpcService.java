@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.dili.assets.sdk.dto.CarTypeDTO;
+import com.dili.assets.sdk.dto.CarTypeForBusinessDTO;
 import com.dili.assets.sdk.rpc.CarTypeRpc;
 import com.dili.customer.commons.constants.CustomerConstant;
 import com.dili.ss.domain.BaseOutput;
@@ -18,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @author yuehongbo
@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 public class CarTypeRpcService {
 
     private final CarTypeRpc carTypeRpc;
+
     @Resource(name = "caffeineTimedCache")
     private Cache<String, String> caffeineTimedCache;
 
@@ -69,5 +70,26 @@ public class CarTypeRpcService {
             return StreamEx.of(carTypeDTOS).toMap(CarTypeDTO::getId, Function.identity());
         }
         return Collections.emptyMap();
+    }
+
+    public List<CarTypeDTO> listCarTypes() {
+        try {
+            String cacheKey = CustomerConstant.CACHE_KEY + "_carType";
+            String str = caffeineTimedCache.get(cacheKey, t -> {
+                BaseOutput<List<CarTypeDTO>> listBaseOutput = carTypeRpc.listCarType();
+                if (listBaseOutput.isSuccess() && CollectionUtil.isNotEmpty(listBaseOutput.getData())) {
+                    return JSONUtil.toJsonStr(listBaseOutput.getData());
+                }
+                return null;
+            });
+            if (StrUtil.isNotBlank(str)) {
+                List<CarTypeDTO> dto = JSONUtil.toList(str, CarTypeDTO.class);
+                return dto;
+            }
+            return Collections.emptyList();
+        } catch (Exception e) {
+            log.error(String.format("获取市场:%d 车型信息异常:%s", e.getMessage()), e);
+        }
+        return Collections.emptyList();
     }
 }

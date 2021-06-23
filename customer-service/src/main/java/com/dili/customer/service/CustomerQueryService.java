@@ -1,6 +1,7 @@
 package com.dili.customer.service;
 
 import com.dili.customer.domain.Customer;
+import com.dili.customer.domain.vo.FirmCharcterTypeVo;
 import com.dili.customer.sdk.domain.query.CustomerBaseQueryInput;
 import com.dili.customer.sdk.domain.query.CustomerQueryInput;
 import com.dili.ss.base.BaseService;
@@ -8,6 +9,7 @@ import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.domain.PageOutput;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author yuehongbo
@@ -95,10 +97,19 @@ public interface CustomerQueryService extends BaseService<Customer, Long> {
 
     /**
      * 根据手机号获取客户信息
+     *
      * @param contactsPhone    客户手机号
      * @param organizationType 客户类型
      * @return
      */
     List<Customer> getByContactsPhone(String contactsPhone, String organizationType);
 
+    /**
+     * 根据单个客户id及多个市场id，查询市场信息详情及客户在多个市场的角色信息
+     *
+     * @param customerId 客户ID
+     * @param marketIds  市场ID集合
+     * @return
+     */
+    BaseOutput<List<FirmCharcterTypeVo>> getMarketInfoAndCharacterTypes(Long customerId, Set<Long> marketIds);
 }

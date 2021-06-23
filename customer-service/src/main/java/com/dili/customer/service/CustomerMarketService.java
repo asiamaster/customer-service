@@ -1,7 +1,9 @@
 package com.dili.customer.service;
 
 import com.dili.customer.domain.CustomerMarket;
+import com.dili.customer.domain.dto.CustomerMarketCharacterTypeDto;
 import com.dili.customer.domain.dto.CustomerMarketDto;
+import com.dili.customer.domain.vo.CustomerMarketVehicleVo;
 import com.dili.customer.sdk.domain.dto.MarketApprovalResultInput;
 import com.dili.customer.sdk.enums.CustomerEnum;
 import com.dili.ss.base.BaseService;
@@ -55,9 +57,27 @@ public interface CustomerMarketService extends BaseService<CustomerMarket, Long>
 
     /**
      * 更改客户状态
+     *
      * @param customerId 客户ID
-     * @param marketId 客户市场
-     * @param state 客户状态
+     * @param marketId   客户市场
+     * @param state      客户状态
      */
     Optional<String> updateState(Long customerId, Long marketId, Integer state);
+
+    /**
+     * 获取市场和其他类型子角色分类信息的组合对象
+     *
+     * @param marketIds 市场id集合
+     * @return
+     */
+    List<CustomerMarketCharacterTypeDto> listOtherCharacterType(List<Long> marketIds);
+
+    /**
+     * 获取客户所在市场和车辆信息
+     *
+     * @param customerId 客户id
+     * @return
+     */
+
+    List<CustomerMarketVehicleVo> listCustomerMarketAndVehicleInfo(Long customerId);
 }
